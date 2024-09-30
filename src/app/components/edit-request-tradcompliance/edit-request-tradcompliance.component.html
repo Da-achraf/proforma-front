@@ -1,0 +1,75 @@
+<h1 mat-dialog-title>Edit Request (Trade Compliance)</h1>
+<div mat-dialog-content>
+  <form [formGroup]="requestForm">
+    <div class="form-grid">
+      <mat-form-field appearance="fill">
+        <mat-label>Invoice Type</mat-label>
+        <input matInput formControlName="invoicesTypes" readonly>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Shipping Point</mat-label>
+        <input matInput formControlName="shippingPoint" readonly>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Delivery Address</mat-label>
+        <input matInput formControlName="deliveryAddress" readonly>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Incoterm</mat-label>
+        <input matInput formControlName="incoterm" readonly>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>DHL Account</mat-label>
+        <input matInput formControlName="dhlAccount" readonly>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>HTS Code</mat-label>
+        <input matInput formControlName="htsCode" required>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>COO</mat-label>
+        <input matInput formControlName="coo" required>
+      </mat-form-field>
+    </div>
+    <div formArrayName="items">
+      <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="item-form">
+        <mat-form-field appearance="fill">
+          <mat-label>PN</mat-label>
+          <input matInput formControlName="pn" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Quantity</mat-label>
+          <input matInput formControlName="quantity" type="number" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Unit Of Quantity</mat-label>
+          <input matInput formControlName="unitOfQuantity" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Unit Value Finance</mat-label>
+          <input matInput formControlName="unitValueFinance" type="number" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Description</mat-label>
+          <input matInput formControlName="description" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Cost Center</mat-label>
+          <input matInput formControlName="costCenter" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Business Unit</mat-label>
+          <input matInput formControlName="businessUnit" readonly>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Plant</mat-label>
+          <input matInput formControlName="plant" readonly>
+        </mat-form-field>
+      </div>
+    </div>
+    <div mat-dialog-actions>
+      <button mat-raised-button color="warn" type="button" (click)="openRejectDialog()">Reject</button>
+      <button mat-raised-button color="primary" type="button" (click)="onSubmit()" [disabled]="!requestForm.valid">Submit</button>
+    </div>
+  </form>
+</div>

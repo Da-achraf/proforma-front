@@ -1,0 +1,110 @@
+<div class="container">
+  <h3>List of users</h3>
+  <div class="search-bar">
+    <input (input)="searchUser()" [(ngModel)]="SearchText" placeholder="Search..." type="text" class="search-input form-control mt-3 mb-3">
+  </div>
+  @if (filteredUsers != undefined) {
+    <table class="table">
+      <thead>
+        <tr>
+          <th>TEID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>N+1</th>
+          <th>Backup</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of filteredUsers | slice:(page-1)*tableSize:page*tableSize; track user.teId) {
+          <tr>
+            <td>{{ user.teId }}</td>
+            <td>{{ user.userName }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.nPlus1 }}</td>
+            <td>{{ user.backUp }}</td>
+            <td>{{ user.role | userRoleForDisplay }}</td>
+            <td>
+              <i class="pi pi-pencil icon-button" (click)="showUpdateDialog(user)"></i>
+              <i class="pi pi-trash icon-button" (click)="deleteUser(user.userId)"></i>
+            </td>
+          </tr>
+        }
+        @empty {
+          <div class="w-full py-6 bg-red-300 text-gray-800">Empty</div>
+        }
+      </tbody>
+    </table>
+  }
+  <!-- <div class="d-flex justify-content-center">
+    <ul class="pagination">
+      <li class="page-item" [ngClass]="{ 'disabled': page === 1 }">
+        <a class="page-link" (click)="onPageChange(page - 1)">Previous</a>
+      </li>
+      <li class="page-item" *ngFor="let item of getPageNumbers()">
+        <a class="page-link" [ngClass]="{ 'active': item === page }" (click)="onPageChange(item)">{{ item }}</a>
+      </li>
+      <li class="page-item" [ngClass]="{ 'disabled': page === getPageNumbers().length }">
+        <a class="page-link" (click)="onPageChange(page + 1)">Next</a>
+      </li>
+    </ul>
+  </div> -->
+  <p-dialog header="Update User" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
+    <div class="update-user-container">
+      <form (ngSubmit)="saveUser()" class="update-user-form">
+        <label>
+          TeId:
+          <input type="text" [(ngModel)]="user.teId" name="teId">
+        </label>
+        <br>
+        <label>
+          Username:
+          <input type="text" [(ngModel)]="user.userName" name="userName">
+        </label>
+        <br>
+        <label>
+          Email:
+          <input type="email" [(ngModel)]="user.email" name="email" >
+        </label>
+        <br>
+        <label>
+          N+1:
+          <input type="text" [(ngModel)]="user.nPlus1" name="nPlus1" required>
+        </label>
+        <br>
+        <label>
+          Backup:
+          <input type="text" [(ngModel)]="user.backUp" name="backUp" >
+        </label>
+        <br>
+        <label>
+          Role:
+          <select [(ngModel)]="user.role" name="role" required>
+            <option *ngFor="let role of Roles" [value]="role">{{ role | userRoleForDisplay }}</option>
+          </select>
+        </label>
+        <br>
+        <label>
+          Department:
+          <select [(ngModel)]="user.departementId" name="departementId" (change)="onDepartmentChange($event)">
+            <option *ngFor="let department of departements" [value]="department.value">
+              {{ department.label }}
+            </option>
+          </select>
+        </label>
+        <br>
+        <label>
+          Plants:
+          <p-multiSelect [(ngModel)]="user.plantsIds" name="plantId" [options]="plants" optionLabel="label" optionValue="value" (onChange)="loadPlants()"></p-multiSelect>
+        </label>
+        <br>
+        <div class="button-SR">
+          <button type="submit" class="icon-submit-btn">
+            <i class="pi pi-check"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </p-dialog>
+</div>

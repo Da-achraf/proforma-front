@@ -1,0 +1,48 @@
+
+/* :host ::ng-deep {
+  .menu-button {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 10px;
+    font-size: 0.9rem;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .menu-button i {
+    margin-right: 10px;
+  }
+
+  .menu-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .logo {
+    text-align: center;
+    padding: 2.6rem 1rem;
+  }
+
+  .logo img {
+    width: 120px;
+  }
+
+  .divider {
+    border-top: 2px solid white;
+  }
+
+  .applications-title {
+    text-align: center;
+    font-style: italic;
+    color: white;
+  }
+
+  .sidebar {
+    background: linear-gradient(to bottom, #f0f0f0, #2b6e44, #ff7f11);
+    height: 100vh;
+    padding: 1rem;
+  }
+} */

@@ -1,0 +1,53 @@
+<div class="container">
+  <h3>List of Ship Points</h3>
+  <div class="top-controls">
+    <div class="search-bar">
+      <input (input)="searchShipPoint()" [(ngModel)]="SearchText" placeholder="Search..." type="text" class="p-inputtext p-component mt-3 mb-3">
+    </div>
+    <div class="add-icon">
+      <i class="pi pi-plus" style="font-size: 1.5em; cursor: pointer;" (click)="AjouterShipPoint()"></i>
+    </div>
+  </div>
+  <p-table [value]="filteredshippoints" [paginator]="true" [rows]="tableSize" [totalRecords]="filteredshippoints.length" (onPage)="onPageChange($event)">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Ship Point</th>
+        <th>Full Address</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-Ship>
+      <tr>
+        <td>{{ Ship.shipPoint }}</td>
+        <td>{{ Ship.fullAddress }}</td>
+        <td>
+          <i class="pi pi-pencil icon-button" (click)="openUpdateShipPointDialog(Ship)"></i>
+          <i class="pi pi-trash icon-button" (click)="deleteShipPoint(Ship.id_ship)"></i>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog header=" Register Ship Point" [(visible)]="display" [modal]="true" [style]="{width: '50vw'}">
+  <div class="create-shippoint-container">
+    <form (ngSubmit)="onSaveClick()" class="create-shippoint-form">
+      <label>
+        Ship Point:
+        <input type="text" [(ngModel)]="data.shipPoint" name="shipPoint" required placeholder=" ">
+      </label>
+      <br>
+      <label>
+        Full Address:
+        <textarea [(ngModel)]="data.fullAddress" name="fullAddress" required placeholder=" " rows="4" autoResize="autoResize"></textarea>
+      </label>
+      <br>
+      <div class="button-SR">
+        <button type="submit" class="icon-submit-btn">
+          <i class="pi pi-check"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</p-dialog>
+

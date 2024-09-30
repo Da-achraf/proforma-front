@@ -1,0 +1,94 @@
+<div class="container">
+  <h3>List of Departments</h3>
+  <div class="top-controls">
+    <div class="search-bar">
+      <input (input)="searchUser()" [(ngModel)]="SearchText" placeholder="Search..." type="text" class="search-input form-control mt-3 mb-3">
+    </div>
+    <div class="add-icon">
+      <i class="pi pi-plus" style="font-size: 1.5em; cursor: pointer;" (click)="showCreateDialog()"></i>
+    </div>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Manager</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let departement of filtereddepartements | slice:(page-1)*tableSize:page*tableSize; let i = index">
+        <td>{{ departement.name }}</td>
+        <td>{{ departement.manager }}</td>
+        <td>
+          <i class="pi pi-pencil icon-button" (click)="showUpdateDialog(departement)"></i>
+          <i class="pi pi-trash icon-button" (click)="deleteDepartement(departement.id_departement)"></i>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-center">
+    <ul class="pagination">
+      <li class="page-item" [ngClass]="{ 'disabled': page === 1 }">
+        <a class="page-link" (click)="onPageChange(page - 1)">Previous</a>
+      </li>
+      <li class="page-item" *ngFor="let item of getPageNumbers()">
+        <a class="page-link" [ngClass]="{ 'active': item === page }" (click)="onPageChange(item)">{{ item }}</a>
+      </li>
+      <li class="page-item" [ngClass]="{ 'disabled': page === getPageNumbers().length }">
+        <a class="page-link" (click)="onPageChange(page + 1)">Next</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Update Departement Dialog -->
+  <p-dialog header="Update Department" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
+    <div class="form-container">
+      <form (ngSubmit)="saveDepartement()">
+        <label>
+          Name:
+          <input type="text" [(ngModel)]="departement.name" name="name" required>
+        </label>
+        <label>
+          Manager:
+          <input type="text" [(ngModel)]="departement.manager" [formControl]="managerControl" [matAutocomplete]="autoManager" name="manager" required>
+          <mat-autocomplete #autoManager="matAutocomplete">
+            <mat-option *ngFor="let manager of filteredManagers | async" [value]="manager">
+              {{ manager }}
+            </mat-option>
+          </mat-autocomplete>
+        </label>
+        <div class="button-SR">
+          <button type="submit" class="icon-submit-btn">
+            <i class="pi pi-check"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </p-dialog>
+
+  <!-- Create Departement Dialog -->
+  <p-dialog header="Register a Department" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '50vw'}">
+    <div class="form-container">
+      <form [formGroup]="createDepartementForm" (ngSubmit)="save()">
+        <label>
+          Name:
+          <input type="text" formControlName="name" required placeholder=" ">
+        </label>
+        <label>
+          Manager:
+          <input type="text" [formControl]="managerControl" [matAutocomplete]="autoManager" placeholder=" ">
+          <mat-autocomplete #autoManager="matAutocomplete">
+            <mat-option *ngFor="let manager of filteredManagers | async" [value]="manager">
+              {{ manager }}
+            </mat-option>
+          </mat-autocomplete>
+        </label>
+        <div class="button-SR">
+          <button type="submit" class="icon-submit-btn">
+            <i class="pi pi-check"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </p-dialog>
+</div>

@@ -1,0 +1,32 @@
+<div class="dashboard">
+  <!-- Cartes d'aperçu -->
+  <div class="overview-box">
+    <h2>Number of Requests</h2>
+    <p>{{scenarioCount}}</p>
+  </div>
+  <div class="overview-box">
+    <h2>Average Flow Time per Request</h2>
+    <p>{{averageFlowTime}} min</p>
+  </div>
+
+  <!-- Graphiques -->
+  <div class="chart-card">
+    <h3>Requests by Scenario</h3>
+    <p-chart type="bar" [data]="scenarioChartData" [options]="scenarioChartOptions"></p-chart>
+  </div>
+
+  <div class="chart-card">
+    <h3>Requests by Cost Center</h3>
+    <p-chart type="bar" [data]="costCenterChartData" [options]="costCenterChartOptions"></p-chart>
+  </div>
+
+  <div class="chart-card">
+    <h3>Requests by Cost Center Per Day</h3>
+    <p-chart type="line" [data]="costCenterPerDayChartData" [options]="costCenterPerDayChartOptions"></p-chart>
+  </div>
+
+  <div class="chart-card">
+    <h3>Average Flow Time per Request</h3>
+    <p-chart type="bar" [data]="averageFlowTimeChartData" [options]="averageFlowTimeChartOptions"></p-chart>
+  </div>
+</div>

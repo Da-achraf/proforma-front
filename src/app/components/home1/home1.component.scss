@@ -1,0 +1,32 @@
+/* Ajoutez les styles Bootstrap */
+@import url('https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css');
+
+/* Ajoutez les styles de la police Montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* Ajoutez les styles des icônes Material */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+.page {
+    color: white;
+    padding: 0 1rem;
+    background: #f1f5f9;
+    &__box {
+        min-height: 120px;
+        background: #000000;
+        margin: 0 -1rem;
+        font-size: 36px;
+    }
+    &__content {
+        min-height: calc(100vh - 178px);
+        border-radius: 10px;
+        margin-top: -2rem;
+        background: white;
+        color: black;
+        font-size: 2rem;
+        &-data {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+}

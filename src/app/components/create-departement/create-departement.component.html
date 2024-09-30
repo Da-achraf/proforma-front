@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="form-container">
+    <h2>Register a Department</h2>
+    <form [formGroup]="createDepartementForm" (ngSubmit)="save()">
+      <label>
+        Name:
+        <input type="text" formControlName="name" required placeholder=" ">
+      </label>
+      <br>
+      <label>
+        Manager:
+        <input type="text" [formControl]="managerControl" [matAutocomplete]="autoManager" placeholder=" ">
+        <mat-autocomplete #autoManager="matAutocomplete">
+          <mat-option *ngFor="let manager of filteredManagers | async" [value]="manager">
+            {{ manager }}
+          </mat-option>
+        </mat-autocomplete>
+      </label>
+      <br>
+      <br>
+      <div class="button-SR">
+        <button mat-icon-button type="submit">
+          <mat-icon>check_circle</mat-icon>
+        </button>
+        <button mat-icon-button type="button" (click)="returnClicked()">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

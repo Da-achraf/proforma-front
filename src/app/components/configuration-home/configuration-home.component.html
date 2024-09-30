@@ -1,0 +1,53 @@
+<div class="container">
+  <h2>Create a Scenario</h2>
+  <form [formGroup]="scenarioForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Scenario Name:</label>
+      <input type="text" id="name" class="form-control" formControlName="name" placeholder="Enter the scenario name" required>
+    </div>
+
+    <div class="control-group">
+      <label for="quantity">Approver:</label>
+      <button type="button" (click)="subtractApprover()">-</button>
+      <span>{{ approvers.length }}</span>
+      <button type="button" (click)="addApprover()">+</button>
+    </div>
+    <div id="dynamic-inputs" formArrayName="approvers">
+      <div *ngFor="let approver of approvers.controls; let i = index" [formGroupName]="i" class="input-group">
+        <label for="role">Role:</label>
+        <select formControlName="role" class="form-control">
+          <option *ngFor="let role of roles" [value]="role">{{ role | userRoleForDisplay }}</option>
+        </select>
+        <label for="class">Class:</label>
+        <select formControlName="class" class="form-control">
+          <option *ngFor="let classe of classes" [value]="classe">{{ classe }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label for="quantity">Items:</label>
+      <button type="button" (click)="subtractItem()">-</button>
+      <span>{{ items.length }}</span>
+      <button type="button" (click)="addItem()">+</button>
+    </div>
+    <div formArrayName="items">
+      <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
+        <h3>Item {{ i + 1 }}</h3>
+        <div class="form-group">
+          <label for="requestItemId">Select a request item:</label>
+          <select id="requestItemId" class="form-control" formControlName="requestItemId">
+            <option *ngFor="let requestItem of myItems()" [value]="requestItem.id">{{ requestItem.label }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="isMandatory{{i}}">Mandatory:</label>
+          <input type="checkbox" id="isMandatory{{i}}" class="form-check-input" formControlName="isMandatory">
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="!scenarioForm.valid">Create Scenario</button>
+    <button type="button" class="btn btn-sec" (click)="createItem()">Create Item</button>
+  </form>
+</div>

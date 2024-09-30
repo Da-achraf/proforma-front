@@ -1,0 +1,45 @@
+<div class="container">
+<div class="form-container">
+    <h2>Register a Plant</h2>
+    <form (ngSubmit)="save()">
+      <label>
+        Plant Number:
+        <input type="text" [(ngModel)]="plant.plantNumber" name="plantNumber" required placeholder=" ">
+      </label>
+      <br>
+      <label>
+        Location:
+        <input type="text" [(ngModel)]="plant.location" name="location" required placeholder=" ">
+      </label>
+      <br>
+      <label>
+        Manager Plant:
+        <input type="text" [formControl]="managerControl" [matAutocomplete]="autoManager" required placeholder=" ">
+        <mat-autocomplete #autoManager="matAutocomplete">
+          <mat-option *ngFor="let manager_plant of filteredManagerPlants | async" [value]="manager_plant">
+            {{ manager_plant }}
+          </mat-option>
+        </mat-autocomplete>
+      </label>
+      <br>
+      <label>
+        Building Id:
+        <input type="text" [(ngModel)]="plant.building_id" name="building_id" required placeholder=" ">
+      </label>
+      <br>
+      <label>
+        Business Unit:
+        <input type="text" [(ngModel)]="plant.businessUnit" name="businessUnit" required placeholder=" ">
+      </label>
+      <br>
+      <div class="button-SR">
+        <button mat-icon-button>
+          <mat-icon>check_circle</mat-icon>
+        </button>
+        <button mat-icon-button  (click)="returnClicked()" >
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

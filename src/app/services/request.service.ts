@@ -1,0 +1,87 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { CreateRequest, RequestModel, UpdateFinanceRequestDTO} from '../models/request.model';
+import { saveAs } from 'file-saver';
+import { API_URL_TOKEN } from '../config/api.config';
+
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class RequestService {
+  private url = inject(API_URL_TOKEN)
+  private baseUrl = `${this.url}/Request`
+
+  constructor(private http: HttpClient) { }
+
+  getRequests(): Observable<CreateRequest[]> {
+    return this.http.get<CreateRequest[]>(`${this.baseUrl}`);
+  }
+
+  deleteRequest(requestNumber: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${requestNumber}`);
+  }
+
+  updateRequestByFinance(requestNumber: number, updateData: UpdateFinanceRequestDTO): Observable<any> {
+    return this.http.put(`${this.baseUrl}/UpdateRequestByFinance/${requestNumber}`, updateData);
+  }
+
+  updateRequestByTradCompliance(requestNumber: number, updateData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/UpdateRequestByTradCompliance/${requestNumber}`, updateData);
+  }
+  updateRequestByWarehouse(requestNumber: number, updateData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/UpdateRequestByWarehouse/${requestNumber}`, updateData);
+  }
+  getRequestById(id: number): Observable<CreateRequest> {
+    return this.http.get<CreateRequest>(`${this.baseUrl}/${id}`);
+  }
+
+  createRequest(requestData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/CreateRequest`, requestData);
+  }
+
+  /*createApproverRequest(approverRequestData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/CreateApproverRequest`, approverRequestData);
+  }*/
+  rejectRequest(requestNumber: number, rejectData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/RejectRequest/${requestNumber}`, rejectData);
+  }
+  downloadInvoice(requestNumber: number): void {
+    this.http.get(`${this.baseUrl}/${requestNumber}/invoice`, { responseType: 'blob' }).pipe(
+      map((response: Blob) => {
+        const blob = new Blob([response], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        saveAs(blob, `Invoice_${requestNumber}.pdf`);
+      })
+    ).subscribe();
+  }
+  exportRequestsExcel(): void {
+    this.http.get(`${this.baseUrl}/ExportRequestsExcel`, { responseType: 'blob' }).subscribe((response: Blob) => {
+      const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      saveAs(blob, `Requests.xlsx`);
+    });
+  }
+
+  getAllRequests(): Observable<RequestModel[]> {
+    return this.http.get<RequestModel[]>(`${this.baseUrl}`)
+  }
+
+  getAllRequestsByUser(userId: number): Observable<RequestModel[]> {
+    return this.http.get<RequestModel[]>(`${this.baseUrl}/by-user?userId=${userId}`)
+  }
+
+  getAllRequestsByPlants(plantsIds: number[]): Observable<RequestModel[]> {
+    let queryParams: string = ''
+    plantsIds?.forEach((plantId, index) => {
+      queryParams += `plantId=${plantId}&`
+      if (index == plantsIds.length -1 ) queryParams += `plantId=${plantId}`
+    });
+    console.log('plants ids: ', plantsIds)
+    console.log('query: ', queryParams)
+    return this.http.get<RequestModel[]>(`${this.baseUrl}/by-plants?${queryParams}`)
+  }
+}
+

@@ -1,0 +1,118 @@
+<h1 mat-dialog-title>Create Request</h1>
+<div mat-dialog-content>
+  <form [formGroup]="requestForm">
+    <div class="notes-container">
+      <div class="note">
+        <mat-icon>info</mat-icon>
+        <p>
+          Proforma Invoice:<br>
+          • Used for free of charges transactions<br>
+          • Used for customs purpose only
+        </p>
+      </div>
+      <div class="note">
+        <mat-icon>info</mat-icon>
+        <p>
+          Manual Commercial Invoice:<br>
+          • Indicates the actual sale of goods<br>
+          • Serves as a demand for payment <br>from the buyer
+        </p>
+      </div>
+    </div>
+    <div class="form-grid">
+      <mat-form-field appearance="fill">
+        <mat-label>Select Invoice Type</mat-label>
+        <mat-select formControlName="invoicesTypes">
+          <mat-option *ngFor="let type of invoiceTypes" [value]="type">{{ type }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Scenario</mat-label>
+        <mat-select formControlName="scenarioId" (selectionChange)="onScenarioChange()">
+          <mat-option *ngFor="let scenario of scenarios" [value]="scenario.id_scenario">{{ scenario.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Shipping Point</mat-label>
+        <mat-select formControlName="shippingPoint">
+          <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Delivery Address</mat-label>
+        <mat-select formControlName="deliveryAddress">
+          <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Incoterm</mat-label>
+        <mat-select formControlName="incoterm">
+          <mat-option *ngFor="let term of incoterms" [value]="term">{{ term }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Operation Type</mat-label>
+        <input matInput formControlName="operationtype">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Number of Boxes</mat-label>
+        <input matInput formControlName="numberofboxes">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Weight</mat-label>
+        <input matInput formControlName="weight" type="number">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Dimension</mat-label>
+        <input matInput formControlName="dimension">
+      </mat-form-field>
+    </div>
+      <div formArrayName="items">
+        <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="item-form">
+          <mat-form-field appearance="fill">
+            <mat-label>PN</mat-label>
+            <input matInput formControlName="pn" [required]="isFieldRequired('pn')">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Quantity</mat-label>
+            <input matInput formControlName="quantity" type="number" [required]="isFieldRequired('quantity')">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Unit Of Quantity</mat-label>
+            <input matInput formControlName="unitofquantity" [required]="isFieldRequired('unitofquantity')">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Unit Value Finance</mat-label>
+            <input matInput formControlName="unitvaluefinance" type="number" [required]="isFieldRequired('unitvaluefinance')">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="description" [required]="isFieldRequired('description')">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Cost Center</mat-label>
+            <input matInput formControlName="costcenter" [required]="isFieldRequired('costcenter')">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Business Unit</mat-label>
+            <input matInput formControlName="businessunit" [required]="isFieldRequired('businessunit')">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Plant</mat-label>
+            <input matInput formControlName="plant" [required]="isFieldRequired('plant')">
+          </mat-form-field>
+          <button mat-icon-button color="warn" (click)="removeItem(i)">
+            <mat-icon>remove_circle</mat-icon>
+          </button>
+        </div>
+      </div>
+      <button mat-button color="primary" (click)="addItem()">
+        <mat-icon>add_circle</mat-icon> Add Item
+      </button>
+    
+    <div mat-dialog-actions>
+      <button mat-button class="cancel-button" (click)="onNoClick()">Cancel</button>
+      <button mat-button class="submit-button" (click)="onSubmit()">Submit</button>
+    </div>
+  </form>
+</div>

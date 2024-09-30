@@ -1,0 +1,45 @@
+<div class="container">
+  <div class="header">
+    <h2>Warehouse Dashboard</h2>
+    <div class="icons-container">
+      <div class="icon" (click)="exportRequestsExcel()" matTooltip="Export to Excel">
+        <i class="pi pi-file-excel"></i>
+      </div>
+    </div>
+  </div>
+
+  <input type="text" placeholder="Search bar" class="form-control mb-3" (input)="applyFilter($event)">
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Request Number</th>
+        <th>Operation Type</th>
+        <th>Date of Submission</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let request of paginatedRequests">
+        <td>{{ request.requestNumber }}</td>
+        <td>{{ request.operationtype }}</td>
+        <td>{{ request.created_at | date }}</td>
+        <td>
+          <span class="badge" [ngClass]="getStatusClass(request.status)">
+            {{ getRequestStatusLabel(request.status) }}
+          </span>
+        </td>
+        <td>
+          <button mat-icon-button (click)="openUpdateRequestDialog(request.requestNumber)" matTooltip="Click here if you need to edit this request">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button *ngIf="request.status === 3" mat-icon-button (click)="downloadInvoice(request.requestNumber)" matTooltip="Click here to download the invoice">
+            <mat-icon>download</mat-icon> 
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p-paginator [rows]="rows" [totalRecords]="filteredRequests.length" [rowsPerPageOptions]="[10, 20, 30]" (onPageChange)="paginate($event)"></p-paginator>
+</div>

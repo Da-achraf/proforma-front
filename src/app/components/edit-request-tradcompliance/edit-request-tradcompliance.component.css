@@ -1,0 +1,75 @@
+.form-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 80vh; /* Limite la hauteur du conteneur */
+  overflow-y: auto; /* Permet le défilement vertical */
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Réduit la largeur minimale */
+  gap: 10px; /* Réduit l'espace */
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+.small-form-field .mat-form-field-wrapper {
+  padding-bottom: 6px; /* Réduit le padding */
+  padding-top: 6px; /* Réduit le padding */
+}
+
+.mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: white;
+}
+
+.mat-form-field-appearance-fill .mat-form-field-underline {
+  background-color: #d67800;
+}
+
+.mat-form-field-appearance-fill .mat-form-field-ripple {
+  background-color: #d67800;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px; /* Ajoute de l'espace entre les boutons */
+  margin-top: 20px;
+}
+
+button[mat-raised-button] {
+  min-width: 80px; /* Réduit la largeur minimale */
+  font-size: 12px; /* Réduit la taille de la police */
+}
+
+button[mat-raised-button].mat-button-base {
+  height: 36px; /* Réduit la hauteur */
+  line-height: 36px; /* Réduit la hauteur de ligne */
+}
+
+button.submit-button {
+  background-color: #228B22; /* Couleur vert royal */
+  color: #ffffff;
+}
+
+button.submit-button:hover {
+  background-color: #1a6e1a;
+}
+
+button.reject-button {
+  background-color: #d32f2f; /* Couleur pour le bouton de rejet */
+  color: #ffffff;
+}
+
+button.reject-button:hover {
+  background-color: #b71c1c;
+}

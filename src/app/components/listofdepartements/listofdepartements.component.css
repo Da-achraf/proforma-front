@@ -1,0 +1,179 @@
+/* Container for the form */
+.container {
+  margin: 20px auto;
+  max-width: 800px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Table styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+.table th, .table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+/* Icon button styling */
+.icon-button {
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.icon-button:hover {
+  color: #d67800;
+}
+
+/* Top controls styling */
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.add-icon i {
+  font-size: 2em;
+  color: #2b6e44;
+  cursor: pointer;
+}
+
+.add-icon i:hover {
+  color: #489765;
+}
+
+/* Form container styling */
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Adjust the form layout */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  flex-grow: 1; /* Allow form to grow within the container */
+  overflow-y: auto; /* Add scroll if content overflows */
+}
+
+/* Labels */
+form label {
+  flex-basis: 45%;
+  margin-bottom: 10px;
+}
+
+/* Input and select fields */
+form input, 
+form select, 
+form .p-multiselect {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+/* Placeholder styling */
+input::placeholder, 
+textarea::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Button container */
+.button-SR {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  align-items: center;
+  width: 100%; /* Ensure the container takes full width */
+}
+
+/* Custom submit icon button */
+.icon-submit-btn {
+  background-color: #2b6e44 !important;
+  border: none;
+  color: #fff !important;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* Custom submit icon button on hover */
+.icon-submit-btn:hover {
+  background: linear-gradient(to bottom, #f0f0f0, #2b6e44, #ff7f11) !important;
+}
+
+/* Custom return icon button */
+.icon-return-btn {
+  background-color: #d4d4d4e0 !important;
+  border: none;
+  color: #fff !important;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+/* Custom return icon button on hover */
+.icon-return-btn:hover {
+  background: linear-gradient(to bottom, #f0f0f0, #2b6e44, #ff7f11) !important;
+}
+
+/* Dialog content padding */
+p-dialog .ui-dialog-content {
+  padding: 20px;
+}
+
+/* MultiSelect component styling */
+.p-multiselect {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+:host ::ng-deep .p-multiselect .p-multiselect-label {
+  background-color: white;
+  border: 1px solid #ccc;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-checkbox .p-checkbox-box {
+  border-color: #333;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-checkbox .p-checkbox-box.p-highlight {
+  background-color: #ccc;
+}
+
+:host ::ng-deep .p-multiselect-panel {
+  max-height: 300px; /* Adjust the height as needed */
+  overflow-y: auto;
+}

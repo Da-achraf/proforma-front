@@ -1,0 +1,125 @@
+/* Réinitialisation des styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Utilisation d'une police de caractères */
+body {
+    font-family: "Poppins", sans-serif;
+}
+
+.responsive-background {
+    width: 100%;
+    height: 100%;
+    background-image: url('../../../assets/image.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Media queries for different screen sizes */
+@media (max-width: 768px) {
+    .responsive-background {
+        background-size: contain;
+        padding: 20px;
+    }
+
+    .wrapper form {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+/* Style du conteneur principal */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Style des titres */
+.wrapper form h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Style des groupes de formulaire */
+.wrapper form .form-group {
+    margin-bottom: 10px;
+    position: relative; /* Ajout pour positionner l'icône */
+}
+
+/* Style des étiquettes */
+.wrapper form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Style des champs de formulaire */
+.wrapper form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Style des icônes */
+.wrapper form .form-group i {
+    position: absolute;
+    top: 33px;
+    right: 10px;
+    color: #aaa;
+    cursor: pointer;
+}
+
+/* Style des messages d'erreur */
+.text-danger {
+    margin-top: 5px;
+    color: red;
+    font-size: 0.875rem;
+}
+
+/* Style du lien "Forgot password?" */
+.wrapper form a {
+    color: #d67800;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 10px; /* Ajout pour l'espacement */
+}
+
+/* Style du bouton de connexion */
+.wrapper form button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #d67800;
+    color: #fff;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+/* Style du lien "SignUp" */
+.wrapper form .signup-route a {
+    color: #d67800;
+    text-decoration: none;
+}
+
+/* Style du lien "Forgot password?" */
+.wrapper form .forgot-password {
+    margin-top: 30px;
+    text-align: center; /* Centrer le lien */
+}

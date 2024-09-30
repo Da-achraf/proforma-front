@@ -1,0 +1,18 @@
+<div class="min-h-screen rounded-tr-2xl rounded-br-2xl bg-[#F8F9FA]">
+  <div class="pt-3 pl-3 pb-12 flex gap-y-2">
+    <img src="assets/logoApp.png" width="50" height="50" alt="Logo">
+    <span class="pl-3 text-orange-400 font-semibold font-serif">Proforma</span>
+  </div>
+  <ul class="flex flex-col justify-center pl-3">
+    <!-- Loop over items -->
+    <li *ngFor="let item of items; let i = index" class="transition">
+      <div class="m-1 flex cursor-pointer items-center rounded-xl py-3 pl-5 text-sm text-gray-500 hover:bg-orange-50"
+           [routerLink]="item.routerLink" routerLinkActive="bg-orange-100 text-orange-500" #rla="routerLinkActive">
+        <span class="mr-5 flex items-center gap-x-2 w-5" [class.text-orange-500]="rla.isActive">
+          <i class="{{ item.icon }}"></i>
+          <span class="text-nowrap">{{ item.label }}</span>
+        </span>
+      </div>
+    </li>
+  </ul>  
+</div>

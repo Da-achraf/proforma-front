@@ -1,0 +1,98 @@
+.form-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  label {
+    flex-basis: 45%;
+    margin-bottom: 10px;
+  }
+  
+  input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .button-SR {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start; /* Align buttons to the start of the column */
+    align-items: center; /* Center the buttons horizontally */
+    height: 100%;
+  }
+  
+  mat-icon-button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  
+  mat-icon-button:hover {
+    background-color: #e0e0e0; /* Light grey background on hover for better feedback */
+  }
+  
+  mat-icon {
+    color: #d67800; /* Default icon color */
+    font-size: 24px; /* Icon size */
+  }
+  
+  input::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+  
+  textarea::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+  
+  /* Example of additional style for the email field */
+  input[type="email"]::placeholder {
+    color: #999;
+    font-style: italic;
+    font-size: 14px;
+  }
+  select{
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+.container {
+  margin: 20px auto;
+  max-width: 800px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff; /* Optional: Set a background color for the container */
+  padding: 20px; /* Optional: Add padding for better readability */
+  border-radius: 10px; /* Optional: Add border radius for a rounded appearance */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.p-multiselect {
+  width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+/* Custom styles for PrimeNG dropdown in your component CSS */
+:host ::ng-deep .p-multiselect .p-multiselect-label {
+  background-color: white;
+  border: 1px solid #ccc;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-checkbox .p-checkbox-box {
+  border-color: #333;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-checkbox .p-checkbox-box.p-highlight {
+  background-color: #ccc;
+}
