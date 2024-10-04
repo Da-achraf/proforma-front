@@ -17,12 +17,12 @@
             </button>
           </mat-chip-row>
         }
-        <button class="ml-3 p-0 rounded-full" mat-raised-button>+</button>
+        <!-- <button class="ml-3 p-0 rounded-full" mat-raised-button>+</button> -->
       </mat-chip-grid>
     </mat-form-field>
-      <form class="flex bg-red-400 items-center gap-x-3" [formGroup]="fieldForm" (ngSubmit)="add()">
+      <form class="flex items-center gap-x-3" [formGroup]="fieldForm" (ngSubmit)="add()">
         <input
-          class="w-16 p-4 border border-gray-200 shadow-md"
+          class="w-2/3 p-4 border border-gray-200 shadow-md"
           placeholder="New Field..."
           formControlName="name"
           #fieldName
@@ -33,14 +33,13 @@
           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
         />
 
-        <mat-form-field>
+        <mat-form-field class="w-1/3">
           <mat-label>Field Type</mat-label>
           <mat-select formControlName="type">
             <mat-option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</mat-option>
           </mat-select>
         </mat-form-field>
         <button type="submit" [disabled]="!fieldForm.valid" mat-raised-button>Add</button>
-
       </form>
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
         @for (field of filteredFields(); track field) {

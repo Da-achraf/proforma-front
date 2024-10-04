@@ -10,6 +10,7 @@ import { CreateItemDialogComponent } from '../create-item-dialog/create-item-dia
 import { Router,ActivatedRoute } from '@angular/router'; // Import Router
 import { map } from 'rxjs'
 import { Roles } from '../../models/user/user.model';
+import { ItemModel } from '../../models/request-item.model';
 
 export type Item = {
   id: string;
@@ -27,7 +28,7 @@ export class ConfigurationHomeComponent implements OnInit {
   roles: string[] = Roles
   classes: number[] = [0, 1, 2, 3, 4];
 
-  myItems = signal<Item[]>([])
+  myItems = signal<ItemModel[]>([])
 
   constructor(
     private fb: FormBuilder,
@@ -71,12 +72,9 @@ export class ConfigurationHomeComponent implements OnInit {
   }
 
   loadItems() {
-    this.requestItemService.getRequestItems().pipe(
-      map((data: any[]) => data.map(item => ({id: item.id_request_item, label: item.nameItem}) as Item))
-    )
+    this.requestItemService.getRequestItems()
     .subscribe({
-      next: (items: Item[]) => {
-        console.log('items: ', items)
+      next: (items: ItemModel[]) => {
         this.myItems.set(items)
         this.itemsAvailable = items;
       },
@@ -103,24 +101,29 @@ export class ConfigurationHomeComponent implements OnInit {
       // data: { nameItem: '' }
     });
 
-    dialogRef.afterClosed().subscribe(data => {
-      if (data) {
-        console.log('item: ', data)
+    dialogRef.afterClosed().subscribe((item: ItemModel) => {
+      if (item) {
+        console.log('creating item fields...')
+
+        // this.requestItemService.saveRequestItemWithFields(item).subscribe({
+        //   next: (createdItem: ItemModel) => {
+        //     this.myItems.update(items => [...items, {id: response.id_request_item, label: response.nameItem}])
+        //     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
+        //   }
+        // })
+
+        // this.requestItemService.saveRequestItem({ nameItem: data.label }).subscribe({
+        //   next: (response) => {
+        //     this.myItems.update(items => [...items, {id: response.id_request_item, label: response.nameItem}])
+        //     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
+        //     console.log('Item created successfully', response);
+        //   },
+        //   error: (error) => {
+        //     this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating item' });
+        //     console.error('Error creating item:', error);
+        //   }
+        // });
       }
-      // if (data && data.label) {
-      //   console.log('creating new item')
-      //   this.requestItemService.saveRequestItem({ nameItem: data.label }).subscribe({
-      //     next: (response) => {
-      //       this.myItems.update(items => [...items, {id: response.id_request_item, label: response.nameItem}])
-      //       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
-      //       console.log('Item created successfully', response);
-      //     },
-      //     error: (error) => {
-      //       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating item' });
-      //       console.error('Error creating item:', error);
-      //     }
-      //   });
-      // }
     });
   }
 

@@ -18,6 +18,7 @@ export type ItemField = {
 }
 
 export type ItemModel = {
+    id?: number;
     label: string
     fields: ItemField[]
 }
