@@ -30,6 +30,10 @@ import { ListofplantsComponent } from './components/listofplants/listofplants.co
 import { ListofdepartementsComponent } from './components/listofdepartements/listofdepartements.component';
 import { ShipPointComponent } from './components/ship-point/ship-point.component';
 import { RoleEnum } from './models/user/user.model';
+import { UsersListComponent } from './components/users-list/users-list.component';
+import { PlantsListComponent } from './components/plants-list/plants-list.component';
+import { DepartmentsListComponent } from './components/departments-list/departments-list.component';
+import { ShipPointsListComponent } from './components/ship-points-list/ship-points-list.component';
 
 const routes: Routes = [
 
@@ -168,31 +172,31 @@ const routes: Routes = [
       },
       {
         path: 'usermanagement',
-        component: ListOfUsersComponent,
+        component: UsersListComponent,
         canActivate: [LoginGuard, authGuardGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] }
       },
       {
         path: 'plantmanagement',
-        component: ListofplantsComponent,
+        component: PlantsListComponent,
         canActivate: [LoginGuard, authGuardGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] }
       },
       {
         path: 'departementmanagement',
-        component: ListofdepartementsComponent,
+        component: DepartmentsListComponent,
+        canActivate: [LoginGuard, authGuardGuard],
+        data: { expectedRoles: [RoleEnum.ADMIN] }
+      },
+      {
+        path: 'ShipPoint',
+        component: ShipPointsListComponent,
         canActivate: [LoginGuard, authGuardGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] }
       },
       {
         path: 'ConfigurationSection',
         component: ConfigurationHomeComponent,
-        canActivate: [LoginGuard, authGuardGuard],
-        data: { expectedRoles: [RoleEnum.ADMIN] }
-      },
-      {
-        path: 'ShipPoint',
-        component: ShipPointComponent,
         canActivate: [LoginGuard, authGuardGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] }
       },

@@ -45,15 +45,15 @@ export class SideNavService {
       roles: [RoleEnum.ADMIN]
     },
     {
-      label: 'Configuration Section',
-      icon: 'pi pi-fw pi-cog',
-      routerLink: '/home/ConfigurationSection',
-      roles: [RoleEnum.ADMIN]
-    },
-    {
       label: 'Shipping Point',
       icon: 'pi pi-fw pi-truck',
       routerLink: '/home/ShipPoint',
+      roles: [RoleEnum.ADMIN]
+    },
+    {
+      label: 'Configuration Section',
+      icon: 'pi pi-fw pi-cog',
+      routerLink: '/home/ConfigurationSection',
       roles: [RoleEnum.ADMIN]
     }
   ];

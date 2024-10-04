@@ -43,6 +43,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { CreateItemDialogComponent } from './components/create-item-dialog/create-item-dialog.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatChipsModule } from '@angular/material/chips';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { MatSelectModule } from '@angular/material/select';
 import { DropdownModule } from 'primeng/dropdown';
@@ -87,6 +88,13 @@ import { RequestStatusMapper } from './shared/pipes/request-status-mapper.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
 import { LoadingDotsComponent } from './shared/components/loading-dots/loading-dots.component';
 import { SearchBarComponent } from './shared/components/search-bar/search-bar.component';
+import { ManagementTablesComponent } from './shared/components/management-tables/management-tables.component';
+import { UsersListComponent } from './components/users-list/users-list.component';
+import { IsPropertyNotEmptyPipe } from './shared/pipes/is-property-empty.pipe';
+import { PlantsListComponent } from './components/plants-list/plants-list.component';
+import { DepartmentsListComponent } from './components/departments-list/departments-list.component';
+import { ShipPointsListComponent } from './components/ship-points-list/ship-points-list.component';
+import { DeleteConfirmationDialogComponent } from './shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @NgModule({
   declarations: [
@@ -129,7 +137,14 @@ import { SearchBarComponent } from './shared/components/search-bar/search-bar.co
     UserRoleForDisplayPipe,
     RequestStatusMapper,
     LoadingDotsComponent,
-    SearchBarComponent
+    SearchBarComponent,
+    ManagementTablesComponent,
+    UsersListComponent,
+    IsPropertyNotEmptyPipe,
+    PlantsListComponent,
+    DepartmentsListComponent,
+    ShipPointsListComponent,
+    DeleteConfirmationDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -173,7 +188,8 @@ import { SearchBarComponent } from './shared/components/search-bar/search-bar.co
     DropdownModule,
     DialogModule,
     ToastModule,
-    PaginatorModule
+    PaginatorModule,
+    MatChipsModule
   ],
   exports: [
     MatDialogModule

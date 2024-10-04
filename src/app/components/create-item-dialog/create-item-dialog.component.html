@@ -2,10 +2,59 @@
 <div mat-dialog-content>
   <mat-form-field appearance="fill">
     <mat-label>Item Name</mat-label>
-    <input matInput [(ngModel)]="data.label">
+    <input matInput [(ngModel)]="label">
   </mat-form-field>
+
+  <form>
+    <mat-form-field class="w-full">
+      <mat-label>Fields</mat-label>
+      <mat-chip-grid #chipGrid aria-label="Fields selection">
+        @for (field of fields(); track $index) {
+          <mat-chip-row (removed)="remove(field.name)">
+            {{ field.name }}
+            <button matChipRemove [attr.aria-label]="'remove ' + field.name">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip-row>
+        }
+        <button class="ml-3 p-0 rounded-full" mat-raised-button>+</button>
+      </mat-chip-grid>
+    </mat-form-field>
+      <form class="flex bg-red-400 items-center gap-x-3" [formGroup]="fieldForm" (ngSubmit)="add()">
+        <input
+          class="w-16 p-4 border border-gray-200 shadow-md"
+          placeholder="New Field..."
+          formControlName="name"
+          #fieldName
+          [ngModel]="currentFieldName()"
+          (ngModelChange)="updateCurrentFieldName($event)"
+          [matChipInputFor]="chipGrid"
+          [matAutocomplete]="auto"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+        />
+
+        <mat-form-field>
+          <mat-label>Field Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button type="submit" [disabled]="!fieldForm.valid" mat-raised-button>Add</button>
+
+      </form>
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+        @for (field of filteredFields(); track field) {
+          <mat-option [value]="field">{{field.name}}</mat-option>
+        }
+      </mat-autocomplete>
+  </form>
 </div>
 <div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-button (click)="saveItem()" cdkFocusInitial>Save</button>
+  <button mat-raised-button (click)="onNoClick()">Cancel</button>
+  <button 
+    mat-raised-button 
+    [disabled]="label().length === 0 || fields().length === 0" 
+    (click)="saveItem()" 
+    cdkFocusInitial
+  >Save</button>
 </div>

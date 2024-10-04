@@ -36,8 +36,8 @@ export class EditRequestWarehouseComponent implements OnInit {
       trackingNumber: ['', Validators.required],
       numberOfBoxes: ['', Validators.required],
       weight: ['', Validators.required],
-      modeOfTransport: ['', Validators.required],
-      shippedVia: ['', Validators.required],
+      modeOfTransport: [{value: '', disabled: true}],
+      shippedVia: [{value: '', disabled: true}],
       items: this.fb.array([]) // FormArray for items
     });
   }
@@ -58,7 +58,7 @@ export class EditRequestWarehouseComponent implements OnInit {
           numberOfBoxes: request.numberOfBoxes,
           weight: request.weight,
           modeOfTransport: request.modeOfTransport,
-          shippedVia: 'DHLL'
+          shippedVia: request.shippedvia
         });
 
         // Populate items

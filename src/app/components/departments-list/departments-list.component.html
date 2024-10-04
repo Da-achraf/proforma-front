@@ -1,0 +1,63 @@
+<app-management-tables 
+    [tableName]="TableNameEnum.DEPARTMENT"
+    [items]="departments$ | async"
+    [tableProperties]="tableProperties"
+    [columns]="tableColumns"
+
+    (onCreate)="onCreate()"
+    (onUpdate)="onUpdate($event)"
+    (onDelete)="onDelete($event)"
+/>
+
+
+<!-- Update department Dialog -->
+<p-dialog header="Update Department" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
+    <div class="form-container">
+      <form (ngSubmit)="updateDepartement()">
+        <label>
+          Name:
+          <input type="text" [(ngModel)]="department.name" name="name" required>
+        </label>
+        <label>
+          Manager:
+          <input type="text" [(ngModel)]="department.manager" [formControl]="managerControl" [matAutocomplete]="autoManager" name="manager" required>
+          <mat-autocomplete #autoManager="matAutocomplete">
+            <mat-option *ngFor="let manager of filteredManagers | async" [value]="manager">
+              {{ manager }}
+            </mat-option>
+          </mat-autocomplete>
+        </label>
+        <div class="button-SR">
+          <button type="submit" class="icon-submit-btn">
+            <i class="pi pi-check"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </p-dialog>
+
+  <!-- Create department Dialog -->
+  <p-dialog header="Register a Department" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '50vw'}">
+    <div class="form-container">
+      <form [formGroup]="createDepartementForm" (ngSubmit)="createDepartment()">
+        <label>
+          Name:
+          <input type="text" formControlName="name" required placeholder=" ">
+        </label>
+        <label>
+          Manager:
+          <input type="text" [formControl]="managerControl" [matAutocomplete]="autoManager" placeholder=" ">
+          <mat-autocomplete #autoManager="matAutocomplete">
+            <mat-option *ngFor="let manager of filteredManagers | async" [value]="manager">
+              {{ manager }}
+            </mat-option>
+          </mat-autocomplete>
+        </label>
+        <div class="button-SR">
+          <button type="submit" class="icon-submit-btn">
+            <i class="pi pi-check"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </p-dialog>

@@ -1,3 +1,5 @@
+import { Column, TableProperty } from "../table.model";
+
 export class Departement {
   id_departement: number;
   name: string;
@@ -15,4 +17,39 @@ export class Departement {
  
   }
 }
-  
+
+export type DepartmentModel = {
+  id: number;
+  name: string;
+  manager: string;
+}
+
+export const departementTableProperties: TableProperty[] = [
+  {
+    name: 'id_departement',
+    isDisplayed: false
+  },
+  {
+    name: 'name',
+    isDisplayed: true
+  },
+  {
+    name: 'manager',
+    isDisplayed: true
+  },
+];
+
+export const departementTableColumns: Column[] = [
+  {
+    label: 'Name',
+    isSortable: false
+  },
+  {
+    label: 'Manager',
+    isSortable: false
+  },
+  {
+    label: 'Actions',
+    isSortable: false
+  }
+]

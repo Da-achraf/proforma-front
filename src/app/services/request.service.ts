@@ -34,11 +34,12 @@ export class RequestService {
   updateRequestByWarehouse(requestNumber: number, updateData: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/UpdateRequestByWarehouse/${requestNumber}`, updateData);
   }
-  getRequestById(id: number): Observable<CreateRequest> {
-    return this.http.get<CreateRequest>(`${this.baseUrl}/${id}`);
+  getRequestById(id: number): Observable<RequestModel> {
+    return this.http.get<RequestModel>(`${this.baseUrl}/${id}`);
   }
 
   createRequest(requestData: any): Observable<any> {
+    console.log('body: ', requestData)
     return this.http.post(`${this.baseUrl}/CreateRequest`, requestData);
   }
 

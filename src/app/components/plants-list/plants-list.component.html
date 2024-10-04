@@ -1,0 +1,97 @@
+<app-management-tables 
+    [tableName]="TableNameEnum.PLANT"
+    [items]="plants$ | async"
+    [tableProperties]="tableProperties"
+    [columns]="tableColumns"
+
+    (onCreate)="onCreate()"
+    (onUpdate)="onUpdate($event)"
+    (onDelete)="onDelete($event)"
+/>
+    
+<!-- Update Plant Dialog -->
+<p-dialog header="Update Plant" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
+<div class="update-plant-container">
+    <form (ngSubmit)="savePlant()" class="update-plant-form">
+    <label>
+        Plant Number:
+        <input type="text" [(ngModel)]="plant.plantNumber" name="plantNumber" required>
+    </label>
+    <br>
+    <label>
+        Location:
+        <input type="text" [(ngModel)]="plant.location" name="location" required>
+    </label>
+    <br>
+    <label>
+        Manager Plant:
+        <input type="text" [(ngModel)]="plant.manager_plant" [formControl]="managerControl" [matAutocomplete]="autoManager" name="manager_plant" required>
+        <mat-autocomplete #autoManager="matAutocomplete">
+        <mat-option *ngFor="let manager_plant of filteredManagerPlants | async" [value]="manager_plant">
+            {{ manager_plant }}
+        </mat-option>
+        </mat-autocomplete>
+    </label>
+    <br>
+    <label>
+        Building Id:
+        <input type="text" [(ngModel)]="plant.building_id" name="building_id" required>
+    </label>
+    <br>
+    <label>
+        Business Unit:
+        <input type="text" [(ngModel)]="plant.businessUnit" name="businessUnit" required>
+    </label>
+    <br>
+    <div class="button-SR">
+        <button type="submit" class="icon-submit-btn">
+        <i class="pi pi-check"></i>
+        </button>
+    </div>
+    </form>
+</div>
+</p-dialog>
+  
+
+<!-- Create Plant Dialog -->
+<p-dialog header="Register a Plant" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '50vw'}">
+<div class="create-plant-container">
+    <form (ngSubmit)="createPlant()" class="create-plant-form">
+    <label>
+        Plant Number:
+        <input type="text" [(ngModel)]="newPlant.plantNumber" name="plantNumber" required placeholder=" ">
+    </label>
+    <br>
+    <label>
+        Location:
+        <input type="text" [(ngModel)]="newPlant.location" name="location" required placeholder=" ">
+    </label>
+    <br>
+    <label>
+        Manager Plant:
+        <input type="text" [(ngModel)]="newPlant.manager_plant" [formControl]="managerControl" [matAutocomplete]="autoManager" name="manager_plant" required placeholder=" ">
+        <mat-autocomplete #autoManager="matAutocomplete">
+        <mat-option *ngFor="let manager_plant of filteredManagerPlants | async" [value]="manager_plant">
+            {{ manager_plant }}
+        </mat-option>
+        </mat-autocomplete>
+    </label>
+    <br>
+    <label>
+        Building Id:
+        <input type="text" [(ngModel)]="newPlant.building_id" name="building_id" required placeholder=" ">
+    </label>
+    <br>
+    <label>
+        Business Unit:
+        <input type="text" [(ngModel)]="newPlant.businessUnit" name="businessUnit" required placeholder=" ">
+    </label>
+    <br>
+    <div class="button-SR">
+        <button type="submit" class="icon-submit-btn">
+        <i class="pi pi-check"></i>
+        </button>
+    </div>
+    </form>
+</div>
+</p-dialog>

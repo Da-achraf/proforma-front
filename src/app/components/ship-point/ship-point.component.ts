@@ -17,7 +17,7 @@ export class ShipPointComponent implements OnInit {
   page: number = 1;
   tableSize: number = 5;
   display: boolean = false;
-  data: { id_ship: number, shipPoint: string, fullAddress: string } = { id_ship: 0, shipPoint: '', fullAddress: '' };
+  data: Ship = { id_ship: 0, shipPoint: '', fullAddress: '', isTe: false};
 
   constructor(
     private shippointService: ShippointService,
@@ -49,7 +49,7 @@ export class ShipPointComponent implements OnInit {
   }
 
   AjouterShipPoint(): void {
-    this.data = { id_ship: 0, shipPoint: '', fullAddress: '' };
+    this.data = { id_ship: 0, shipPoint: '', fullAddress: '', isTe: false };
     this.display = true;
   }
 

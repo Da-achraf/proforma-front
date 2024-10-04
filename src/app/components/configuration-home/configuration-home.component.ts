@@ -37,8 +37,6 @@ export class ConfigurationHomeComponent implements OnInit {
     private requestItemService: RequestItemService,
     private approverService: ApproverService,
     private scenarioItemConfigurationService: ScenarioItemConfigurationService,
-    private router: Router,
-    private route: ActivatedRoute
   ) {
     this.scenarioForm = this.fb.group({
       name: ['', Validators.required],
@@ -101,31 +99,36 @@ export class ConfigurationHomeComponent implements OnInit {
 
   createItem(): void {
     const dialogRef = this.dialog.open(CreateItemDialogComponent, {
-      width: '300px',
-      data: { nameItem: '' }
+      width: '800px',
+      // data: { nameItem: '' }
     });
 
     dialogRef.afterClosed().subscribe(data => {
-      if (data && data.label) {
-        console.log('creating new item')
-        this.requestItemService.saveRequestItem({ nameItem: data.label }).subscribe({
-          next: (response) => {
-            this.myItems.update(items => [...items, {id: response.id_request_item, label: response.nameItem}])
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
-            console.log('Item created successfully', response);
-          },
-          error: (error) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating item' });
-            console.error('Error creating item:', error);
-          }
-        });
+      if (data) {
+        console.log('item: ', data)
       }
+      // if (data && data.label) {
+      //   console.log('creating new item')
+      //   this.requestItemService.saveRequestItem({ nameItem: data.label }).subscribe({
+      //     next: (response) => {
+      //       this.myItems.update(items => [...items, {id: response.id_request_item, label: response.nameItem}])
+      //       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
+      //       console.log('Item created successfully', response);
+      //     },
+      //     error: (error) => {
+      //       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating item' });
+      //       console.error('Error creating item:', error);
+      //     }
+      //   });
+      // }
     });
   }
 
   onSubmit(): void {
     if (this.scenarioForm.valid) {
       const formValue = this.scenarioForm.value;
+
+      console.log('Scenario Form value: ', formValue)
 
       this.scenarioService.CreateScenarios({
         name: formValue.name,
@@ -180,10 +183,10 @@ export class ConfigurationHomeComponent implements OnInit {
           });
 
           // Navigate to the same route to refresh the component
-          const currentUrl = this.router.url;
-          this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-            this.router.navigate([currentUrl]);
-          });
+          // const currentUrl = this.router.url;
+          // this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          //   this.router.navigate([currentUrl]);
+          // });
 
         },
         error: (error) => {

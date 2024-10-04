@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, computed, inject, Inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -6,7 +6,8 @@ import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
 import { MessageService } from 'primeng/api';
-import { CreateRequest, Item } from '../../models/request.model';
+import { Item, RequestModel } from '../../models/request.model';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-edit-request-tradcompliance',
@@ -15,21 +16,21 @@ import { CreateRequest, Item } from '../../models/request.model';
 })
 export class EditRequestTradcomplianceComponent implements OnInit {
   requestForm: FormGroup;
+  fb = inject(FormBuilder)
+  requestService =inject(RequestService)
+  messageService = inject(MessageService)
+  authService = inject(AuthService)
+  public dialogRef = inject(MatDialogRef<EditRequestTradcomplianceComponent>)
+  data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
+  dialog = inject(MatDialog)
 
-  constructor(
-    private fb: FormBuilder,
-    private requestService: RequestService,
-    private messageService: MessageService,
-    private authService: AuthService,
-    public dialogRef: MatDialogRef<EditRequestTradcomplianceComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { requestNumber: number },
-    private dialog: MatDialog
-  ) {
+  constructor() {
     this.requestForm = this.fb.group({
       invoicesTypes: [{ value: '', disabled: true }],
       scenarioId: [{ value: '', disabled: true }],
       shippingPoint: [{ value: '', disabled: true }],
       deliveryAddress: [{ value: '', disabled: true }],
+      modeOfTransport: [{ value: '', disabled: true }],
       incoterm: [{ value: '', disabled: true }],
       dhlAccount: [{ value: '', disabled: true }],
       htsCode: ['', Validators.required],
@@ -40,12 +41,13 @@ export class EditRequestTradcomplianceComponent implements OnInit {
 
   ngOnInit(): void {
     this.requestService.getRequestById(this.data.requestNumber).subscribe(
-      (request: CreateRequest) => {
+      (request: RequestModel) => {
         this.requestForm.patchValue({
           invoicesTypes: request.invoicesTypes,
-          shippingPoint: request.shippingPoint,
-          deliveryAddress: request.deliveryAddress,
+          shippingPoint: request.shipPoint.shipPoint,
+          deliveryAddress: request.deliveryAddress.deliveryAddress,
           incoterm: request.incoterm,
+          modeOfTransport: request.modeOfTransport,
           dhlAccount: request.dhlAccount,
           htsCode: request.htsCode,
           coo: request.coo

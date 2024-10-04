@@ -6,7 +6,7 @@ import { ShippointService } from '../../services/shippoint.service';
 import { RequestService } from '../../services/request.service';
 import { AuthService } from '../../services/auth.service';
 import { Ship } from '../../models/ship.model';
-import { CreateRequest } from '../../models/request.model';
+import { CreateRequest, INCOTERMES, ModesOfTransports } from '../../models/request.model';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -19,8 +19,9 @@ export class CreateRequestDialogComponent implements OnInit {
   scenarios: any[] = [];
   shipPoints: Ship[] = [];
   scenarioAttributes: any[] = [];
-  invoiceTypes: string[] = ['Proforma Invoice', 'Manual Commercial'];
-  incoterms: string[] = ['FCA', 'DAP', 'DDP'];
+  invoiceTypes: string[] = ['Proforma Invoice', 'Manual Commercial']
+  incoterms: string[] = INCOTERMES
+  modesOfTransports: string[] = ModesOfTransports
 
   constructor(
     private fb: FormBuilder,
@@ -37,38 +38,49 @@ export class CreateRequestDialogComponent implements OnInit {
       shippingPoint: ['', Validators.required],
       deliveryAddress: ['', Validators.required],
       incoterm: ['', Validators.required],
-      operationtype: ['', Validators.required],
       dhlAccount: [''],
-      numberofboxes: [''],
-      weight: [null],
+      numberOfBoxes: [''],
+      modeOfTransport: ['', Validators.required],
+      shippedVia: ['', Validators.required],
+      weight: ['', [Validators.required]],
       dimension: [''],
       items: this.fb.array([]) // Initialisation du FormArray pour les items
     });
-    
+
   }
- /******************methodes items*****************/ 
- get items(): FormArray {
-  return this.requestForm.get('items') as FormArray;
-}
+  /******************methodes items*****************/
+  get items(): FormArray {
+    return this.requestForm.get('items') as FormArray;
+  }
 
-addItem(): void {
-  this.items.push(this.fb.group({
-    pn: ['', Validators.required],
-    quantity: [null, Validators.required],
-    unitofquantity: ['', Validators.required],
-    unitvaluefinance: [null, Validators.required],
-    description: ['', Validators.required],
-    costcenter: ['', Validators.required],
-    businessunit: ['', Validators.required],
-    plant: ['', Validators.required]
-  }));
-}
+  addItem(): void {
+    this.items.push(this.fb.group({
+      pn: ['', Validators.required],
+      quantity: [null, Validators.required],
+      unitofquantity: ['', Validators.required],
+      unitvaluefinance: [null, Validators.required],
+      description: ['', Validators.required],
+      costcenter: ['', Validators.required],
+      businessunit: ['', Validators.required],
+      plant: ['', Validators.required]
+    }));
+  }
 
-removeItem(index: number): void {
-  this.items.removeAt(index);
-}
-/***************************************************/
+  removeItem(index: number): void {
+    this.items.removeAt(index);
+  }
+
+  /***************************************************/
   ngOnInit(): void {
+
+    this.requestForm.statusChanges.subscribe(value => {
+      console.log('form status: ', value)
+    })
+
+    this.requestForm.valueChanges.subscribe(value => {
+      console.log('form value: ', value)
+    })
+
     this.loadScenarios();
     this.loadShipPoints();
     this.onScenarioChange();
@@ -81,7 +93,7 @@ removeItem(index: number): void {
         this.scenarios = scenarios;
       },
       (error) => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error loading scenarios'});
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading scenarios' });
         console.error('Error loading scenarios:', error);
       }
     );
@@ -93,7 +105,7 @@ removeItem(index: number): void {
         this.shipPoints = shippingPoints;
       },
       (error) => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error loading shipping points'});
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading shipping points' });
         console.error('Error loading shipping points:', error);
       }
     );
@@ -109,7 +121,7 @@ removeItem(index: number): void {
             this.setFormValidators(attributes);
           },
           (error) => {
-            this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error loading scenario attributes'});
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading scenario attributes' });
             console.error('Error loading scenario attributes:', error);
           }
         );
@@ -128,44 +140,46 @@ removeItem(index: number): void {
         }
         control.updateValueAndValidity();
       }
-// Handling item form group validators
-this.items.controls.forEach(itemGroup => {
-  const itemControl = itemGroup.get(attr.attributeName.toLowerCase());
-  if (itemControl) {
-    if (attr.isMandatory) {
-      itemControl.setValidators(Validators.required);
-    } else {
-      itemControl.clearValidators();
-    }
-    itemControl.updateValueAndValidity();
+      // Handling item form group validators
+      this.items.controls.forEach(itemGroup => {
+        const itemControl = itemGroup.get(attr.attributeName.toLowerCase());
+        if (itemControl) {
+          if (attr.isMandatory) {
+            itemControl.setValidators(Validators.required);
+          } else {
+            itemControl.clearValidators();
+          }
+          itemControl.updateValueAndValidity();
+        }
+      });
+    });
   }
-});
-});
-}
-isFieldRequired(attributeName: string): boolean {
-  const attribute = this.scenarioAttributes.find(attr => attr.attributeName.toLowerCase() === attributeName.toLowerCase());
-  return attribute ? attribute.isMandatory : false;
-}
+
+  isFieldRequired(attributeName: string): boolean {
+    const attribute = this.scenarioAttributes.find(attr => attr.attributeName.toLowerCase() === attributeName.toLowerCase());
+    return attribute ? attribute.isMandatory : false;
+  }
   onSubmit(): void {
     if (this.requestForm) {
       const userId = this.authService.getUserIdFromToken();
       const scenarioId = this.requestForm.value.scenarioId;
       if (typeof scenarioId === 'number') {
-        const shippingPointFullAddress = this.shipPoints.find(point => point.id_ship === this.requestForm.value.shippingPoint)?.fullAddress ?? 'Unknown Shipping Point';
-        const deliveryAddressFullAddress = this.shipPoints.find(point => point.id_ship === this.requestForm.value.deliveryAddress)?.fullAddress ?? 'Unknown Delivery Address';
+        const shippingPointId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.shippingPoint)?.id_ship ?? 0;
+        const deliveryAddressId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.deliveryAddress)?.id_ship ?? 0;
         const requestData: CreateRequest = {
           invoicesTypes: this.requestForm.value.invoicesTypes,
-          shippingPoint: shippingPointFullAddress,
-          deliveryAddress: deliveryAddressFullAddress,
+          shipPointId: shippingPointId,
+          deliveryAddressId: deliveryAddressId,
           incoterm: this.requestForm.value.incoterm,
-          operationtype: this.requestForm.value.operationtype,
           userId: userId,
           scenarioId: scenarioId,
-          dhlAccount: this.requestForm.value.dhlaccount,
-          htsCode: this.requestForm.value.htscode,
+          shippedvia: this.requestForm.value.shippedVia,
+          dhlAccount: this.requestForm.value.dhlAccount,
+          htsCode: this.requestForm.value.htsCode,
           coo: this.requestForm.value.coo,
-          trackingnumber: this.requestForm.value.trackingnumber,
-          numberofboxes: this.requestForm.value.numberofboxes,
+          modeOfTransport: this.requestForm.value.modeOfTransport,
+          trackingNumber: this.requestForm.value.trackingNumber,
+          numberOfBoxes: this.requestForm.value.numberOfBoxes,
           weight: this.requestForm.value.weight ? Number(this.requestForm.value.weight) : null,
           dimension: this.requestForm.value.dimension,
           items: this.requestForm.value.items // Ajout des items au requestData
@@ -173,25 +187,25 @@ isFieldRequired(attributeName: string): boolean {
         console.log('Request Data:', requestData);
         this.requestService.createRequest(requestData).subscribe(
           (response) => {
-            this.messageService.add({severity: 'success', summary: 'Success', detail: 'Request created successfully'});
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request created successfully' });
             console.log('Request created:', response);
             this.dialogRef.close(response);
           },
           (error) => {
-            this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error creating request'});
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating request' });
             console.error('Error creating request:', error);
           }
         );
       } else {
-        this.messageService.add({severity: 'warn', summary: 'Warning', detail: 'Scenario ID is not a number'});
+        this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Scenario ID is not a number' });
         console.error('Scenario ID is not a number');
       }
     } else {
-      this.messageService.add({severity: 'warn', summary: 'Warning', detail: 'Form is invalid'});
+      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Form is invalid' });
       console.error('Form is invalid');
     }
   }
-  
+
 
   getShippingPointName(id: number): string {
     return this.shipPoints.find(point => point.id_ship === id)?.fullAddress ?? 'Unknown';
@@ -216,22 +230,28 @@ isFieldRequired(attributeName: string): boolean {
   }
 
   updateIncoterm(shippingPointId: number, deliveryAddressId: number): void {
-    const shippingPoint = this.shipPoints.find(point => point.id_ship === shippingPointId)?.shipPoint;
-    const deliveryAddress = this.shipPoints.find(point => point.id_ship === deliveryAddressId)?.shipPoint;
+    const shippingPoint = this.shipPoints.find(point => point.id_ship === shippingPointId);
+    const deliveryAddress = this.shipPoints.find(point => point.id_ship === deliveryAddressId);
 
-    if (shippingPoint && deliveryAddress) {
-      console.log('Shipping Point:', shippingPoint);
-      console.log('Delivery Address:', deliveryAddress);
-    } else {
-      console.log('Shipping Point or Delivery Address is not selected');
-    }
-
-    const validAddresses = ["MT10 TMED", "MT60 TAC1-ICT", "MT70 TAC1-AUT", "MT80 TAC2-IND", "MT30 TFZ"];
-
-    if (shippingPoint && deliveryAddress && validAddresses.includes(shippingPoint) && validAddresses.includes(deliveryAddress)) {
+    if (shippingPoint?.isTe && deliveryAddress?.isTe) {
       this.requestForm.patchValue({ incoterm: 'FCA' });
     } else {
       this.requestForm.patchValue({ incoterm: '' });
     }
+
+    // if (shippingPoint && deliveryAddress) {
+    //   console.log('Shipping Point:', shippingPoint);
+    //   console.log('Delivery Address:', deliveryAddress);
+    // } else {
+    //   console.log('Shipping Point or Delivery Address is not selected');
+    // }
+
+    // const validAddresses = ["MT10 TMED", "MT60 TAC1-ICT", "MT70 TAC1-AUT", "MT80 TAC2-IND", "MT30 TFZ"];
+
+    // if (shippingPoint && deliveryAddress && validAddresses.includes(shippingPoint) && validAddresses.includes(deliveryAddress)) {
+    //   this.requestForm.patchValue({ incoterm: 'FCA' });
+    // } else {
+    //   this.requestForm.patchValue({ incoterm: '' });
+    // }
   }
 }

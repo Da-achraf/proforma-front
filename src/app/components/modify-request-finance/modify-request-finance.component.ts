@@ -1,12 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, Inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
 import { MessageService } from 'primeng/api';
-import { CreateRequest, Item, UpdateFinanceRequestDTO, UpdateItemDTO } from '../../models/request.model';
+import { INCOTERMES, Item, ModeOfTransportEnum, RequestModel, UpdateFinanceRequestDTO } from '../../models/request.model';
+import { combineLatestWith, filter, of, shareReplay, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-modify-request-finance',
@@ -14,54 +14,168 @@ import { CreateRequest, Item, UpdateFinanceRequestDTO, UpdateItemDTO } from '../
   styleUrls: ['./modify-request-finance.component.css']
 })
 export class ModifyRequestFinanceComponent implements OnInit {
-  requestForm: FormGroup;
-  invoiceTypes: any;
-  scenarios: any;
-  shipPoints: any;
-  incoterms: any;
+  invoiceTypes: any
+  scenarios: any
+  shipPoints: any
+  incoterms: string[] = INCOTERMES
 
-  constructor(
-    private fb: FormBuilder,
-    private requestService: RequestService,
-    private router: Router,
-    private authService: AuthService,
-    private messageService: MessageService,
-    private dialog: MatDialog,
-    public dialogRef: MatDialogRef<ModifyRequestFinanceComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { requestNumber: number }
-  ) {
+  requestForm!: FormGroup;
+  fb = inject(FormBuilder)
+  requestService =inject(RequestService)
+  messageService = inject(MessageService)
+  authService = inject(AuthService)
+  public dialogRef = inject(MatDialogRef<ModifyRequestFinanceComponent>)
+  data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
+  dialog = inject(MatDialog)
+
+  request$ = this.requestService.getRequestById(this.data.requestNumber).pipe(
+    shareReplay(1)
+  )
+  requestModeOfTransport$ = this.request$.pipe(
+    filter((request: RequestModel) => request != undefined),
+    switchMap((request: RequestModel) => of(request.modeOfTransport))
+  )
+
+  ModeOfTransportEnum = ModeOfTransportEnum
+
+  constructor() {
     this.requestForm = this.fb.group({
       invoicesTypes: [{ value: '', disabled: true }],
       scenarioId: [{ value: '', disabled: true }],
       shippingPoint: [{ value: '', disabled: true }],
       deliveryAddress: [{ value: '', disabled: true }],
+      modeOfTransport: [{ value: '', disabled: true}],
       incoterm: ['', Validators.required],
       dhlAccount: ['', Validators.required],
       items: this.fb.array([]) // Ajout du FormArray pour les items
     });
+
+    // effect(() => {      
+    //   const requestModeOfTransport = this.requestModeOfTransport()
+    //   const request = this.request()
+    //   console.log('requestModeOfTransport: ', requestModeOfTransport)
+    //   if (requestModeOfTransport === ModeOfTransportEnum.BY_AIR){
+    //     this.requestForm = this.fb.group({
+    //       invoicesTypes: [{ value: '', disabled: true }],
+    //       scenarioId: [{ value: '', disabled: true }],
+    //       shippingPoint: [{ value: '', disabled: true }],
+    //       deliveryAddress: [{ value: '', disabled: true }],
+    //       modeOfTransport: request?.modeOfTransport,
+    //       incoterm: ['', Validators.required],
+    //       dhlAccount: ['', Validators.required],
+    //       items: this.fb.array([]) // Ajout du FormArray pour les items
+    //     });
+    //   }else {
+    //     this.requestForm = this.fb.group({
+    //       invoicesTypes: [{ value: '', disabled: true }],
+    //       scenarioId: [{ value: '', disabled: true }],
+    //       shippingPoint: [{ value: '', disabled: true }],
+    //       deliveryAddress: [{ value: '', disabled: true }],
+    //       incoterm: ['', Validators.required],
+    //       items: this.fb.array([]) // Ajout du FormArray pour les items
+    //     });
+    //   }
+    // })
   }
 
   ngOnInit(): void {
-    this.requestService.getRequestById(this.data.requestNumber).subscribe(
-      (request: CreateRequest) => {
-        this.requestForm.patchValue({
-          invoicesTypes: request.invoicesTypes,
-          scenarioId: request.scenarioId,
-          shippingPoint: request.shippingPoint,
-          deliveryAddress: request.deliveryAddress,
-          incoterm: request.incoterm,
-          dhlAccount: request.dhlAccount
-        });
 
-        // Patch items
-        (request.items || []).forEach(item => this.addItem(item));
-      },
-      (error) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error fetching request data' });
-        console.error('Error fetching request data:', error);
+    this.requestModeOfTransport$.pipe(
+      combineLatestWith(this.request$)
+    ).pipe(
+      tap(console.log)
+    )
+    .subscribe(([modeOfTransport, request]) => {
+      if (modeOfTransport == ModeOfTransportEnum.BY_AIR){
+        this.requestForm.patchValue({
+          invoicesTypes: request?.invoicesTypes,
+          scenarioId: request?.scenarioId,
+          shippingPoint: request?.shipPoint.shipPoint,
+          modeOfTransport: request?.modeOfTransport,
+          deliveryAddress: request?.deliveryAddress.deliveryAddress,
+          incoterm: request?.incoterm,
+          dhlAccount: request?.dhlAccount
+        });
+      }else{
+        this.requestForm.patchValue({
+          invoicesTypes: request?.invoicesTypes,
+          scenarioId: request?.scenarioId,
+          shippingPoint: request?.shipPoint.shipPoint,
+          modeOfTransport: request?.modeOfTransport,
+          deliveryAddress: request?.deliveryAddress.deliveryAddress,
+          incoterm: request?.incoterm,
+        });
       }
-    );
+
+      (request.items || []).forEach((item: any) => this.addItem(item));
+    })
+    
+    
+    // if (modeOfTransport == ModeOfTransportEnum.BY_AIR){
+    //   this.requestForm.patchValue({
+    //     invoicesTypes: request?.invoicesTypes,
+    //     scenarioId: request?.scenarioId,
+    //     shippingPoint: request?.shipPoint.shipPoint,
+    //     modeOfTransport: request?.modeOfTransport,
+    //     deliveryAddress: request?.deliveryAddress.deliveryAddress,
+    //     incoterm: request?.incoterm,
+    //     dhlAccount: request?.dhlAccount
+    //   });
+    // }else{
+    //   this.requestForm.patchValue({
+    //     invoicesTypes: request?.invoicesTypes,
+    //     scenarioId: request?.scenarioId,
+    //     shippingPoint: request?.shipPoint.shipPoint,
+    //     modeOfTransport: request?.modeOfTransport,
+    //     deliveryAddress: request?.deliveryAddress.deliveryAddress,
+    //     incoterm: request?.incoterm,
+    //   });
+    // }
+
+    // this.requestService.getRequestById(this.data.requestNumber).subscribe(
+    //   (request: RequestModel) => {
+    //     this.requestForm.patchValue({
+    //       invoicesTypes: request.invoicesTypes,
+    //       shippingPoint: request.shipPoint.shipPoint,
+    //       deliveryAddress: request.deliveryAddress.deliveryAddress,
+    //       incoterm: request.incoterm,
+    //       modeOfTransport: request.modeOfTransport,
+    //       dhlAccount: request.dhlAccount,
+    //       htsCode: request.htsCode,
+    //       coo: request.coo
+    //     });
+    //   // Patch items
+    //   (request.items || []).forEach(item => this.addItem(item));
+    //         },
+    //         (error) => {
+    //           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error fetching request data' });
+    //           console.error('Error fetching request data:', error);
+    //         }
+    //   );
   }
+
+
+  // ngOnInit(): void {
+  //   this.requestService.getRequestById(this.data.requestNumber).subscribe(
+  //     (request: RequestModel) => {
+  //       this.requestForm.patchValue({
+  //         invoicesTypes: request.invoicesTypes,
+  //         scenarioId: request.scenarioId,
+  //         shippingPoint: request.shipPoint.shipPoint,
+  //         deliveryAddress: request.deliveryAddress.deliveryAddress,
+  //         incoterm: request.incoterm,
+  //         dhlAccount: request.dhlAccount
+  //       });
+
+  //       // Patch items
+  //       (request.items || []).forEach(item => this.addItem(item));
+  //     },
+  //     (error) => {
+  //       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error fetching request data' });
+  //       console.error('Error fetching request data:', error);
+  //     }
+  //   );
+  // }
 
   get items(): FormArray {
     return this.requestForm.get('items') as FormArray;

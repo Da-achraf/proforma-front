@@ -51,12 +51,18 @@
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
-        <mat-label>Operation Type</mat-label>
-        <input matInput formControlName="operationtype">
+        <mat-label>Mode Of Transport</mat-label>
+        <mat-select formControlName="modeOfTransport">
+          <mat-option *ngFor="let modeOfTransport of modesOfTransports" [value]="modeOfTransport">{{ modeOfTransport }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Shiped Via</mat-label>
+        <input matInput formControlName="shippedVia">
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Number of Boxes</mat-label>
-        <input matInput formControlName="numberofboxes">
+        <input matInput formControlName="numberOfBoxes">
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Weight</mat-label>
@@ -112,7 +118,7 @@
     
     <div mat-dialog-actions>
       <button mat-button class="cancel-button" (click)="onNoClick()">Cancel</button>
-      <button mat-button class="submit-button" (click)="onSubmit()">Submit</button>
+      <button mat-button [disabled]="!requestForm.valid" class="submit-button" (click)="onSubmit()">Submit</button>
     </div>
   </form>
 </div>

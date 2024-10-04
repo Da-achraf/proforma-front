@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, input, Signal, signal } from '@ang
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../services/auth.service';
 import { getRequestModificationComponent, getStatusClass } from './helpers';
-import { RequestModel } from '../../../models/request.model';
+import { adminRequestColumns, otherUsersRequestColumns, RequestModel } from '../../../models/request.model';
 import { UserStoreService } from '../../../services/user-store.service';
 import { RequestStrategyFactory } from '../../services/requests-strategies/requests-strategies-factory';
 import { RoleEnum } from '../../../models/user/user.model';
@@ -10,12 +10,10 @@ import { CreateRequestDialogComponent } from '../../../components/create-request
 import { MessageService } from 'primeng/api';
 import { RequestStatus, RequestStatusLabelMapping } from '../../../models/requeststatus.model';
 import { PaginatorState } from 'primeng/paginator';
-import { delay } from 'rxjs';
-
-export type Column = {
-  label: string
-  isSortable: boolean
-}
+import { delay, filter, switchMap } from 'rxjs';
+import { Column } from '../../../models/table.model';
+import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { RequestService } from '../../../services/request.service';
 
 @Component({
   selector: 'app-reqs-table',
@@ -28,9 +26,11 @@ export class RequestsTableComponent {
   auth = inject(AuthService)
   userStore = inject(UserStoreService)
   requestFactory = inject(RequestStrategyFactory)
+  requestService = inject(RequestService)
   messageService = inject(MessageService)
 
   loggedInUser = this.userStore.loggedInUser
+  RoleEnum = RoleEnum
 
   searchValue = signal('')
 
@@ -62,13 +62,25 @@ export class RequestsTableComponent {
     const loggedInUser = this.loggedInUser()
     return loggedInUser && loggedInUser.role == RoleEnum.REQUESTER
   })
+  
+  showUpdateButton = computed(() => {
+    const loggedInUser = this.loggedInUser()
+    return loggedInUser && loggedInUser.role != RoleEnum.ADMIN
+  })
 
-  columns = signal<Column[]>([
-    {label: 'Request Number', isSortable: false},
-    {label: 'Date of Submission', isSortable: true},
-    {label: 'Status', isSortable: false},
-    {label: 'Actions', isSortable: false},
-  ])
+  columns = computed(() => {
+    const loggedInUser = this.loggedInUser()
+
+    if (loggedInUser?.role == RoleEnum.ADMIN){
+      return adminRequestColumns
+    }
+    return otherUsersRequestColumns
+  })
+  
+  columnsLength = computed(() => {
+    const columns = this.columns()
+    return columns.length
+  })
 
   getStatusClass = getStatusClass
 
@@ -142,6 +154,37 @@ export class RequestsTableComponent {
       RequestStatusLabelMapping[request.status as RequestStatus].toLowerCase().includes(searchValue) ||
       request.created_at.toLowerCase().includes(searchValue)
     );
+  }
+
+  cancelRequest(reqNumber: number) {
+    if (!reqNumber) return
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      data: {
+        label: 'request'
+      }
+    })
+
+    dialogRef.afterClosed().pipe(
+      filter(result => result),
+      switchMap(_ => this.requestService.deleteRequest(reqNumber))
+    ).subscribe({
+      next: () => {
+        this.showSuccessMessage('Request Deleted successfully.')
+        this.loadRequests();
+      },
+      error: () => {
+        this.showErrorMessage('Error in deleting ship point')
+      }
+    })
+  }
+
+
+  private showErrorMessage(message: string) {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
+  }
+
+  private showSuccessMessage(message: string) {
+    this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
   }
 
   onPageChange(event: PaginatorState) {

@@ -1,5 +1,11 @@
-import { Component, Inject } from '@angular/core';
+import { Component, computed, effect, inject, model, signal } from '@angular/core';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { FieldTypeEnum, fieldTypes, ItemField, ItemModel, standardFields } from '../../models/request-item.model';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-item-dialog',
@@ -7,16 +13,102 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrl: './create-item-dialog.component.css'
 })
 export class CreateItemDialogComponent {
-  constructor(
-    public dialogRef: MatDialogRef<CreateItemDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { label: string },
-  ) {}
+
+  dialogRef = inject(MatDialogRef<CreateItemDialogComponent>)
+  data: ItemModel = inject(MAT_DIALOG_DATA)
+  readonly announcer = inject(LiveAnnouncer)
+  fb = inject(FormBuilder)
+
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+
+  fieldTypes = fieldTypes
+
+  label = model('')
+  readonly currentFieldName = signal<string>('');
+  readonly fields = signal<ItemField[]>(standardFields);
+  readonly allFields = signal<ItemField[]>([
+    ...standardFields,
+    {
+      name: 'PN',
+      type: FieldTypeEnum.TEXT
+    }
+  ]);
+  
+  readonly filteredFields = computed(() => {
+    const currentField = this.currentFieldName()?.toLowerCase();
+    const allFields = this.allFields()
+    return currentField
+      ? allFields.filter(field => field.name.toLowerCase()?.includes(currentField))
+      : allFields.slice();
+  });
+
+  fieldFormVisible = signal(false)
+
+  fieldForm = this.fb.group({
+    name: ['', Validators.required],
+    type: ['', Validators.required]
+  })
 
   onNoClick(): void {
     this.dialogRef.close();
   }
 
   saveItem(): void {
-    this.dialogRef.close(this.data)
+    const itemToSave: ItemModel = {
+      label: this.label(),
+      fields: this.fields()
+    }
+    this.dialogRef.close(itemToSave)
+  }
+
+  toggleFieldForm() {
+    this.fieldFormVisible.update(v => !v)
+  }
+
+  add(): void {
+    const value = this.fieldForm.value
+    const newField: ItemField = {
+      name: value.name as string,
+      type: value.type as FieldTypeEnum
+    }
+    console.log(value)
+    if (value.name && value.type) {
+      this.fields.update(fields => [...fields, newField]);
+    }
+
+    // Clear the input value and reset the form
+    this.currentFieldName.set('');
+    this.fieldForm.reset();
+  }
+
+  remove(field: string): void {
+    this.fields.update(fields => {
+      const index = fields.map(f => f.name).indexOf(field);
+      if (index < 0) {
+        return fields;
+      }
+
+      fields.splice(index, 1);
+      this.announcer.announce(`Removed ${field}`);
+      return [...fields];
+    });
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    const selectedField: ItemField = event.option.value as ItemField
+    if (selectedField) {
+      this.fields.update(fields => {
+        if (!fields.map(f => f.name.toLowerCase()).includes(selectedField.name.toLowerCase() as string)) {
+          return [...fields, selectedField]
+        }
+        return fields
+      });
+      this.currentFieldName.set('');
+      this.fieldForm.patchValue({ name: '', type: '' });
+    }
+  }
+
+  updateCurrentFieldName(value: string): void {
+    this.currentFieldName.set(value);
   }
 }

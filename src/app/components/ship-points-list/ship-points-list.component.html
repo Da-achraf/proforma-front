@@ -1,0 +1,63 @@
+<app-management-tables 
+    [tableName]="TableNameEnum.SHIP_POINT"
+    [items]="shipPoints$ | async"
+    [tableProperties]="tableProperties"
+    [columns]="tableColumns"
+
+    (onCreate)="onCreate()"
+    (onUpdate)="onUpdate($event)"
+    (onDelete)="onDelete($event)"
+/>
+
+
+<!-- Update shipPoint Dialog -->
+<p-dialog header="Update Ship Point" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
+    <div class="form-container">
+      <form (ngSubmit)="updateShipPoint()">
+        <label>
+          ShipPoint:
+          <input type="text" [(ngModel)]="shipPoint.shipPoint" name="shipPoint" required>
+        </label>
+        <label>
+          Full Address:
+          <input type="text" [(ngModel)]="shipPoint.fullAddress" name="fullAddress" required>
+        </label>
+        <label>
+          is TE
+        <input type="checkbox" [checked]="true" [(ngModel)]="shipPoint.isTe" name="isTe" required placeholder=" ">
+      </label>
+        <div class="button-SR">
+          <button type="submit" class="icon-submit-btn">
+            <i class="pi pi-check"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </p-dialog>
+
+  <!-- Create shipPoint Dialog -->
+  <p-dialog header="Register a Ship Point" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '50vw'}">
+    <div class="form-container">
+      <form [formGroup]="createShipPointForm" (ngSubmit)="createShipPoint()">
+        <label>
+            ShipPoint:
+          <input type="text" formControlName="shipPoint" required placeholder=" ">
+        </label>
+        <label>
+          Full Address:
+          <input type="text" formControlName="fullAddress" required placeholder=" ">
+        </label>
+
+        <label>
+          is TE
+        <input type="checkbox" [checked]="true" formControlName="isTe" required placeholder=" ">
+      </label>
+
+        <div class="button-SR">
+          <button type="submit" class="icon-submit-btn">
+            <i class="pi pi-check"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </p-dialog>

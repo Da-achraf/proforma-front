@@ -1,0 +1,70 @@
+<app-management-tables 
+    [tableName]="TableNameEnum.USER"
+    [items]="users$ | async"
+    [tableProperties]="userTableProperties"
+    [columns]="userTableColumns"
+    [showCreateButton]="false"
+
+    (onUpdate)="onUpdate($event)"
+    (onDelete)="onDelete($event)"
+/>
+
+
+<!-- User Update Dialog -->
+<p-dialog header="Update User" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
+    <div class="update-user-container">
+      <form (ngSubmit)="updateUser()" class="update-user-form">
+        <label>
+          TeId:
+          <input type="text" [(ngModel)]="user.teId" name="teId">
+        </label>
+        <br>
+        <label>
+          Username:
+          <input type="text" [(ngModel)]="user.userName" name="userName">
+        </label>
+        <br>
+        <label>
+          Email:
+          <input type="email" [(ngModel)]="user.email" name="email" >
+        </label>
+        <br>
+        <label>
+          N+1:
+          <input type="text" [(ngModel)]="user.nPlus1" name="nPlus1" required>
+        </label>
+        <br>
+        <label>
+          Backup:
+          <input type="text" [(ngModel)]="user.backUp" name="backUp" >
+        </label>
+        <br>
+        <label>
+          Role:
+          <select [(ngModel)]="user.role" name="role" required>
+            <option *ngFor="let role of roles$ | async" [value]="role">{{ role | userRoleForDisplay }}</option>
+          </select>
+        </label>
+        <br>
+        <label>
+          Department:
+          <select [(ngModel)]="user.departementId" name="departementId" (change)="onDepartmentChange($event)">
+            <option *ngFor="let department of departments$ | async" [value]="department.id_departement">
+              {{ department.name }}
+            </option>
+          </select>
+        </label>
+        <br>
+        <label>
+          Plants:
+          <p-multiSelect [(ngModel)]="user.plantsIds" name="plantId" [options]="(plants$ | async) ?? []" optionLabel="label" optionValue="value" (onChange)="loadPlants()"></p-multiSelect>
+        </label>
+        <br>
+        <div class="button-SR">
+          <button type="submit" class="icon-submit-btn">
+            <i class="pi pi-check"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </p-dialog>

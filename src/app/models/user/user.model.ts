@@ -1,5 +1,7 @@
 // export class User {
 
+import { Column, TableProperty } from "../table.model";
+
 //   userId : number ;
 //   teId : string;
 //   identifier: string;
@@ -84,6 +86,76 @@ export type LoggedInUser = {
   departementId: number;
   userPlants: Plant[];
 }
+
+export const userTableProperties: TableProperty[] = [
+  {
+    name: 'userId',
+    isDisplayed: false
+  },
+  {
+    name: 'teId',
+    isDisplayed: true
+  },
+  {
+    name: 'userName',
+    isDisplayed: true
+  },
+  {
+    name: 'email',
+    isDisplayed: true
+  },
+  {
+    name: 'nPlus1',
+    isDisplayed: true
+  },
+  {
+    name: 'backUp',
+    isDisplayed: true
+  },
+  {
+    name: 'role',
+    isDisplayed: true
+  },
+  {
+    name: 'departementId',
+    isDisplayed: false
+  },
+  {
+    name: 'plantsIds',
+    isDisplayed: false
+  }
+];
+
+export const userTableColumns: Column[] = [
+  {
+    label: 'TEID',
+    isSortable: false
+  },
+  {
+    label: 'Username',
+    isSortable: false
+  },
+  {
+    label: 'Email',
+    isSortable: false
+  },
+  {
+    label: 'N+1',
+    isSortable: false
+  },
+  {
+    label: 'Backup',
+    isSortable: false
+  },
+  {
+    label: 'Role',
+    isSortable: false
+  },
+  {
+    label: 'Actions',
+    isSortable: false
+  }
+]
 
 export enum RoleEnum {
   ALL = '*',

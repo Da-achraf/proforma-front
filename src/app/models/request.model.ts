@@ -1,3 +1,5 @@
+import { DeliveryAddressModel, ShipPointModel } from "./ship.model";
+import { Column } from "./table.model";
 import { LoggedInUser } from "./user/user.model";
 
 export interface Item {
@@ -15,24 +17,23 @@ export interface Item {
 export interface CreateRequest {
   requestNumber?: number;
   invoicesTypes?: string;
-  shippingPoint?: string;
-  deliveryAddress?: string;
+  shipPointId?: number;
+  deliveryAddressId?: number;
   incoterm?: string;
-  operationtype? : string;
   userId?: number;
   scenarioId?: number;
   dhlAccount?: string;
   htsCode?: string;
   coo?: string;
-  trackingnumber?: string;
-  numberofboxes?: string | null;
+  trackingNumber?: string;
+  numberOfBoxes?: number | null;
   weight?: number | null;
   created_at?: Date;
   status?: string;
   invoiceAddress?: string;
   exporterAddress?: string;
   shippedvia?: string;
-  modeoftransport?: string;
+  modeOfTransport?: string;
   dimension?:string;
   items: Item[];
 }
@@ -105,8 +106,8 @@ export interface RequestModel {
   scenario: Scenario;
   invoicesTypes: string;
   invoicesAddress: string | null;
-  shippingPoint: string;
-  deliveryAddress: string;
+  shipPoint: ShipPointModel;
+  deliveryAddress: DeliveryAddressModel;
   incoterm: string;
   scenarioId: number;
   coo: string;
@@ -122,3 +123,28 @@ export interface RequestModel {
   shippedVia: string;
   items: RequestItem[];
 }
+
+export enum ModeOfTransportEnum {
+  BY_AIR = 'By Air',
+  BY_ROAD = 'By Road',
+  BY_MARITIME = 'By Maritime'
+}
+
+export const ModesOfTransports:string[] = Object.values(ModeOfTransportEnum)
+
+export const adminRequestColumns: Column[] = [
+  {label: 'Request Number', isSortable: false},
+  {label: 'Date of Submission', isSortable: true},
+  {label: 'Status', isSortable: false},
+]
+
+export const INCOTERMES = [
+  'FCA', 'DAP', 'DDP'
+]
+
+export const otherUsersRequestColumns: Column[] = [
+  {label: 'Request Number', isSortable: false},
+  {label: 'Date of Submission', isSortable: true},
+  {label: 'Status', isSortable: false},
+  {label: 'Actions', isSortable: false},
+]
