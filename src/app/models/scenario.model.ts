@@ -1,3 +1,5 @@
+import { ItemModel } from "./request-item.model";
+
 export class Scenario {
   id_scenario: number;
   name: string;
@@ -11,4 +13,18 @@ export class Scenario {
     this.name=name;
     this.approverId=approverId;
   }
+}
+
+
+export type ScenarioModel = {
+  id_scenario: number;
+  name: string;
+  items: ItemModel[];
+};
+
+
+export const emptyScenario: ScenarioModel = {
+  id_scenario: 0,
+  name: '',
+  items: []
 }

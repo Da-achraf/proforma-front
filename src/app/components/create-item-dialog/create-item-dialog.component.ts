@@ -1,11 +1,10 @@
-import { Component, computed, effect, inject, model, signal } from '@angular/core';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Component, computed, inject, model, signal } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FieldTypeEnum, fieldTypes, ItemField, ItemModel, standardFields } from '../../models/request-item.model';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-item-dialog',
@@ -33,7 +32,7 @@ export class CreateItemDialogComponent {
       type: FieldTypeEnum.TEXT
     }
   ]);
-  
+
   readonly filteredFields = computed(() => {
     const currentField = this.currentFieldName()?.toLowerCase();
     const allFields = this.allFields()
@@ -55,7 +54,7 @@ export class CreateItemDialogComponent {
 
   saveItem(): void {
     const itemToSave: ItemModel = {
-      label: this.label(),
+      nameItem: this.label(),
       fields: this.fields()
     }
     this.dialogRef.close(itemToSave)

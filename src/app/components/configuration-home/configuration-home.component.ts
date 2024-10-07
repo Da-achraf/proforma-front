@@ -1,16 +1,14 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api'; // Import MessageService
-import { ScenarioService } from '../../services/scenario.service';
-import { RequestItemService } from '../../services/request-item.service';
-import { ApproverService } from '../../services/approver.service';
-import { ScenarioItemConfigurationService } from '../../services/scenario-item-configuration.service';
-import { CreateItemDialogComponent } from '../create-item-dialog/create-item-dialog.component';
-import { Router,ActivatedRoute } from '@angular/router'; // Import Router
-import { map } from 'rxjs'
-import { Roles } from '../../models/user/user.model';
 import { ItemModel } from '../../models/request-item.model';
+import { Roles } from '../../models/user/user.model';
+import { ApproverService } from '../../services/approver.service';
+import { RequestItemService } from '../../services/request-item.service';
+import { ScenarioItemConfigurationService } from '../../services/scenario-item-configuration.service';
+import { ScenarioService } from '../../services/scenario.service';
+import { CreateItemDialogComponent } from '../create-item-dialog/create-item-dialog.component';
 
 export type Item = {
   id: string;
@@ -105,12 +103,12 @@ export class ConfigurationHomeComponent implements OnInit {
       if (item) {
         console.log('creating item fields...')
 
-        // this.requestItemService.saveRequestItemWithFields(item).subscribe({
-        //   next: (createdItem: ItemModel) => {
-        //     this.myItems.update(items => [...items, {id: response.id_request_item, label: response.nameItem}])
-        //     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
-        //   }
-        // })
+        this.requestItemService.saveRequestItemWithFields(item).subscribe({
+          next: (createdItem: ItemModel) => {
+            this.myItems.update(items => [...items, {id_request_item: createdItem.id_request_item, nameItem: createdItem.nameItem, fields: createdItem.fields}])
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
+          }
+        })
 
         // this.requestItemService.saveRequestItem({ nameItem: data.label }).subscribe({
         //   next: (response) => {
@@ -184,13 +182,6 @@ export class ConfigurationHomeComponent implements OnInit {
               }
             });
           });
-
-          // Navigate to the same route to refresh the component
-          // const currentUrl = this.router.url;
-          // this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-          //   this.router.navigate([currentUrl]);
-          // });
-
         },
         error: (error) => {
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create scenario' });

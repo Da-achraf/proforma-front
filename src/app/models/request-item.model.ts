@@ -13,13 +13,14 @@ export class RequestItem {
 
 
 export type ItemField = {
+    id?: number
     name: string
     type: FieldTypeEnum
 }
 
 export type ItemModel = {
-    id?: number;
-    label: string
+    id_request_item?: number;
+    nameItem: string
     fields: ItemField[]
 }
 

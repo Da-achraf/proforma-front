@@ -1,8 +1,8 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Scenario } from '../models/scenario.model';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URL_TOKEN } from '../config/api.config';
+import { Scenario, ScenarioModel } from '../models/scenario.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +14,8 @@ export class ScenarioService {
 
   constructor(private http: HttpClient) { }
 
-  getScenarios(): Observable<Scenario[]> {
-    return this.http.get<Scenario[]>(`${this.baseUrl}`);
+  getScenarios(): Observable<ScenarioModel[]> {
+    return this.http.get<ScenarioModel[]>(`${this.baseUrl}`);
   }
 
   deleteScenarios(id_scenario: number): Observable<any> {
