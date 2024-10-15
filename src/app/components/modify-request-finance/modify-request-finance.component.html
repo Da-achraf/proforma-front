@@ -1,88 +1,5 @@
 <h1 mat-dialog-title>Modify Request (Finance)</h1>
 <div mat-dialog-content>
-  
-  <!-- <form [formGroup]="requestForm">
-    <div class="form-grid">
-      <mat-form-field appearance="fill">
-        <mat-label>Invoice Type</mat-label>
-        <input matInput formControlName="invoicesTypes" readonly>
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Scenario</mat-label>
-        <input matInput formControlName="scenarioId" readonly>
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Shipping Point</mat-label>
-        <input matInput formControlName="shippingPoint" readonly>
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Delivery Address</mat-label>
-        <input matInput formControlName="deliveryAddress" readonly>
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Mode Of Transport</mat-label>
-        <input matInput formControlName="modeOfTransport" readonly>
-      </mat-form-field>
-      <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>Incoterm</mat-label>
-        <mat-select formControlName="incoterm">
-          <mat-option *ngFor="let term of ['FCA', 'DAP']" [value]="term">{{ term }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      @if ((requestModeOfTransport$ | async); as mode) {
-        @if (mode == ModeOfTransportEnum.BY_AIR){
-          <mat-form-field appearance="fill">
-            <mat-label>DHL Account</mat-label>
-            <input matInput formControlName="dhlAccount" readonly>
-          </mat-form-field>
-        }
-      }
-      <div formArrayName="items" class="flex items-center gap-2 flex-wrap">
-        <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class=" item-form">
-          <mat-form-field appearance="fill">
-            <mat-label>PN</mat-label>
-            <input matInput formControlName="pn" readonly>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Quantity</mat-label>
-            <input matInput formControlName="quantity" type="number" readonly>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Unit Of Quantity</mat-label>
-            <input matInput formControlName="unitOfQuantity" readonly>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Unit Value Finance</mat-label>
-            <input matInput formControlName="unitValueFinance" type="number" required>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="description" readonly>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Cost Center</mat-label>
-            <input matInput formControlName="costCenter" readonly>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Business Unit</mat-label>
-            <input matInput formControlName="businessUnit" readonly>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Plant</mat-label>
-            <input matInput formControlName="plant" readonly>
-          </mat-form-field>
-          <input type="hidden" formControlName="id_items">
-        </div>
-      </div>
-    </div>
-    <div mat-dialog-actions>
-      <button mat-raised-button color="warn" type="button" (click)="openRejectDialog()">Reject</button>
-      <button mat-button class="submit-button" (click)="onSubmit()" [disabled]="!requestForm.valid">Submit</button>
-    </div>
-  </form> -->
-
-
-
   <form [formGroup]="requestForm">
     <div fxLayout="row wrap" fxLayoutGap="16px">
       <!-- Normal fields -->
@@ -122,58 +39,71 @@
       @if ((requestModeOfTransport$ | async) == ModeOfTransportEnum.BY_AIR) {
         <mat-form-field appearance="fill">
           <mat-label>DHL Account</mat-label>
-          <input matInput formControlName="dhlAccount">
+          <input required matInput formControlName="dhlAccount">
         </mat-form-field>
       }
+
+      <mat-form-field>
+        <mat-label>Currency</mat-label>
+        <input type="text"
+               placeholder="Pick one"
+               #currencyInput
+               (input)="onChange(currencyInput.value)"
+               matInput
+               formControlName="currency"
+               [matAutocomplete]="auto">
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+          @for (option of filteredOptions | async; track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
     </div>
-  
-    <!-- Items array form -->
-    <div formArrayName="items" fxLayout="row wrap" fxLayoutGap="16px" class="items-container">
-      <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="item-form" fxFlex="100%">
-        <div fxLayout="row wrap" fxLayoutGap="16px">
-          <mat-form-field fxFlex="20%" appearance="fill">
-            <mat-label>PN</mat-label>
-            <input matInput formControlName="pn" readonly>
-          </mat-form-field>
-  
-          <mat-form-field fxFlex="20%" appearance="fill">
-            <mat-label>Quantity</mat-label>
-            <input matInput formControlName="quantity" type="number" readonly>
-          </mat-form-field>
-  
-          <mat-form-field fxFlex="20%" appearance="fill">
-            <mat-label>Unit Of Quantity</mat-label>
-            <input matInput formControlName="unitOfQuantity" readonly>
-          </mat-form-field>
-  
-          <mat-form-field fxFlex="20%" appearance="fill">
-            <mat-label>Unit Value Finance</mat-label>
-            <input matInput formControlName="unitValueFinance" type="number" required>
-          </mat-form-field>
-  
-          <mat-form-field fxFlex="20%" appearance="fill">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="description" readonly>
-          </mat-form-field>
-  
-          <mat-form-field fxFlex="20%" appearance="fill">
-            <mat-label>Cost Center</mat-label>
-            <input matInput formControlName="costCenter" readonly>
-          </mat-form-field>
-  
-          <mat-form-field fxFlex="20%" appearance="fill">
-            <mat-label>Business Unit</mat-label>
-            <input matInput formControlName="businessUnit" readonly>
-          </mat-form-field>
-  
-          <mat-form-field fxFlex="20%" appearance="fill">
-            <mat-label>Plant</mat-label>
-            <input matInput formControlName="plant" readonly>
-          </mat-form-field>
+
+    @if (items.controls.length !== 0) {
+      <div class="border border-gray-200 rounded-md overflow-hidden">
+        <div class="bg-orange-200 p-2 mb-2 text-center">
+          <span class="font-mono text-md w-fit text-orange-600">
+            Items
+            <span class="font-bold text-xs text-gray-800">
+              ({{ items.length }})
+            </span>
+          </span>
         </div>
-        <input type="hidden" formControlName="id_items">
+        <div class="p-2" formArrayName="items">
+          @for (itemGroup of items.controls; track itemGroup; let i = $index) {
+            <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold">Item {{ i + 1 }}</span>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                @for (field of formItems() || []; track field) {
+                  <div [formGroupName]="field.nameItem">
+                    <mat-form-field appearance="fill" class="w-full mb-2">
+                      <mat-label>{{ field.nameItem }}</mat-label>
+                      <input 
+                        matInput 
+                        formControlName="value"
+                        [type]="field.type"
+                        [readonly]="field.readOnly"
+                      >
+                    </mat-form-field>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        <div class="p-2">
+          <!-- <button mat-icon-button color="primary" matTooltipPosition="above" matTooltip="Add another item" (click)="addItem()" type="button">
+            <mat-icon>add_circle</mat-icon>
+          </button> -->
+          <!-- <button mat-raised-button color="primary" matTooltip="" (click)="addItem()" type="button">
+            <mat-icon>add_circle</mat-icon>
+          </button> -->
+        </div>
       </div>
-    </div>
+    }
   
     <!-- Actions -->
     <div mat-dialog-actions>

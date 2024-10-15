@@ -1,4 +1,4 @@
-import { Component, computed, inject, Inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, Inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -6,8 +6,13 @@ import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
 import { MessageService } from 'primeng/api';
-import { Item, RequestModel } from '../../models/request.model';
+import { Item, RequestModel, StandardFieldEnum } from '../../models/request.model';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { BehaviorSubject, filter, shareReplay, switchMap } from 'rxjs';
+import { FieldTypeEnum, ItemModel } from '../../models/request-item.model';
+import { ScenarioService } from '../../services/scenario.service';
+import { mergeArrays } from '../../shared/components/tables/helpers';
+import _ from 'lodash';
 
 @Component({
   selector: 'app-edit-request-tradcompliance',
@@ -15,16 +20,131 @@ import { toSignal } from '@angular/core/rxjs-interop';
   styleUrls: ['./edit-request-tradcompliance.component.css']
 })
 export class EditRequestTradcomplianceComponent implements OnInit {
-  requestForm: FormGroup;
+  requestForm!: FormGroup;
   fb = inject(FormBuilder)
   requestService =inject(RequestService)
+  scenarioService = inject(ScenarioService)
   messageService = inject(MessageService)
   authService = inject(AuthService)
   public dialogRef = inject(MatDialogRef<EditRequestTradcomplianceComponent>)
   data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
   dialog = inject(MatDialog)
 
+  additionalItems: ItemModel[] = [
+    {
+      nameItem: 'HTS Code',
+      type: FieldTypeEnum.TEXT,
+      isMandatory: true
+    },
+    {
+      nameItem: 'COO',
+      type: FieldTypeEnum.TEXT,
+      isMandatory: true
+    }
+  ]
+
+  request$ = this.requestService.getRequestById(this.data.requestNumber).pipe(
+    shareReplay(1)
+  )
+
+  requestSig = toSignal(this.request$)
+
+  modeOfTransport = computed(() => {
+    const request = this.requestSig()
+    if (!request) return
+    return request.modeOfTransport
+  })
+
+  selectedScenario = computed(() => {
+    const request = this.requestSig()
+    if (!request) return
+    this.scenearioIdSubject.next(request.scenario.id_scenario)
+    return request.scenario
+  })
+
+  scenearioIdSubject = new BehaviorSubject<number>(0)
+  scenarioAttributes$ = this.scenearioIdSubject.pipe(
+    filter((id: number) => id != 0),
+    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
+  )
+  scenarioAttributes = toSignal(this.scenarioAttributes$)
+
+  formItems = computed(() => {
+    const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
+    const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
+  
+    if (!selectedScenarioItems.length || !scenarioAttributes.length) return [];
+  
+    const items = selectedScenarioItems.map(item => {
+      const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
+      return {
+        ...item,
+        readOnly: (item.nameItem != 'HTS Code' && item.nameItem != 'COO'),
+        isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false)
+      };
+    });
+
+    return [...items, ...this.additionalItems]
+  });
+
+  existingItemsData = computed(() => {
+    const request = this.requestSig()
+    if (!request) return
+    return request.itemsWithValues
+  })
+
   constructor() {
+    effect(() => {
+      const formItems = this.formItems()
+      const existingItemsData = this.existingItemsData()
+
+
+      if (existingItemsData?.length == 0) return
+      this.items?.clear()
+      if (existingItemsData && existingItemsData.length > 0) {
+        this.patchExistingData(existingItemsData);
+      } else {
+        this.addItem();
+      }
+    })
+  }
+
+  patchExistingData(data: any[]) {
+    this.items.clear();
+    data?.forEach(itemData => {
+      this.items.push(this.createItem(itemData));
+    });
+  }
+
+  createItem(data?: any): FormGroup {
+    const formItems = this.formItems()
+    if (!formItems) return this.fb.group({});
+    const group: { [key: string]: FormGroup } = {};
+
+    formItems.forEach((item: ItemModel) => {
+      const fieldData = this.findDataOfItem(item.nameItem, data?.values) ?? undefined;
+      group[item.nameItem] = this.fb.group({
+        name: item.nameItem,
+        value: [fieldData ? fieldData?.value : '', (fieldData?.isMandatory || item.isMandatory) ? Validators.required : null],
+        type: [fieldData ? fieldData?.type : item.type],
+        isMandatory: [fieldData?.isMandatory]
+      });
+    });
+    console.log(this.fb.group(group))
+    return this.fb.group(group);
+  }
+
+  findDataOfItem(itemName: string, data: any[]) {
+    console.log('data: ', data)
+    let foundData:any = null
+    data?.forEach(d => {
+      if (d['name'] === itemName) foundData = d
+    })
+
+    return foundData
+  }
+
+  ngOnInit(): void {
     this.requestForm = this.fb.group({
       invoicesTypes: [{ value: '', disabled: true }],
       scenarioId: [{ value: '', disabled: true }],
@@ -33,13 +153,9 @@ export class EditRequestTradcomplianceComponent implements OnInit {
       modeOfTransport: [{ value: '', disabled: true }],
       incoterm: [{ value: '', disabled: true }],
       dhlAccount: [{ value: '', disabled: true }],
-      htsCode: ['', Validators.required],
-      coo: ['', Validators.required],
       items: this.fb.array([]) // Ajout du FormArray pour les items
     });
-  }
 
-  ngOnInit(): void {
     this.requestService.getRequestById(this.data.requestNumber).subscribe(
       (request: RequestModel) => {
         this.requestForm.patchValue({
@@ -49,11 +165,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
           incoterm: request.incoterm,
           modeOfTransport: request.modeOfTransport,
           dhlAccount: request.dhlAccount,
-          htsCode: request.htsCode,
-          coo: request.coo
         });
-// Patch items
-(request.items || []).forEach(item => this.addItem(item));
       },
       (error) => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error fetching request data' });
@@ -66,24 +178,21 @@ export class EditRequestTradcomplianceComponent implements OnInit {
     return this.requestForm.get('items') as FormArray;
   }
 
-  addItem(item: Item): void {
-    this.items.push(this.fb.group({
-      pn: [{ value: item.pn, disabled: true }],
-      quantity: [{ value: item.quantity, disabled: true }],
-      unitOfQuantity: [{ value: item.unitofquantity, disabled: true }],
-      unitValueFinance: [{ value: item.unitvaluefinance, disabled: true }],
-      description: [{ value: item.description, disabled: true }],
-      costCenter: [{ value: item.costcenter, disabled: true }],
-      businessUnit: [{ value: item.businessunit, disabled: true }],
-      plant: [{ value: item.plant, disabled: true }]
-    }));
+  fieldsArray(index: number): FormArray {
+    return this.items.at(index).get('fields') as FormArray;
   }
+
+  addItem() {
+    this.items.push(this.createItem());
+  }
+
   onSubmit(): void {
     if (this.requestForm.valid) {
       const userId = this.authService.getUserIdFromToken();
+      const existingItemsData = this.existingItemsData() ?? []
+      const itemsCopy = _.cloneDeep(this.requestForm.value.items)
       const updateData = {
-        htsCode: this.requestForm.get('htsCode')?.value,
-        coo: this.requestForm.get('coo')?.value,
+        itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
         userId: userId
       };
 
@@ -117,6 +226,22 @@ export class EditRequestTradcomplianceComponent implements OnInit {
     });
   }
 
+  patchValuesToFormArray(values: any[]) {
+    const itemsArray = this.requestForm.get('items') as FormArray;
+  
+    values.forEach((itemValue, itemIndex) => {
+      const itemGroup = itemsArray.at(itemIndex) as FormGroup;
+      const fieldsArray = itemGroup.get('fields') as FormArray;
+  
+      itemValue.fields.forEach((fieldValue: any, fieldIndex: number) => {
+        const fieldGroup = fieldsArray.at(fieldIndex) as FormGroup;
+        fieldGroup.patchValue({
+          value: fieldValue.value // Assuming fieldValue contains the `value` key
+        });
+      });
+    });
+  }
+
   onReject(comment: string): void {
     const userId = this.authService.getUserIdFromToken();
     const rejectData = {
@@ -136,7 +261,6 @@ export class EditRequestTradcomplianceComponent implements OnInit {
       }
     );
   }
-
 
   onNoClick(): void {
     this.dialogRef.close();

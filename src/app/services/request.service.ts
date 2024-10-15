@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { CreateRequest, RequestModel, UpdateFinanceRequestDTO} from '../models/request.model';
@@ -16,8 +16,10 @@ export class RequestService {
 
   constructor(private http: HttpClient) { }
 
-  getRequests(): Observable<CreateRequest[]> {
-    return this.http.get<CreateRequest[]>(`${this.baseUrl}`);
+  invoiceRequest = signal<any>(null)
+
+  getRequests(): Observable<RequestModel[]> {
+    return this.http.get<RequestModel[]>(`${this.baseUrl}`);
   }
 
   deleteRequest(requestNumber: number): Observable<any> {
@@ -39,7 +41,6 @@ export class RequestService {
   }
 
   createRequest(requestData: any): Observable<any> {
-    console.log('body: ', requestData)
     return this.http.post(`${this.baseUrl}/CreateRequest`, requestData);
   }
 

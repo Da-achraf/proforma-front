@@ -64,7 +64,7 @@ export class PlantsListComponent implements AfterViewInit, OnInit {
     if (!id) return
     const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
       data: {
-        label: TableNameEnum.USER
+        label: TableNameEnum.PLANT
       }
     })
 
@@ -73,11 +73,11 @@ export class PlantsListComponent implements AfterViewInit, OnInit {
       switchMap(_ => this.plantService.deletePlant(id))
     ).subscribe({
       next: () => {
-        this.showSuccessMessage('User Deleted successfully.')
+        this.showSuccessMessage('Plant Deleted successfully.')
         this.loadPlants();
       },
       error: () => {
-        this.showErrorMessage('Error in deleting ship point')
+        this.showErrorMessage('Error in deleting plant')
       }
     })
   }

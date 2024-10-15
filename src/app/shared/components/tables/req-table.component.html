@@ -2,16 +2,13 @@
   <div class="bg-transparent">
     <div class="mx-auto max-w-screen-2xl px-2 py-9">
       <div class="mt-4 w-full">
-        <p class="font-bold w-fit font-mono text-orange-500 text-md mb-5 border-b-2 opacity-75 border-b-blue-400">requests list</p>
+        <p class="font-bold w-fit font-mono text-orange-500 text-md mb-5 border-b-2 opacity-75 border-b-blue-400">
+          requests list</p>
         <div class="flex w-full flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0">
           <app-search-bar (searchTerm)="searchValue.set($event)" />
           @if (showCreateButton()){
-          <button 
-            (click)="openCreateRequestDialog()"
-            class='create-btn' 
-            matTooltip="Create a new request" 
-            matTooltipPosition="above"
-          >
+          <button (click)="openCreateRequestDialog()" class='create-btn' matTooltip="Create a new request"
+            matTooltipPosition="above">
             <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none"
               xmlns="http://www.w3.org/2000/svg">
               <path stroke-width="2" stroke="#fffffff"
@@ -22,6 +19,17 @@
             </svg>
             Create
           </button>
+          }
+          <!-- View report button -->
+          @if (loggedInUser(); as loggedUser) {
+            @if (loggedUser.role === RoleEnum.ADMIN) {
+              <i
+              (click)="onOpenReportDialog()"
+              matTooltip="Show report" 
+              matTooltipPosition="above" 
+              class="pi pi-window-maximize cursor-pointer text-gray-500 hover:text-gray-700"
+              ></i>
+            }
           }
         </div>
       </div>
@@ -62,14 +70,19 @@
                     @if (loggedInUser(); as loggedUser) {
                       @if (loggedUser.role != RoleEnum.ADMIN && loggedUser.role != RoleEnum.REQUESTER) {
                         <button (click)="openUpdateRequestDialog(request.requestNumber)" matTooltip="Edit the request">
-                        <i class="pi pi-pen-to-square text-gray-500 hover:text-gray-700"></i>
-                      </button>
+                          <i class="pi pi-pen-to-square text-gray-500 hover:text-gray-700"></i>
+                        </button>
                       }
                       @if (loggedUser.role == RoleEnum.REQUESTER) {
                         <button (click)="cancelRequest(request.requestNumber)" matTooltip="Cancel the request">
                           <i class="pi pi-times-circle text-gray-500 hover:text-gray-700"></i>
                         </button>
-                        
+                      }
+                      @if (loggedUser.role == RoleEnum.WAREHOUSE_APPROVER) {
+                        <button [disabled]="request.status != 3" class="ml-3" (click)="openDownloadDialog(request)"
+                          [matTooltip]="request.status === 3 ? 'Download the invoice' : 'Invoice unavailable'">
+                          <i class="pi pi-cloud-download text-gray-500 hover:text-gray-700"></i>
+                        </button>
                       }
                     }
                   </td>
@@ -103,4 +116,4 @@
     </div>
   </div>
   <p-paginator [rows]="rows()" [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 20, 30]"
-          (onPageChange)="onPageChange($event)"></p-paginator>
+    (onPageChange)="onPageChange($event)"></p-paginator>

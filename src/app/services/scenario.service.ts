@@ -29,7 +29,7 @@ export class ScenarioService {
   CreateScenarios(scenario: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/CreateScenario`, scenario);
   }
-  getScenarioAttributes(scenarioId: number): Observable<any[]> {
+  getScenarioAttributes(scenarioId: number): Observable<{attributeName: string, isMandatory: boolean}[]> {
     return this.http.get<any[]>(`${this.baseUrl}/${scenarioId}/attributes`);
   }
   getApproversByScenarioId(scenarioId: number): Observable<any[]> {

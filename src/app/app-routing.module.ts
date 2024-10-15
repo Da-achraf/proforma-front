@@ -34,11 +34,13 @@ import { UsersListComponent } from './components/users-list/users-list.component
 import { PlantsListComponent } from './components/plants-list/plants-list.component';
 import { DepartmentsListComponent } from './components/departments-list/departments-list.component';
 import { ShipPointsListComponent } from './components/ship-points-list/ship-points-list.component';
+import { InvoiceComponent } from './shared/components/invoice/invoice.component';
 
 const routes: Routes = [
 
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  { path: 'invoice', component: InvoiceComponent },
   { path: 'sign-up', component: SignUpComponent },
   // {
   //   path: 'home',

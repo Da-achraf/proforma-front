@@ -8,6 +8,7 @@ import { API_URL_TOKEN } from '../config/api.config';
   providedIn: 'root'
 })
 export class ScenarioItemConfigurationService {
+  
   getScenarioItemsConfiguration(scenarioId: number) {
     throw new Error('Method not implemented.');
   }

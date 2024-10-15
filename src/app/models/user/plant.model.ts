@@ -37,7 +37,7 @@ export type PlantModel = {
 
 export const plantTableProperties: TableProperty[] = [
   {
-    name: 'idPlant',
+    name: 'id_plant',
     isDisplayed: false
   },
   {

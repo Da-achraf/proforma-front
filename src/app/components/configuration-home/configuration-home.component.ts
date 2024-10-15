@@ -1,9 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, effect, OnInit, signal } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api'; // Import MessageService
-import { ItemModel } from '../../models/request-item.model';
-import { Roles } from '../../models/user/user.model';
+import { FieldTypeEnum, ItemModel, RequestItemModel, standardFields } from '../../models/request-item.model';
+import { RoleEnum, Roles } from '../../models/user/user.model';
 import { ApproverService } from '../../services/approver.service';
 import { RequestItemService } from '../../services/request-item.service';
 import { ScenarioItemConfigurationService } from '../../services/scenario-item-configuration.service';
@@ -26,12 +26,13 @@ export class ConfigurationHomeComponent implements OnInit {
   roles: string[] = Roles
   classes: number[] = [0, 1, 2, 3, 4];
 
-  myItems = signal<ItemModel[]>([])
+  mandatoryFor = new FormControl('');
 
+  myItems = signal<RequestItemModel[]>([])
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private messageService: MessageService, // Inject MessageService
+    private messageService: MessageService,
     private scenarioService: ScenarioService,
     private requestItemService: RequestItemService,
     private approverService: ApproverService,
@@ -40,7 +41,33 @@ export class ConfigurationHomeComponent implements OnInit {
     this.scenarioForm = this.fb.group({
       name: ['', Validators.required],
       approvers: this.fb.array([]),
-      items: this.fb.array([])  // Start with an empty FormArray
+      items: this.fb.array([])
+    });
+
+    effect(() => {
+      const myItems = this.myItems();
+      console.log('items: ', myItems);
+
+      if (myItems.length === 0) return;
+
+      // Clear the existing form array
+      this.items.clear();
+
+      const standardFieldsMap = new Map(standardFields.map(f => [f.name, f]));
+
+      const standardFieldsNames = standardFields.map(f => f.name)
+
+      // Create form group for each item and patch the form array
+      myItems.forEach((item: RequestItemModel) => {
+        const standardField = standardFieldsMap.get(item.nameItem);
+        if (standardField) {
+          const itemFormGroup = this.fb.group({
+            requestItemId: [item.id_request_item, Validators.required],
+            isMandatory: [standardField.isMandatory],
+          });
+          this.items.push(itemFormGroup);
+        }
+        });
     });
   }
 
@@ -72,7 +99,7 @@ export class ConfigurationHomeComponent implements OnInit {
   loadItems() {
     this.requestItemService.getRequestItems()
     .subscribe({
-      next: (items: ItemModel[]) => {
+      next: (items: RequestItemModel[]) => {
         this.myItems.set(items)
         this.itemsAvailable = items;
       },
@@ -83,44 +110,34 @@ export class ConfigurationHomeComponent implements OnInit {
   addItem(): void {
     this.items.push(this.fb.group({
       requestItemId: ['', Validators.required],
-      isMandatory: [false]
+      isMandatory: [false],
     }));
   }
 
-  subtractItem(): void {
+  subtractItem(i: number): void {
     if (this.items.length > 0) {
-      this.items.removeAt(this.items.length - 1);
+      this.items.removeAt(i);
     }
   }
 
   createItem(): void {
     const dialogRef = this.dialog.open(CreateItemDialogComponent, {
       width: '800px',
-      // data: { nameItem: '' }
     });
 
-    dialogRef.afterClosed().subscribe((item: ItemModel) => {
-      if (item) {
-        console.log('creating item fields...')
-
-        this.requestItemService.saveRequestItemWithFields(item).subscribe({
-          next: (createdItem: ItemModel) => {
-            this.myItems.update(items => [...items, {id_request_item: createdItem.id_request_item, nameItem: createdItem.nameItem, fields: createdItem.fields}])
+    dialogRef.afterClosed().subscribe((itemToSave: RequestItemModel) => {
+      if (itemToSave) {
+        this.requestItemService.saveRequestItem(itemToSave).subscribe({
+          next: (response) => {
+            this.myItems.update(items => [...items, {...response}])
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
+            console.log('Item created successfully', response);
+          },
+          error: (error) => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating item' });
+            console.error('Error creating item:', error);
           }
-        })
-
-        // this.requestItemService.saveRequestItem({ nameItem: data.label }).subscribe({
-        //   next: (response) => {
-        //     this.myItems.update(items => [...items, {id: response.id_request_item, label: response.nameItem}])
-        //     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
-        //     console.log('Item created successfully', response);
-        //   },
-        //   error: (error) => {
-        //     this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating item' });
-        //     console.error('Error creating item:', error);
-        //   }
-        // });
+        });
       }
     });
   }
@@ -144,7 +161,6 @@ export class ConfigurationHomeComponent implements OnInit {
       }).subscribe({
         next: (response) => {
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Scenario created successfully' });
-          console.log('Scenario created:', response);
           const scenarioId = response.id_scenario;
 
           formValue.items.forEach((item: any) => {

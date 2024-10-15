@@ -1,15 +1,16 @@
-import { Component, computed, effect, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, model, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
-import { ItemField } from '../../models/request-item.model';
-import { INCOTERMES, ModesOfTransports } from '../../models/request.model';
+import { FieldTypeEnum, ItemField, ItemModel } from '../../models/request-item.model';
+import { CreateRequest, currencyCodes, INCOTERMES, InvoicesTypes, ModesOfTransports } from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
+import { BehaviorSubject, filter, map, Observable, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-create-request-dialog',
@@ -17,46 +18,19 @@ import { ShippointService } from '../../services/shippoint.service';
   styleUrls: ['./create-request-dialog.component.css']
 })
 export class CreateRequestDialogComponent implements OnInit {
-  requestForm: FormGroup;
-  // scenarios: any[] = [];
+  requestForm!: FormGroup;
   shipPoints: Ship[] = [];
-  scenarioAttributes: any[] = [];
-  invoiceTypes: string[] = ['Proforma Invoice', 'Manual Commercial']
+  currencyCodes = currencyCodes
+  invoiceTypes: string[] = InvoicesTypes
   incoterms: string[] = INCOTERMES
   modesOfTransports: string[] = ModesOfTransports
 
-  constructor(
-    private fb: FormBuilder,
-    private scenarioService: ScenarioService,
-    private shippointService: ShippointService,
-    private requestService: RequestService,
-    private authService: AuthService,
-    private messageService: MessageService,
-    public dialogRef: MatDialogRef<CreateRequestDialogComponent>
-  ) {
-    this.requestForm = this.fb.group({
-      invoicesTypes: ['', Validators.required],
-      scenarioId: ['', Validators.required],
-      shippingPoint: ['', Validators.required],
-      deliveryAddress: ['', Validators.required],
-      incoterm: ['', Validators.required],
-      dhlAccount: [''],
-      numberOfBoxes: [''],
-      modeOfTransport: ['', Validators.required],
-      shippedVia: ['', Validators.required],
-      weight: ['', [Validators.required]],
-      dimension: [''],
-      items: this.fb.array([]) // Initialisation du FormArray pour les items
-    });
+  filteredOptions!: Observable<string[]>;
 
-    effect(() => {
-      const selectedScenario = this.selectedScenario()
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
 
-      if (!selectedScenario) return
-      this.populateForm()
-    })
-
-
+    return this.currencyCodes.filter(option => option.toLowerCase().includes(filterValue));
   }
 
   // Signals
@@ -72,38 +46,126 @@ export class CreateRequestDialogComponent implements OnInit {
     return undefined
   })
 
+  scenearioIdSubject = new BehaviorSubject<number>(0)
+  scenarioAttributes$ = this.scenearioIdSubject.pipe(
+    filter((id: number) => id != 0),
+    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
+  )
+  scenarioAttributes = toSignal(this.scenarioAttributes$)
+
+  formItems = computed(() => {
+    const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
+    const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
+  
+    if (!selectedScenarioItems.length || !scenarioAttributes.length) return [];
+  
+    return selectedScenarioItems.map(item => {
+      const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
+      return {
+        ...item,
+        isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false)
+      };
+    });
+  });
+
+  existingItemsData = []
+
+  constructor(
+    private fb: FormBuilder,
+    private scenarioService: ScenarioService,
+    private shippointService: ShippointService,
+    private requestService: RequestService,
+    private authService: AuthService,
+    private messageService: MessageService,
+    public dialogRef: MatDialogRef<CreateRequestDialogComponent>
+  ) {
+
+    effect(() => {
+      const selectedScenario = this.selectedScenario()
+
+      if (!selectedScenario) return
+      this.items?.clear()
+      if (this.existingItemsData.length > 0) {
+        this.patchExistingData();
+      } else {
+        this.addItem();
+      }
+    })
+  }
+
+  onChange(text: string) {
+    this.filteredOptions = of(text).pipe(
+      startWith(''),
+      map(value => this._filter(value || '')),
+    );
+  }
+
   ngOnInit(): void {
-    // this.loadScenarios();
+    this.requestForm = this.fb.group({
+      invoicesTypes: ['', Validators.required],
+      scenarioId: ['', Validators.required],
+      shippingPoint: ['', Validators.required],
+      deliveryAddress: ['', Validators.required],
+      incoterm: ['', Validators.required],
+      dhlAccount: [''],
+      numberOfBoxes: [''],
+      modeOfTransport: ['', Validators.required],
+      shippedVia: ['', Validators.required],
+      currency: ['', Validators.required],
+      items: this.fb.array([])
+    });
     this.loadShipPoints();
     this.onScenarioChange();
     this.onShippingOrDeliveryChange();
+
+    if (this.existingItemsData.length > 0) {
+      this.patchExistingData();
+    } else {
+      this.addItem();
+    }
   }
 
-  populateForm() {
-    const itemsArray = this.requestForm.get('items') as FormArray;
-
-    // Clear any existing form array entries
-    itemsArray.clear();
-
-    const selectedScenario = this.selectedScenario()
-    if (!selectedScenario) return
-
-    // Loop through each item and add a new FormGroup for it
-    selectedScenario.items.forEach(item => {
-      itemsArray.push(this.fb.group({
-        nameItem: [item.nameItem],
-        fields: this.fb.array(
-          item.fields.map((field: ItemField) => this.fb.group({
-            id: [field.id],
-            name: [field.name],
-            type: [field.type],
-            value: ['', field.type === 'number' ? Validators.required : Validators.nullValidator]
-          }))
-        )
-      }));
+  patchExistingData() {
+    this.items.clear();
+    this.existingItemsData.forEach(itemData => {
+      this.items.push(this.createItem(itemData));
     });
+  }
 
-    console.log('Called populateForm')
+  createItem(data?: any): FormGroup {
+    const formItems = this.formItems()
+    if (!formItems) return this.fb.group({});
+    const group: { [key: string]: FormGroup } = {};
+
+    formItems.forEach((item: ItemModel) => {
+      const fieldData = this.findDataOfItem(item.nameItem, data?.values) ?? undefined;
+      group[item.nameItem] = this.fb.group({
+        name: item.nameItem,
+        value: [fieldData ? fieldData?.value : '', (fieldData?.isMandatory || item.isMandatory) ? Validators.required : null],
+        type: [fieldData ? fieldData?.type : item.type],
+        isMandatory: [fieldData?.isMandatory]
+      });
+    });
+    console.log(this.fb.group(group))
+    return this.fb.group(group);
+  }
+
+  findDataOfItem(itemName: string, data: any[]) {
+    console.log('data: ', data)
+    let foundData:any = null
+    data?.forEach(d => {
+      if (d['name'] === itemName) foundData = d
+    })
+
+    return foundData
+  }
+
+  addItem() {
+    this.items.push(this.createItem());
+  }
+
+  removeItem(index: number) {
+    this.items.removeAt(index);
   }
 
   /******************methodes items*****************/
@@ -114,35 +176,6 @@ export class CreateRequestDialogComponent implements OnInit {
   fieldsArray(index: number): FormArray {
     return this.items.at(index).get('fields') as FormArray;
   }
-
-  // addItem(): void {
-  //   this.items.push(this.fb.group({
-  //     pn: ['', Validators.required],
-  //     quantity: [null, Validators.required],
-  //     unitofquantity: ['', Validators.required],
-  //     unitvaluefinance: [null, Validators.required],
-  //     description: ['', Validators.required],
-  //     costcenter: ['', Validators.required],
-  //     businessunit: ['', Validators.required],
-  //     plant: ['', Validators.required]
-  //   }));
-  // }
-
-  // removeItem(index: number): void {
-  //   this.items.removeAt(index);
-  // }
-
-  // loadScenarios(): void {
-  //   this.scenarioService.getScenarios().subscribe(
-  //     (scenarios) => {
-  //       this.scenarios. scenarios;
-  //     },
-  //     (error) => {
-  //       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading scenarios' });
-  //       console.error('Error loading scenarios:', error);
-  //     }
-  //   );
-  // }
 
   loadShipPoints(): void {
     this.shippointService.getShipPoints().subscribe(
@@ -159,20 +192,7 @@ export class CreateRequestDialogComponent implements OnInit {
   onScenarioChange(): void {
     const scenarioIdControl = this.requestForm.get('scenarioId');
     this.selectedScenarioId.set(scenarioIdControl?.value ?? 0)
-    // scenarioIdControl?.valueChanges.subscribe(scenarioId => {
-    //   if (scenarioId) {
-    //     this.scenarioService.getScenarioAttributes(scenarioId).subscribe(
-    //       (attributes: any[]) => {
-    //         this.scenarioAttributes = attributes;
-    //         this.setFormValidators(attributes);
-    //       },
-    //       (error) => {
-    //         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading scenario attributes' });
-    //         console.error('Error loading scenario attributes:', error);
-    //       }
-    //     );
-    //   }
-    // });
+    this.scenearioIdSubject.next(scenarioIdControl?.value ?? 0)
   }
 
   setFormValidators(attributes: any[]): void {
@@ -201,57 +221,48 @@ export class CreateRequestDialogComponent implements OnInit {
     });
   }
 
-  isFieldRequired(attributeName: string): boolean {
-    const attribute = this.scenarioAttributes.find(attr => attr.attributeName.toLowerCase() === attributeName.toLowerCase());
-    return attribute ? attribute.isMandatory : false;
-  }
   onSubmit(): void {
     console.log('request form: ', this.requestForm.value)
-
-    // if (this.requestForm) {
-    //   const userId = this.authService.getUserIdFromToken();
-    //   const scenarioId = this.requestForm.value.scenarioId;
-    //   if (typeof scenarioId === 'number') {
-    //     const shippingPointId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.shippingPoint)?.id_ship ?? 0;
-    //     const deliveryAddressId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.deliveryAddress)?.id_ship ?? 0;
-    //     const requestData: CreateRequest = {
-    //       invoicesTypes: this.requestForm.value.invoicesTypes,
-    //       shipPointId: shippingPointId,
-    //       deliveryAddressId: deliveryAddressId,
-    //       incoterm: this.requestForm.value.incoterm,
-    //       userId: userId,
-    //       scenarioId: scenarioId,
-    //       shippedvia: this.requestForm.value.shippedVia,
-    //       dhlAccount: this.requestForm.value.dhlAccount,
-    //       htsCode: this.requestForm.value.htsCode,
-    //       coo: this.requestForm.value.coo,
-    //       modeOfTransport: this.requestForm.value.modeOfTransport,
-    //       trackingNumber: this.requestForm.value.trackingNumber,
-    //       numberOfBoxes: this.requestForm.value.numberOfBoxes,
-    //       weight: this.requestForm.value.weight ? Number(this.requestForm.value.weight) : null,
-    //       dimension: this.requestForm.value.dimension,
-    //       items: this.requestForm.value.items // Ajout des items au requestData
-    //     };
-    //     console.log('Request Data:', requestData);
-    //     this.requestService.createRequest(requestData).subscribe(
-    //       (response) => {
-    //         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request created successfully' });
-    //         console.log('Request created:', response);
-    //         this.dialogRef.close(response);
-    //       },
-    //       (error) => {
-    //         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating request' });
-    //         console.error('Error creating request:', error);
-    //       }
-    //     );
-    //   } else {
-    //     this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Scenario ID is not a number' });
-    //     console.error('Scenario ID is not a number');
-    //   }
-    // } else {
-    //   this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Form is invalid' });
-    //   console.error('Form is invalid');
-    // }
+    if (this.requestForm) {
+      const userId = this.authService.getUserIdFromToken();
+      const scenarioId = this.requestForm.value.scenarioId;
+      if (typeof scenarioId === 'number') {
+        const shippingPointId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.shippingPoint)?.id_ship ?? 0;
+        const deliveryAddressId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.deliveryAddress)?.id_ship ?? 0;
+        const requestData: CreateRequest = {
+          invoicesTypes: this.requestForm.value.invoicesTypes,
+          shipPointId: shippingPointId,
+          deliveryAddressId: deliveryAddressId,
+          incoterm: this.requestForm.value.incoterm,
+          userId: userId,
+          scenarioId: scenarioId,
+          shippedvia: this.requestForm.value.shippedVia,
+          currency: this.requestForm.value.currency,
+          modeOfTransport: this.requestForm.value.modeOfTransport,
+          numberOfBoxes: this.requestForm.value.numberOfBoxes,
+          dimension: this.requestForm.value.dimension,
+          itemsWithValuesJson: JSON.stringify(this.requestForm.value.items)
+        };
+        console.log('Request Data:', requestData);
+        this.requestService.createRequest(requestData).subscribe(
+          (response) => {
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request created successfully' });
+            console.log('Request created:', response);
+            this.dialogRef.close(response);
+          },
+          (error) => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating request' });
+            console.error('Error creating request:', error);
+          }
+        );
+      } else {
+        this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Scenario ID is not a number' });
+        console.error('Scenario ID is not a number');
+      }
+    } else {
+      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Form is invalid' });
+      console.error('Form is invalid');
+    }
   }
 
 
@@ -286,20 +297,5 @@ export class CreateRequestDialogComponent implements OnInit {
     } else {
       this.requestForm.patchValue({ incoterm: '' });
     }
-
-    // if (shippingPoint && deliveryAddress) {
-    //   console.log('Shipping Point:', shippingPoint);
-    //   console.log('Delivery Address:', deliveryAddress);
-    // } else {
-    //   console.log('Shipping Point or Delivery Address is not selected');
-    // }
-
-    // const validAddresses = ["MT10 TMED", "MT60 TAC1-ICT", "MT70 TAC1-AUT", "MT80 TAC2-IND", "MT30 TFZ"];
-
-    // if (shippingPoint && deliveryAddress && validAddresses.includes(shippingPoint) && validAddresses.includes(deliveryAddress)) {
-    //   this.requestForm.patchValue({ incoterm: 'FCA' });
-    // } else {
-    //   this.requestForm.patchValue({ incoterm: '' });
-    // }
   }
 }

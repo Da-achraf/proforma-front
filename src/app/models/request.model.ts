@@ -1,3 +1,5 @@
+import { FieldTypeEnum, ItemModel } from "./request-item.model";
+import { ScenarioModel } from "./scenario.model";
 import { DeliveryAddressModel, ShipPointModel } from "./ship.model";
 import { Column } from "./table.model";
 import { LoggedInUser } from "./user/user.model";
@@ -27,7 +29,6 @@ export interface CreateRequest {
   coo?: string;
   trackingNumber?: string;
   numberOfBoxes?: number | null;
-  weight?: number | null;
   created_at?: Date;
   status?: string;
   invoiceAddress?: string;
@@ -35,7 +36,9 @@ export interface CreateRequest {
   shippedvia?: string;
   modeOfTransport?: string;
   dimension?:string;
-  items: Item[];
+  currency?: string;
+  // items: Item[];
+  itemsWithValuesJson?: string
 }
 
 export interface UpdateFinanceRequestDTO {
@@ -43,6 +46,8 @@ export interface UpdateFinanceRequestDTO {
   incoterm: string;
   dhlAccount: string;
   items: UpdateItemDTO[];
+  currency: string;
+  itemsWithValuesJson?: string
 }
 
 export interface UpdateItemDTO {
@@ -103,25 +108,31 @@ export interface RequestModel {
   created_at: string;
   status: number;
   user: LoggedInUser;
-  scenario: Scenario;
+  scenario: ScenarioModel;
   invoicesTypes: string;
   invoicesAddress: string | null;
   shipPoint: ShipPointModel;
   deliveryAddress: DeliveryAddressModel;
   incoterm: string;
   scenarioId: number;
-  coo: string;
   numberOfBoxes: string;
-  weight: number;
-  htsCode: string;
   dhlAccount: string;
   trackingNumber: string;
   dimension: string;
   invoiceAddress: string;
   exporterAddress: string;
   modeOfTransport: string;
+  currency: string;
   shippedVia: string;
+  itemsWithValues: {values: JsonItemModel[]}[]
   items: RequestItem[];
+}
+
+export type JsonItemModel = {
+  name: string
+  value: string
+  type: FieldTypeEnum,
+  isMandatory: boolean
 }
 
 export enum ModeOfTransportEnum {
@@ -142,9 +153,63 @@ export const INCOTERMES = [
   'FCA', 'DAP', 'DDP'
 ]
 
+export const InvoicesTypes = [
+  'Proforma Invoice',
+  'Manual Commercial'
+]
+
+export enum InvoiceTypeEnum {
+  PROFORMA = 'Proforma Invoice',
+  COMMERCIAL = 'Manual Commercial'
+}
+
 export const otherUsersRequestColumns: Column[] = [
   {label: 'Request Number', isSortable: false},
   {label: 'Date of Submission', isSortable: true},
   {label: 'Status', isSortable: false},
   {label: 'Actions', isSortable: false},
 ]
+
+
+export enum StandardFieldEnum {
+  QUANTITY = "Quantity",
+  UNIT_VALUE = "Unit Value",
+  UNIT = "Unit",
+  DESCRIPTION = "Description",
+  COST_CENTER = "Cost Center",
+  BUSINESS_UNIT = "Business Unit",
+  GROSS_WEIGHT = "Gross Weight",
+  NET_WEIGHT = "Net Weight"
+}
+
+export const standardFieldsNames: string[] = Object.values(StandardFieldEnum)
+
+export const currencyCodes: string[] = [
+  "MAD", // Moroccan Dirham
+  "USD", // United States Dollar
+  "EUR", // Euro
+  "JPY", // Japanese Yen
+  "GBP", // British Pound
+  "CHF", // Swiss Franc
+  "CAD", // Canadian Dollar
+  "AUD", // Australian Dollar
+  "CNY", // Chinese Yuan
+  "INR", // Indian Rupee
+  "BRL", // Brazilian Real
+  "ZAR", // South African Rand
+  "NZD", // New Zealand Dollar
+  "SGD", // Singapore Dollar
+  "HKD", // Hong Kong Dollar
+  "MXN", // Mexican Peso
+  "RUB", // Russian Ruble
+  "TRY", // Turkish Lira
+  "SEK", // Swedish Krona
+  "NOK", // Norwegian Krone
+  "DKK", // Danish Krone
+  "PLN", // Polish Zloty
+  "THB", // Thai Baht
+  "AED", // United Arab Emirates Dirham
+  "ILS", // Israeli New Shekel
+  "MYR", // Malaysian Ringgit
+  "PHP",  // Philippine Peso
+];

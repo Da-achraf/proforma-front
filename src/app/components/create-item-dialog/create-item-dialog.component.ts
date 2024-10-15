@@ -4,7 +4,7 @@ import { Component, computed, inject, model, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FieldTypeEnum, fieldTypes, ItemField, ItemModel, standardFields } from '../../models/request-item.model';
+import { FieldTypeEnum, fieldTypes, ItemField, ItemModel, RequestItemModel, standardFields } from '../../models/request-item.model';
 
 @Component({
   selector: 'app-create-item-dialog',
@@ -53,9 +53,11 @@ export class CreateItemDialogComponent {
   }
 
   saveItem(): void {
-    const itemToSave: ItemModel = {
-      nameItem: this.label(),
-      fields: this.fields()
+
+    const itemToSave: RequestItemModel = {
+      nameItem: this.fieldForm.value.name as string,
+      type: this.fieldForm.value.type as FieldTypeEnum,
+      isMandatory: false
     }
     this.dialogRef.close(itemToSave)
   }

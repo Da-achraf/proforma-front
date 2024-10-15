@@ -1,94 +1,44 @@
-/* Styles pour le conteneur général */
-.container {
-    margin: 20px auto;
-    max-width: 800px;
-    width: 100%;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-family: 'Arial', sans-serif; /* Assurez-vous que la police correspond à celle utilisée dans votre application */
+/* Styles for the items container */
+.items-container {
+    display: flex;
+    flex-wrap: wrap; /* Enables wrapping */
+    gap: 40px; /* Adds some space between items */
 }
 
-/* Styles pour les titres */
-h2 {
-    color: #d67800; /* Orange similaire au logo */
-    margin-bottom: 20px;
-}
-
-/* Styles pour les étiquettes des champs */
-label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-/* Styles pour les champs de saisie et sélecteurs */
-input[type="text"],
-input[type="number"],
-select {
-    width: 100%;
-    padding: 8px;
+/* Styles for each item box */
+.item-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    margin-bottom: 20px; /* Espace entre les champs */
+    border-radius: 8px;
+    background-color: #f9f9f9; /* Light grey background instead of red */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* flex: 1 1 200px;  */
+    max-width: calc(50% - 20px); /* Ensures two items per row at most (adjust if needed) */
 }
 
-/* Styles pour les checkboxes */
-.form-check-input {
-    margin-right: 10px;
+/* Adjust the spacing and appearance of form fields */
+.mat-form-field {
+    flex: 1;
 }
 
-/* Styles pour les boutons */
-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 10px;
+.mat-checkbox {
+    flex-shrink: 0; /* Prevents checkbox from shrinking */
 }
 
-.btn-primary {
-    background-color: #d67800; /* Orange similaire au logo */
-    color: white;
-}
-.btn-sec {
-    background-color: #d67800; /* Orange similaire au logo */
-    color: white;
-}
-.btn-secondary {
-    background-color: #424242; /* Gris pour les actions secondaires */
-    color: white;
-}
-
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Styles pour les titres des items */
-h3 {
-    color: #666;
-    margin-top: 0;
-}
-
-/* Amélioration de la visibilité des options du sélecteur */
-select option {
-    color: #333;
-}
-.input-group {
-    margin-bottom: 10px;
-  }
 .control-group {
     display: flex;
     align-items: center;
     margin-bottom: 20px;
-  }
+}
+
 .control-group button {
-    margin: 0 5px;
-  }
+    margin: 0 10px;
+}
+
 .control-group span {
     margin: 0 10px;
-  }
+}

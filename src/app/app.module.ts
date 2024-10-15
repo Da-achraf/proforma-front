@@ -95,6 +95,13 @@ import { PlantsListComponent } from './components/plants-list/plants-list.compon
 import { DepartmentsListComponent } from './components/departments-list/departments-list.component';
 import { ShipPointsListComponent } from './components/ship-points-list/ship-points-list.component';
 import { DeleteConfirmationDialogComponent } from './shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { InvoiceComponent } from './shared/components/invoice/invoice.component';
+import { NewlinePipe } from './shared/pipes/new-line.pipe';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import { TruncateTextPipe } from './shared/pipes/truncate-text.pipe';
+import { RequestsReportComponent } from './components/requests-report/requests-report.component';
+import { WeightCalculatorPipe } from './shared/pipes/report-table/gross-weight-calculator.pipe';
+
 
 @NgModule({
   declarations: [
@@ -141,10 +148,15 @@ import { DeleteConfirmationDialogComponent } from './shared/components/delete-co
     ManagementTablesComponent,
     UsersListComponent,
     IsPropertyNotEmptyPipe,
+    NewlinePipe,
     PlantsListComponent,
     DepartmentsListComponent,
     ShipPointsListComponent,
-    DeleteConfirmationDialogComponent
+    DeleteConfirmationDialogComponent,
+    InvoiceComponent,
+    TruncateTextPipe,
+    RequestsReportComponent,
+    WeightCalculatorPipe
   ],
   imports: [
     BrowserModule,
@@ -163,6 +175,7 @@ import { DeleteConfirmationDialogComponent } from './shared/components/delete-co
     TooltipModule,
     OverlayPanelModule,
     MatTooltipModule,
+    MatCheckboxModule,
     CarouselModule,
     CardModule,
     FlexLayoutModule,

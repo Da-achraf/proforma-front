@@ -37,7 +37,8 @@
           <mat-option
             *ngFor="let scenario of scenarios()"
             [value]="scenario.id_scenario"
-            >{{ scenario.name }}</mat-option
+            >{{ scenario.name }}
+          </mat-option
           >
         </mat-select>
       </mat-form-field>
@@ -79,6 +80,22 @@
           >
         </mat-select>
       </mat-form-field>
+      <mat-form-field>
+        <mat-label>Currency</mat-label>
+        <input type="text"
+               placeholder="Pick one"
+               #currencyInput
+               (input)="onChange(currencyInput.value)"
+               matInput
+               formControlName="currency"
+               [matAutocomplete]="auto">
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+          @for (option of filteredOptions | async; track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+    
       <mat-form-field appearance="fill">
         <mat-label>Shiped Via</mat-label>
         <input matInput formControlName="shippedVia" />
@@ -87,140 +104,54 @@
         <mat-label>Number of Boxes</mat-label>
         <input matInput formControlName="numberOfBoxes" />
       </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Weight</mat-label>
-        <input matInput formControlName="weight" type="number" />
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Dimension</mat-label>
-        <input matInput formControlName="dimension" />
-      </mat-form-field>
     </div>
-    <!-- <div formArrayName="items">
-      <div
-        *ngFor="let item of items.controls; let i = index"
-        [formGroupName]="i"
-        class="item-form"
-      >
-        <mat-form-field appearance="fill">
-          <mat-label>PN</mat-label>
-          <input
-            matInput
-            formControlName="pn"
-            [required]="isFieldRequired('pn')"
-          />
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Quantity</mat-label>
-          <input
-            matInput
-            formControlName="quantity"
-            type="number"
-            [required]="isFieldRequired('quantity')"
-          />
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Unit Of Quantity</mat-label>
-          <input
-            matInput
-            formControlName="unitofquantity"
-            [required]="isFieldRequired('unitofquantity')"
-          />
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Unit Value Finance</mat-label>
-          <input
-            matInput
-            formControlName="unitvaluefinance"
-            type="number"
-            [required]="isFieldRequired('unitvaluefinance')"
-          />
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Description</mat-label>
-          <input
-            matInput
-            formControlName="description"
-            [required]="isFieldRequired('description')"
-          />
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Cost Center</mat-label>
-          <input
-            matInput
-            formControlName="costcenter"
-            [required]="isFieldRequired('costcenter')"
-          />
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Business Unit</mat-label>
-          <input
-            matInput
-            formControlName="businessunit"
-            [required]="isFieldRequired('businessunit')"
-          />
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Plant</mat-label>
-          <input
-            matInput
-            formControlName="plant"
-            [required]="isFieldRequired('plant')"
-          />
-        </mat-form-field>
-        <button mat-icon-button color="warn" (click)="removeItem(i)">
-          <mat-icon>remove_circle</mat-icon>
-        </button>
-      </div>
-    </div>
-    <button mat-button color="primary" (click)="addItem()">
-      <mat-icon>add_circle</mat-icon> Add Item
-    </button> -->
-
-    <!-- Items Array -->
-    @if (items.length != 0) {
-    <div class="border border-gray-200 rounded-md overflow-hidden">
-      <div class="bg-orange-200 p-2 mb-2 text-center">
-        <span class="font-mono text-md w-fit text-orange-600"
-          >Items
-          <span class="font-bold text-xs text-gray-800"
-            >({{ items.length }})</span
-          ></span
-        >
-      </div>
-      <div class="p-2" formArrayName="items">
-        <div
-          *ngFor="let item of items.controls; let i = index"
-          [formGroupName]="i"
-        >
-          <span class="text-sm font-serif mb-1">{{
-            item.get("nameItem")?.value
-          }}</span>
-          <div
-            formArrayName="fields"
-            class="flex items-center flex-wrap gap-x-3"
-          >
-            <div
-              *ngFor="let field of fieldsArray(i).controls; let j = index"
-              [formGroupName]="j"
-            >
-              <mat-form-field appearance="fill">
-                <mat-label>{{ field.get("name")?.value }}</mat-label>
-                <input
-                  [type]="field.get('type')?.value"
-                  matInput
-                  formControlName="value"
-                />
-              </mat-form-field>
+   
+    @if (items.controls.length !== 0) {
+      <div class="border border-gray-200 rounded-md overflow-hidden">
+        <div class="bg-orange-200 p-2 mb-2 text-center">
+          <span class="font-mono text-md w-fit text-orange-600">
+            Items
+            <span class="font-bold text-xs text-gray-800">
+              ({{ items.length }})
+            </span>
+          </span>
+        </div>
+        <div class="p-2" formArrayName="items">
+          @for (itemGroup of items.controls; track itemGroup; let i = $index) {
+            <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold">Item {{ i + 1 }}</span>
+                <button mat-icon-button color="warn" matTooltipPosition="above" matTooltip="Remove this item" (click)="removeItem(i)" type="button">
+                  <mat-icon>remove_circle</mat-icon>
+                </button>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                @for (field of formItems() || []; track field) {
+                  <div [formGroupName]="field.nameItem">
+                    <mat-form-field appearance="fill" class="w-full mb-2">
+                      <mat-label>{{ field.nameItem }}</mat-label>
+                      <input 
+                        matInput 
+                        formControlName="value"
+                        [type]="field.type"
+                        [required]="field.isMandatory"
+                      >
+                    </mat-form-field>
+                  </div>
+                }
+              </div>
             </div>
-          </div>
-          @if (items.length > 0 && items.length != 1 && i != items.length - 1) {
-          <mat-divider class="my-2"></mat-divider>
           }
         </div>
+        <div class="p-2">
+          <button mat-icon-button color="primary" matTooltipPosition="above" matTooltip="Add another item" (click)="addItem()" type="button">
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
     }
+
+
 
     <div class="mt-2" mat-dialog-actions>
       <button mat-raised-button class="cancel-button" (click)="onNoClick()">

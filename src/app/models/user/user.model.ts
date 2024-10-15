@@ -181,6 +181,8 @@ export const getUserRoleToDisplay = (role : any) => {
       return 'Trade Compliance Approver'
     case RoleEnum.WAREHOUSE_APPROVER:
       return 'Warehouse Approver'
+    case RoleEnum.ALL:
+    return 'All'
     default:
       return 'None'
   }

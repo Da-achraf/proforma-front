@@ -22,91 +22,95 @@
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>DHL Account</mat-label>
-        <input matInput formControlName="dhlAccount" readonly>
-      </mat-form-field>
-
-      <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>HTS Code</mat-label>
-        <input matInput formControlName="htsCode" readonly>
-      </mat-form-field>
-
-      <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>Country Of Origin</mat-label>
-        <input matInput formControlName="coo" readonly>
-      </mat-form-field>
-
-      <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>Tracking Number</mat-label>
-        <input matInput formControlName="trackingNumber" type="text">
-      </mat-form-field>
-
-      <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>Number Of Boxes</mat-label>
-        <input matInput formControlName="numberOfBoxes" type="text">
-      </mat-form-field>
-
-      <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>Weight</mat-label>
-        <input matInput formControlName="weight" type="number">
-      </mat-form-field>
-
-      <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Mode Of Transport</mat-label>
         <input matInput formControlName="modeOfTransport" type="text">
+      </mat-form-field>
+
+      @if (modeOfTransport() === 'By Air') {
+        <mat-form-field appearance="fill">
+          <mat-label>DHL Account</mat-label>
+          <input matInput formControlName="dhlAccount" readonly>
+        </mat-form-field>
+      }
+
+      <mat-form-field>
+        <mat-label>Currency</mat-label>
+        <input type="text"
+               placeholder="Pick one"
+               #currencyInput
+               (input)="onChange(currencyInput.value)"
+               matInput
+               formControlName="currency"
+               [matAutocomplete]="auto">
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+          @for (option of filteredOptions | async; track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-autocomplete>
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Shipped Via</mat-label>
         <input matInput formControlName="shippedVia" type="text">
       </mat-form-field>
-
-      <div formArrayName="items">
-        <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="item-form">
-          <mat-form-field appearance="fill" class="small-form-field">
-            <mat-label>PN</mat-label>
-            <input matInput formControlName="pn" readonly>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="small-form-field">
-            <mat-label>Quantity</mat-label>
-            <input matInput formControlName="quantity" type="number" readonly>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="small-form-field">
-            <mat-label>Unit Of Quantity</mat-label>
-            <input matInput formControlName="unitOfQuantity" readonly>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="small-form-field">
-            <mat-label>Unit Value Finance</mat-label>
-            <input matInput formControlName="unitValueFinance" type="number" readonly>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="small-form-field">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="description" readonly>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="small-form-field">
-            <mat-label>Cost Center</mat-label>
-            <input matInput formControlName="costCenter" readonly>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="small-form-field">
-            <mat-label>Business Unit</mat-label>
-            <input matInput formControlName="businessUnit" readonly>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="small-form-field">
-            <mat-label>Plant</mat-label>
-            <input matInput formControlName="plant" readonly>
-          </mat-form-field>
-        </div>
-      </div>
+      <mat-form-field appearance="fill" class="small-form-field">
+        <mat-label>Tracking Number</mat-label>
+        <input matInput formControlName="trackingNumber" type="text">
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="small-form-field">
+        <mat-label>Number Of Boxes</mat-label>
+        <input matInput formControlName="numberOfBoxes" type="text">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Dimension</mat-label>
+        <input matInput formControlName="dimension" />
+      </mat-form-field>
     </div>
+      
+       <!-- Items Array -->
+       @if (items.controls.length !== 0) {
+        <div class="border border-gray-200 rounded-md overflow-hidden">
+          <div class="bg-orange-200 p-2 mb-2 text-center">
+            <span class="font-mono text-md w-fit text-orange-600">
+              Items
+              <span class="font-bold text-xs text-gray-800">
+                ({{ items.length }})
+              </span>
+            </span>
+          </div>
+          <div class="p-2" formArrayName="items">
+            @for (itemGroup of items.controls; track itemGroup; let i = $index) {
+              <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-bold">Item {{ i + 1 }}</span>
+                  <!-- <button mat-icon-button color="warn" matTooltipPosition="above" matTooltip="Remove this item" (click)="removeItem(i)" type="button">
+                    <mat-icon>remove_circle</mat-icon>
+                  </button> -->
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  @for (field of formItems() || []; track field) {
+                    <div [formGroupName]="field.nameItem">
+                      <mat-form-field appearance="fill" class="w-full mb-2">
+                        <mat-label>{{ field.nameItem }}</mat-label>
+                        <input 
+                          matInput 
+                          formControlName="value"
+                          [type]="field.type"
+                          [required]="field.isMandatory ?? false"
+                          [readonly]="field.readOnly"
+                        >
+                      </mat-form-field>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
     <div class="form-actions">
-      <button mat-raised-button type="submit" color="primary">Submit</button>
+      <button mat-raised-button type="submit" [disabled]="!requestForm.valid" color="primary">Submit</button>
     </div>
   </form>
 </div>

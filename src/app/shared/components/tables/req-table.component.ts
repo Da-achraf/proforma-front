@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, Signal, signal } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, input, Signal, signal, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../services/auth.service';
 import { getRequestModificationComponent, getStatusClass } from './helpers';
@@ -14,6 +14,11 @@ import { delay, filter, switchMap } from 'rxjs';
 import { Column } from '../../../models/table.model';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { RequestService } from '../../../services/request.service';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas-pro';
+import { InvoiceComponent } from '../invoice/invoice.component';
+import { RequestsReportComponent } from '../../../components/requests-report/requests-report.component';
+
 
 @Component({
   selector: 'app-reqs-table',
@@ -22,6 +27,7 @@ import { RequestService } from '../../../services/request.service';
 })
 export class RequestsTableComponent {
 
+  // Injected dependencies
   dialog = inject(MatDialog)
   auth = inject(AuthService)
   userStore = inject(UserStoreService)
@@ -29,12 +35,17 @@ export class RequestsTableComponent {
   requestService = inject(RequestService)
   messageService = inject(MessageService)
 
-  loggedInUser = this.userStore.loggedInUser
+  // Enums and constants
   RoleEnum = RoleEnum
 
+  // Signals and computed values
+  loggedInUser = this.userStore.loggedInUser
+  request = this.requestService.invoiceRequest
   searchValue = signal('')
-
   requests = signal<RequestModel[] | undefined | null>(undefined)
+  rows = signal(10)
+  first = signal(0)
+
   filteredRequests = computed(() => {
     const requests = this.requests()
     const searchValue = this.searchValue()
@@ -46,13 +57,12 @@ export class RequestsTableComponent {
     }
     return null
   }, undefined)
+  
   paginatedRequests = computed(() => {
     const filteredRequests = this.filteredRequests()
     return filteredRequests?.slice(this.first(), this.first() + this.rows())
   }, undefined)
 
-  rows = signal(10)
-  first = signal(0)
   totalRecords = computed(() => {
     const filteredRequests = this.filteredRequests()
     return filteredRequests?.length
@@ -81,8 +91,6 @@ export class RequestsTableComponent {
     const columns = this.columns()
     return columns.length
   })
-
-  getStatusClass = getStatusClass
 
   constructor() {
     effect(() => {
@@ -113,6 +121,9 @@ export class RequestsTableComponent {
     console.log('UserId: ', userId)
   }
 
+  // Methods
+  getStatusClass = getStatusClass
+
   loadRequests() {
     const userId = this.auth.getUserIdFromToken()
     this.userStore.getLoggedInUser(userId)
@@ -136,6 +147,20 @@ export class RequestsTableComponent {
     });
   }
 
+  openDownloadDialog(req: any) {
+    const request = req as RequestModel
+
+    const dialogRef = this.dialog.open(InvoiceComponent, {
+      width: '800px',
+      data: { request }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed ', result)
+      if (result) this.loadRequests()
+    });
+  }
+
   openCreateRequestDialog(): void {
     const dialogRef = this.dialog.open(CreateRequestDialogComponent, {
       width: '800px'
@@ -145,6 +170,14 @@ export class RequestsTableComponent {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request created successfully' });
         this.loadRequests();
       }
+    });
+  }
+
+  onOpenReportDialog() {
+    const dialogRef = this.dialog.open(RequestsReportComponent, {
+      minWidth: '800px',
+      maxWidth: '1400px',
+      data: {requests: this.requests()}
     });
   }
 
@@ -177,7 +210,6 @@ export class RequestsTableComponent {
       }
     })
   }
-
 
   private showErrorMessage(message: string) {
     this.messageService.add({ severity: 'error', summary: 'Error', detail: message });

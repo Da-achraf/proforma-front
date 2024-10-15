@@ -5,8 +5,13 @@ import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
 import { MessageService } from 'primeng/api';
-import { INCOTERMES, Item, ModeOfTransportEnum, RequestModel, UpdateFinanceRequestDTO } from '../../models/request.model';
-import { combineLatestWith, filter, of, shareReplay, switchMap, tap } from 'rxjs';
+import { currencyCodes, INCOTERMES, Item, ModeOfTransportEnum, RequestModel, StandardFieldEnum, standardFieldsNames, UpdateFinanceRequestDTO } from '../../models/request.model';
+import { BehaviorSubject, combineLatestWith, filter, map, Observable, of, shareReplay, startWith, switchMap, tap } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FieldTypeEnum, financeMandatoryFields, ItemModel, standardFields } from '../../models/request-item.model';
+import { ScenarioService } from '../../services/scenario.service';
+import { mergeArrays } from '../../shared/components/tables/helpers';
+import _ from 'lodash';
 
 @Component({
   selector: 'app-modify-request-finance',
@@ -14,10 +19,14 @@ import { combineLatestWith, filter, of, shareReplay, switchMap, tap } from 'rxjs
   styleUrls: ['./modify-request-finance.component.css']
 })
 export class ModifyRequestFinanceComponent implements OnInit {
+
+  scenarioService = inject(ScenarioService)
+
   invoiceTypes: any
   scenarios: any
   shipPoints: any
   incoterms: string[] = INCOTERMES
+  currencyCodes = currencyCodes
 
   requestForm!: FormGroup;
   fb = inject(FormBuilder)
@@ -36,9 +45,122 @@ export class ModifyRequestFinanceComponent implements OnInit {
     switchMap((request: RequestModel) => of(request.modeOfTransport))
   )
 
+
+  requestSig = toSignal(this.request$)
+  selectedScenario = computed(() => {
+    const request = this.requestSig()
+    if (!request) return
+    this.scenearioIdSubject.next(request.scenario.id_scenario)
+    return request.scenario
+  })
+
+  scenearioIdSubject = new BehaviorSubject<number>(0)
+  scenarioAttributes$ = this.scenearioIdSubject.pipe(
+    filter((id: number) => id != 0),
+    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
+  )
+  scenarioAttributes = toSignal(this.scenarioAttributes$)
+
+  formItems = computed(() => {
+    const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
+    const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
+  
+    if (!selectedScenarioItems.length || !scenarioAttributes.length) return [];
+  
+    return selectedScenarioItems.map(item => {
+      const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
+      return {
+        ...item,
+        readOnly: item.nameItem != StandardFieldEnum.UNIT_VALUE,
+        // isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false)
+        isMandatory: financeMandatoryFields.includes(item.nameItem) ? true : matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false) 
+      };
+    });
+  });
+
+  existingItemsData = computed(() => {
+    const request = this.requestSig()
+    if (!request) return
+    return request.itemsWithValues
+  })
+
+
   ModeOfTransportEnum = ModeOfTransportEnum
 
   constructor() {
+
+    effect(() => {
+      const formItems = this.formItems()
+      const existingItemsData = this.existingItemsData()
+
+
+      if (existingItemsData?.length == 0) return
+      this.items?.clear()
+      if (existingItemsData && existingItemsData.length > 0) {
+        this.patchExistingData(existingItemsData);
+      } else {
+        this.addItem();
+      }
+    })
+  }
+  filteredOptions!: Observable<string[]>;
+
+
+  patchExistingData(data: any[]) {
+    this.items.clear();
+    data?.forEach(itemData => {
+      this.items.push(this.createItem(itemData));
+    });
+  }
+
+  onChange(text: string) {
+    this.filteredOptions = of(text).pipe(
+      startWith(''),
+      map(value => this._filter(value || '')),
+    );
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.currencyCodes.filter(option => option.toLowerCase().includes(filterValue));
+  }
+
+  createItem(data?: any): FormGroup {
+    const formItems = this.formItems()
+    if (!formItems) return this.fb.group({});
+    const group: { [key: string]: FormGroup } = {};
+
+    formItems.forEach((item: ItemModel) => {
+      const fieldData = this.findDataOfItem(item.nameItem, data?.values) ?? undefined;
+      group[item.nameItem] = this.fb.group({
+        name: item.nameItem,
+        value: [fieldData ? fieldData?.value : '', (fieldData?.isMandatory || item.isMandatory) ? Validators.required : null],
+        type: [fieldData ? fieldData?.type : item.type],
+        isMandatory: [fieldData?.isMandatory]
+      });
+    });
+    return this.fb.group(group);
+  }
+
+  findDataOfItem(itemName: string, data: any[]) {
+    let foundData:any = null
+    data?.forEach(d => {
+      if (d['name'] === itemName) foundData = d
+    })
+
+    return foundData
+  }
+
+  addItem() {
+    this.items.push(this.createItem());
+  }
+
+  removeItem(index: number) {
+    this.items.removeAt(index);
+  }
+
+  ngOnInit(): void {
     this.requestForm = this.fb.group({
       invoicesTypes: [{ value: '', disabled: true }],
       scenarioId: [{ value: '', disabled: true }],
@@ -46,55 +168,25 @@ export class ModifyRequestFinanceComponent implements OnInit {
       deliveryAddress: [{ value: '', disabled: true }],
       modeOfTransport: [{ value: '', disabled: true}],
       incoterm: ['', Validators.required],
-      dhlAccount: ['', Validators.required],
+      dhlAccount: [''],
+      currency: ['', Validators.required],
       items: this.fb.array([]) // Ajout du FormArray pour les items
     });
 
-    // effect(() => {      
-    //   const requestModeOfTransport = this.requestModeOfTransport()
-    //   const request = this.request()
-    //   console.log('requestModeOfTransport: ', requestModeOfTransport)
-    //   if (requestModeOfTransport === ModeOfTransportEnum.BY_AIR){
-    //     this.requestForm = this.fb.group({
-    //       invoicesTypes: [{ value: '', disabled: true }],
-    //       scenarioId: [{ value: '', disabled: true }],
-    //       shippingPoint: [{ value: '', disabled: true }],
-    //       deliveryAddress: [{ value: '', disabled: true }],
-    //       modeOfTransport: request?.modeOfTransport,
-    //       incoterm: ['', Validators.required],
-    //       dhlAccount: ['', Validators.required],
-    //       items: this.fb.array([]) // Ajout du FormArray pour les items
-    //     });
-    //   }else {
-    //     this.requestForm = this.fb.group({
-    //       invoicesTypes: [{ value: '', disabled: true }],
-    //       scenarioId: [{ value: '', disabled: true }],
-    //       shippingPoint: [{ value: '', disabled: true }],
-    //       deliveryAddress: [{ value: '', disabled: true }],
-    //       incoterm: ['', Validators.required],
-    //       items: this.fb.array([]) // Ajout du FormArray pour les items
-    //     });
-    //   }
-    // })
-  }
-
-  ngOnInit(): void {
-
     this.requestModeOfTransport$.pipe(
       combineLatestWith(this.request$)
-    ).pipe(
-      tap(console.log)
     )
     .subscribe(([modeOfTransport, request]) => {
       if (modeOfTransport == ModeOfTransportEnum.BY_AIR){
         this.requestForm.patchValue({
           invoicesTypes: request?.invoicesTypes,
-          scenarioId: request?.scenarioId,
+          scenarioId: request?.scenario.name,
           shippingPoint: request?.shipPoint.shipPoint,
           modeOfTransport: request?.modeOfTransport,
           deliveryAddress: request?.deliveryAddress.deliveryAddress,
           incoterm: request?.incoterm,
-          dhlAccount: request?.dhlAccount
+          dhlAccount: request?.dhlAccount,
+          currency: request.currency
         });
       }else{
         this.requestForm.patchValue({
@@ -104,114 +196,61 @@ export class ModifyRequestFinanceComponent implements OnInit {
           modeOfTransport: request?.modeOfTransport,
           deliveryAddress: request?.deliveryAddress.deliveryAddress,
           incoterm: request?.incoterm,
+          currency: request.currency
         });
       }
-
-      (request.items || []).forEach((item: any) => this.addItem(item));
     })
-    
-    
-    // if (modeOfTransport == ModeOfTransportEnum.BY_AIR){
-    //   this.requestForm.patchValue({
-    //     invoicesTypes: request?.invoicesTypes,
-    //     scenarioId: request?.scenarioId,
-    //     shippingPoint: request?.shipPoint.shipPoint,
-    //     modeOfTransport: request?.modeOfTransport,
-    //     deliveryAddress: request?.deliveryAddress.deliveryAddress,
-    //     incoterm: request?.incoterm,
-    //     dhlAccount: request?.dhlAccount
-    //   });
-    // }else{
-    //   this.requestForm.patchValue({
-    //     invoicesTypes: request?.invoicesTypes,
-    //     scenarioId: request?.scenarioId,
-    //     shippingPoint: request?.shipPoint.shipPoint,
-    //     modeOfTransport: request?.modeOfTransport,
-    //     deliveryAddress: request?.deliveryAddress.deliveryAddress,
-    //     incoterm: request?.incoterm,
-    //   });
-    // }
-
-    // this.requestService.getRequestById(this.data.requestNumber).subscribe(
-    //   (request: RequestModel) => {
-    //     this.requestForm.patchValue({
-    //       invoicesTypes: request.invoicesTypes,
-    //       shippingPoint: request.shipPoint.shipPoint,
-    //       deliveryAddress: request.deliveryAddress.deliveryAddress,
-    //       incoterm: request.incoterm,
-    //       modeOfTransport: request.modeOfTransport,
-    //       dhlAccount: request.dhlAccount,
-    //       htsCode: request.htsCode,
-    //       coo: request.coo
-    //     });
-    //   // Patch items
-    //   (request.items || []).forEach(item => this.addItem(item));
-    //         },
-    //         (error) => {
-    //           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error fetching request data' });
-    //           console.error('Error fetching request data:', error);
-    //         }
-    //   );
   }
-
-
-  // ngOnInit(): void {
-  //   this.requestService.getRequestById(this.data.requestNumber).subscribe(
-  //     (request: RequestModel) => {
-  //       this.requestForm.patchValue({
-  //         invoicesTypes: request.invoicesTypes,
-  //         scenarioId: request.scenarioId,
-  //         shippingPoint: request.shipPoint.shipPoint,
-  //         deliveryAddress: request.deliveryAddress.deliveryAddress,
-  //         incoterm: request.incoterm,
-  //         dhlAccount: request.dhlAccount
-  //       });
-
-  //       // Patch items
-  //       (request.items || []).forEach(item => this.addItem(item));
-  //     },
-  //     (error) => {
-  //       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error fetching request data' });
-  //       console.error('Error fetching request data:', error);
-  //     }
-  //   );
-  // }
 
   get items(): FormArray {
     return this.requestForm.get('items') as FormArray;
   }
 
-  addItem(item: Item): void {
-    this.items.push(this.fb.group({
-      id_items: [item.id_items],
-      pn: [{ value: item.pn, disabled: true }],
-      quantity: [{ value: item.quantity, disabled: true }],
-      unitOfQuantity: [{ value: item.unitofquantity, disabled: true }],
-      unitValueFinance: [item.unitvaluefinance, Validators.required],
-      description: [{ value: item.description, disabled: true }],
-      costCenter: [{ value: item.costcenter, disabled: true }],
-      businessUnit: [{ value: item.businessunit, disabled: true }],
-      plant: [{ value: item.plant, disabled: true }]
-    }));
+
+  fieldsArray(index: number): FormArray {
+    return this.items.at(index).get('fields') as FormArray;
   }
 
+  patchValuesToFormArray(values: any[]) {
+    const itemsArray = this.requestForm.get('items') as FormArray;
+  
+    values.forEach((itemValue, itemIndex) => {
+      const itemGroup = itemsArray.at(itemIndex) as FormGroup;
+      const fieldsArray = itemGroup.get('fields') as FormArray;
+  
+      itemValue.fields.forEach((fieldValue: any, fieldIndex: number) => {
+        const fieldGroup = fieldsArray.at(fieldIndex) as FormGroup;
+        fieldGroup?.patchValue({
+          value: fieldValue.value // Assuming fieldValue contains the `value` key
+        });
+      });
+    });
+  }
+
+
   onSubmit(): void {
+    console.log('from value: ', this.requestForm.value)
     if (this.requestForm.valid) {
       const userId = this.authService.getUserIdFromToken();
+      const existingItemsData = this.existingItemsData() ?? []
+
+      const itemsCopy = _.cloneDeep(this.requestForm.value.items)
+
       const updateData: UpdateFinanceRequestDTO = {
         incoterm: this.requestForm.get('incoterm')?.value,
         dhlAccount: this.requestForm.get('dhlAccount')?.value,
+        currency: this.requestForm.get('currency')?.value,
         items: this.items.value.map((item: any) => ({
           id_items: item.id_items,
           unitvaluefinance: item.unitValueFinance
         })),
-        userId: userId
+        userId: userId,
+        itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
       };
 
       this.requestService.updateRequestByFinance(this.data.requestNumber, updateData).subscribe(
         (response) => {
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request updated successfully' });
-          console.log('Request updated:', response);
           this.dialogRef.close(true);
         },
         (error) => {

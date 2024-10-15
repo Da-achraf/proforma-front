@@ -1,7 +1,7 @@
-<h1 mat-dialog-title>Add New Item</h1>
+<!-- <h1 mat-dialog-title>Add New Item</h1>
 <div mat-dialog-content>
   <mat-form-field appearance="fill">
-    <mat-label>Item Name</mat-label>
+    <mat-label>Field</mat-label>
     <input matInput [(ngModel)]="label">
   </mat-form-field>
 
@@ -17,7 +17,6 @@
             </button>
           </mat-chip-row>
         }
-        <!-- <button class="ml-3 p-0 rounded-full" mat-raised-button>+</button> -->
       </mat-chip-grid>
     </mat-form-field>
       <form class="flex items-center gap-x-3" [formGroup]="fieldForm" (ngSubmit)="add()">
@@ -48,12 +47,34 @@
       </mat-autocomplete>
   </form>
 </div>
-<div mat-dialog-actions>
-  <button mat-raised-button (click)="onNoClick()">Cancel</button>
-  <button 
-    mat-raised-button 
-    [disabled]="label().length === 0 || fields().length === 0" 
-    (click)="saveItem()" 
-    cdkFocusInitial
-  >Save</button>
+-->
+
+<div class="p-4 flex flex-col justify-center gap-y-3">
+  <h4>Add a new item</h4>
+
+  <form class="flex items-center gap-x-3" [formGroup]="fieldForm" (ngSubmit)="add()">
+    <mat-form-field class="w-1/3">
+      <mat-label>Field Name</mat-label>
+      <input
+        matInput
+        formControlName="name"
+      />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Field Type</mat-label>
+      <mat-select formControlName="type">
+        <mat-option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- <button type="submit" [disabled]="!fieldForm.valid" mat-raised-button>Add</button> -->
+  </form>
+  <div mat-dialog-actions>
+    <button mat-raised-button (click)="onNoClick()">Cancel</button>
+    <button 
+      mat-raised-button 
+      [disabled]="!fieldForm.valid" 
+      (click)="saveItem()" 
+      cdkFocusInitial
+    >Save</button>
+  </div>
 </div>

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ItemModel, RequestItem } from '../models/request-item.model';
+import { FieldTypeEnum, ItemModel, RequestItem, RequestItemModel } from '../models/request-item.model';
 import { Observable } from 'rxjs';
 import { API_URL_TOKEN } from '../config/api.config';
 
@@ -14,8 +14,8 @@ export class RequestItemService {
 
   constructor(private http: HttpClient) { }
 
-  getRequestItems(): Observable<ItemModel[]> {
-    return this.http.get<ItemModel[]>(`${this.baseUrl}`);
+  getRequestItems(): Observable<RequestItemModel[]> {
+    return this.http.get<RequestItemModel[]>(`${this.baseUrl}`);
   }
 
   deleteRequestItem(id_request_item: number): Observable<any> {
@@ -26,11 +26,11 @@ export class RequestItemService {
     return this.http.put(`${this.baseUrl}/${id_request_item }`,requestItem);
   }
 
-  saveRequestItem(requestItem: { nameItem: string }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/CreateRequestItem`, requestItem)
+  saveRequestItem(requestItem: { nameItem: string }): Observable<RequestItemModel> {
+    return this.http.post<RequestItemModel>(`${this.baseUrl}/CreateRequestItem`, requestItem)
   }
 
-  saveRequestItemWithFields(requestItem: ItemModel): Observable<any> {
+  saveRequestItemWithFields(requestItem: {nameItem: string, type: FieldTypeEnum}): Observable<any> {
     console.log('creating new item: ', requestItem)
     return this.http.post(`${this.baseUrl}/with-fields`, requestItem)
   }

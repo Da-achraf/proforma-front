@@ -13,19 +13,16 @@
 <!-- Update shipPoint Dialog -->
 <p-dialog header="Update Ship Point" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
     <div class="form-container">
-      <form (ngSubmit)="updateShipPoint()">
-        <label>
-          ShipPoint:
-          <input type="text" [(ngModel)]="shipPoint.shipPoint" name="shipPoint" required>
-        </label>
-        <label>
-          Full Address:
-          <input type="text" [(ngModel)]="shipPoint.fullAddress" name="fullAddress" required>
-        </label>
-        <label>
-          is TE
-        <input type="checkbox" [checked]="true" [(ngModel)]="shipPoint.isTe" name="isTe" required placeholder=" ">
-      </label>
+      <form class="flex flex-col gap-y-2" (ngSubmit)="updateShipPoint()">
+        <mat-form-field class="example-full-width">
+          <mat-label>ShipPoint</mat-label>
+          <input matInput [(ngModel)]="shipPoint.shipPoint" name="shipPoint">
+        </mat-form-field>
+        <mat-form-field class="example-full-width">
+          <mat-label>Full address</mat-label>
+          <textarea matInput [(ngModel)]="shipPoint.fullAddress" name="fullAddress"></textarea>
+        </mat-form-field>
+        <p><mat-checkbox [ariaChecked]="true" color="primary" [(ngModel)]="shipPoint.isTe" name="isTe">is TE</mat-checkbox></p>
         <div class="button-SR">
           <button type="submit" class="icon-submit-btn">
             <i class="pi pi-check"></i>
@@ -38,21 +35,16 @@
   <!-- Create shipPoint Dialog -->
   <p-dialog header="Register a Ship Point" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '50vw'}">
     <div class="form-container">
-      <form [formGroup]="createShipPointForm" (ngSubmit)="createShipPoint()">
-        <label>
-            ShipPoint:
-          <input type="text" formControlName="shipPoint" required placeholder=" ">
-        </label>
-        <label>
-          Full Address:
-          <input type="text" formControlName="fullAddress" required placeholder=" ">
-        </label>
-
-        <label>
-          is TE
-        <input type="checkbox" [checked]="true" formControlName="isTe" required placeholder=" ">
-      </label>
-
+      <form [formGroup]="createShipPointForm" class="flex flex-col gap-y-2" (ngSubmit)="createShipPoint()">
+        <mat-form-field class="example-full-width">
+          <mat-label>ShipPoint</mat-label>
+          <input matInput formControlName="shipPoint" name="shipPoint">
+        </mat-form-field>
+        <mat-form-field class="example-full-width">
+          <mat-label>Full address</mat-label>
+          <textarea matInput formControlName="fullAddress" name="fullAddress"></textarea>
+        </mat-form-field>
+        <p><mat-checkbox [ariaChecked]="true" color="primary" formControlName="isTe" name="isTe">is TE</mat-checkbox></p>
         <div class="button-SR">
           <button type="submit" class="icon-submit-btn">
             <i class="pi pi-check"></i>

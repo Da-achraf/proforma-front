@@ -4,6 +4,7 @@ import { ModifyRequestFinanceComponent } from "../../../components/modify-reques
 import { EditRequestTradcomplianceComponent } from "../../../components/edit-request-tradcompliance/edit-request-tradcompliance.component"
 import { EditRequestWarehouseComponent } from "../../../components/edit-request-warehouse/edit-request-warehouse.component"
 import { RequestStatus } from "../../../models/requeststatus.model"
+import { JsonItemModel } from "../../../models/request.model"
 
 export const getRequestModificationComponent = (role: RoleEnum): ComponentType<any> | undefined => {
     switch (role){
@@ -36,3 +37,63 @@ export const getRequestModificationComponent = (role: RoleEnum): ComponentType<a
         return '';
     }
   }
+
+// Function to convert an array of key-value pairs into an object
+const arrayToMap = (arr: JsonItemModel[]): { [key: string]: JsonItemModel } => {
+  return arr.reduce((acc, item) => {
+      acc[item.name] = item;
+      return acc;
+  }, {} as { [key: string]: JsonItemModel });
+};
+
+// Improved function to merge the two arrays
+export const mergeArrays = (oldArr: {values: JsonItemModel[]}[], newArr: {[key: string]: JsonItemModel}[]): {[key: string]: JsonItemModel}[] => {
+  return oldArr.map((oldItem, index) => {
+      const newItem = newArr[index] || {};
+      
+      // Use the arrayToMap function to create the map from old values
+      const oldMap = arrayToMap(oldItem.values);
+
+      // Start merging values
+      const mergedItem: {[key: string]: JsonItemModel} = { ...oldMap }; // Start with oldMap
+      
+      // Update or add values from newItem
+      for (const key in newItem) {
+          if (mergedItem[key]) {
+              // If the key exists in the old structure, update its value
+              mergedItem[key] = {
+                  ...mergedItem[key],
+                  value: newItem[key].value
+              };
+          } else {
+              // If the key does not exist in oldItem, add the new value
+              mergedItem[key] = newItem[key];
+          }
+      }
+
+      return mergedItem;
+  });
+};
+
+
+
+
+
+// export const deepCopy = <T>(obj: T): T => {
+//   if (obj === null || typeof obj !== 'object') {
+//     return obj;
+//   }
+
+//   if (Array.isArray(obj)) {
+//     return obj.map(item => deepCopy(item)) as unknown as T;
+//   }
+
+//   const copy = {} as T;
+//   for (const key in obj) {
+//     if (Object.prototype.hasOwnProperty.call(obj, key)) {
+//       copy[key] = deepCopy(obj[key]);
+//     }
+//   }
+
+//   return copy;
+// }
