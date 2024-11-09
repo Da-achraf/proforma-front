@@ -9,9 +9,7 @@
 @tailwind utilities;
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-
+body { margin: 0; font-family: 'Robotto', sans-serif; }
 
 .create-btn {
     border: none;
@@ -52,3 +50,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     width: 1.25rem;
     height: 1.25rem;
   }
+
+  ::ng-deep .mat-mdc-menu-content {
+    font-size: 14px;
+    line-height: 1.2;
+}

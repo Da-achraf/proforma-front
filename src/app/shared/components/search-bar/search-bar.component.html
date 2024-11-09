@@ -15,10 +15,12 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65" class=""></line>
         </svg>
     }
-
-    <input
+    <div class="flex items-center border-b-2 border-b-gray-100 focus-within:border-b-blue-300">
+        <input
         (input)="onChange()" name='search' [(ngModel)]="searchValue" type="name"
-      class="h-12 w-full border-b-2 border-b-gray-100 bg-transparent py-4 pl-12 text-sm outline-none focus:border-b-gray-300 transition-all duration-150"
+      class="h-12 w-full bg-transparent py-4 pl-12 text-sm outline-none transition-all duration-150"
       placeholder="Search..." 
     />
+    <mat-icon (click)="clearSearch()" class="text-gray-300 cursor-pointer transition-all duration-200 hover:text-gray-400">clear</mat-icon>
+    </div>
 </form>

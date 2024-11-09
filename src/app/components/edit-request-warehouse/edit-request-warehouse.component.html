@@ -38,7 +38,7 @@
         <input type="text"
                placeholder="Pick one"
                #currencyInput
-               (input)="onChange(currencyInput.value)"
+               (input)="onCurrencyChange(currencyInput.value)"
                matInput
                formControlName="currency"
                [matAutocomplete]="auto">

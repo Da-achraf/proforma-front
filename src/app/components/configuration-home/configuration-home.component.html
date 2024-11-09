@@ -52,7 +52,7 @@
         <!-- <h6>Item {{ i + 1 }}</h6> -->
         <mat-form-field appearance="fill">
           <mat-label>Request item</mat-label>
-          <mat-select formControlName="requestItemId">
+          <mat-select formControlName="requestItemId" (selectionChange)="onItemFieldSelected(item, i)">
             <mat-option *ngFor="let requestItem of myItems()" [value]="requestItem.id_request_item">
               {{ requestItem.nameItem }}
             </mat-option>

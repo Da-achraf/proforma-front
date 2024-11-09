@@ -1,0 +1,42 @@
+:root {
+    --mat-menu-item-label-text-size: 12px;
+    --mat-menu-item-spacing: 5px;
+    --mat-menu-item-leading-spacing: 10px;
+    --mat-menu-item-trailing-spacing: 10px;
+    --mat-menu-item-with-icon-leading-spacing: 0;
+    --mat-menu-item-with-icon-trailing-spacing: 0;
+}
+
+/* Styles specific to the .small-menu class */
+.small-menu .mat-menu-panel {
+    min-width: 150px;
+    padding: 4px 0;
+    font-size: 12px;
+}
+
+.small-menu .mat-menu-item {
+    height: 32px;
+    padding: 0 16px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.small-menu .mat-menu-item .mat-icon {
+    font-size: 16px;
+    margin-right: 8px;
+}
+
+.mat-mdc-menu-content, .mat-mdc-menu-content .mat-mdc-menu-item .mat-mdc-menu-item-tex {
+    font-size: 10px;
+    width: fit-content;
+}
+
+.mat-mdc-menu-item .mat-icon {
+    font-size: 15px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    fill: rebeccapurple;
+}

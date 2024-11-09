@@ -1,12 +1,11 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormBuilder, FormArray } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { HttpClient } from '@angular/common/http';
-import { Departement } from '../../models/user/departement';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
-import { Plant } from '../../models/user/plant.model';
-import { Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
+import { pureRoles } from '../../models/user/user.model';
 
 @Component({
   selector: 'app-sign-up',
@@ -22,13 +21,16 @@ export class SignUpComponent implements OnInit {
   plants: any[] = [];
   SignUpForm!: FormGroup;
 
+  roles = pureRoles
+
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private departementservice: DepartementService,
     private plantService: PlantService,
     private fb: FormBuilder,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     console.log('test: ', this.authService.baseServerUrl)
@@ -94,6 +96,9 @@ export class SignUpComponent implements OnInit {
   get email(): FormControl {
     return this.SignUpForm.get('email') as FormControl;
   }
+  get role(): FormControl {
+    return this.SignUpForm.get('role') as FormControl;
+  }
   get departementId(): FormControl {
     return this.SignUpForm.get('departementId') as FormControl;
   }
@@ -116,15 +121,15 @@ export class SignUpComponent implements OnInit {
 
       const userPayload = {
         // user: {
-          teId: this.SignUpForm.value.teId,
-          userName: this.SignUpForm.value.username,
-          email: this.SignUpForm.value.email,
-          nPlus1: this.SignUpForm.value.nPlus1 || null,
-          backUp: this.SignUpForm.value.backup,
-          role: this.SignUpForm.value.role || null,
-          pwd: this.SignUpForm.get('yourpassword')!.value,
-          departementId: Number(this.SignUpForm.value.departementId),
-          plants: plantId
+        teId: this.SignUpForm.value.teId,
+        userName: this.SignUpForm.value.username,
+        email: this.SignUpForm.value.email,
+        nPlus1: this.SignUpForm.value.nPlus1 || null,
+        backUp: this.SignUpForm.value.backup,
+        role: this.SignUpForm.value.role || null,
+        pwd: this.SignUpForm.get('yourpassword')!.value,
+        departementId: Number(this.SignUpForm.value.departementId),
+        plants: plantId
         // },
         // plantId: plantId // array of numbers
       };

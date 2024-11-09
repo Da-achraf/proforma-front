@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { UserStoreService } from '../../services/user-store.service';
 import { MessageService } from 'primeng/api'; // Import MessageService
-import { RoleEnum, Roles } from '../../models/user/user.model';
+import { RoleEnum } from '../../models/user/user.model';
+import { AuthService } from '../../services/auth.service';
+import { UserStoreService } from '../../services/user-store.service';
 
 @Component({
   selector: 'app-login',

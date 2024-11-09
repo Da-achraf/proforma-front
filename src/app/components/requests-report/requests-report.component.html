@@ -1,37 +1,52 @@
-<div class="mt-6 overflow-auto rounded-xl py-3 bg-white px-6 shadow-md lg:px-4">
+<div class="mt-6 overflow-auto py-3 bg-white px-6 lg:px-4">
     <div class="flex items-center justify-between mb-3">
         <app-search-bar class="w-1/4" (searchTerm)="searchValue.set($event)" />
-        <button 
-            (click)="onExport()" 
-            [disabled]="filteredRequests().length === 0"
-            [ngClass]="{'cursor-not-allowed': filteredRequests().length === 0}"
-            class="px-2 py-1 border bg-orange-200 border-orange-400 rounded-md transition-colors duration-300 hover:bg-orange-400 hover:text-gray-100"
-        >
-            <span class="mr-2 text-sm font-semibold">Export</span>
-            <i class="pi pi-copy"></i>
+        <button [matMenuTriggerFor]="menu" (click)="exportMenuOpened.set(true)"
+            class="flex items-center gap-x-2 p-2 border border-grya-200 rounded-lg shadow-md transition-colors duration-300 hover:bg-orange-400 hover:text-gray-100"
+            [ngClass]="{
+                'bg-orange-400 text-gray-100': exportMenuOpened(),
+                'text-gray-500 bg-gray-100': !exportMenuOpened(),
+            }">
+            <span class="text-sm font-semibold">Export</span>
+            <i class="pi" [ngClass]="{
+                    'pi-spinner-dotted animate-spin': isExporting(),
+                    'pi-file-export': !isExporting()
+                }"></i>
         </button>
+        <mat-menu #menu="matMenu" (closed)="exportMenuOpened.set(false)">
+            @for (option of exportMenuOptions(); track $index) {
+                <button mat-menu-item (click)="onExportMenuItemSelected(option.name)">
+                    <mat-icon>{{ option.icon }}</mat-icon>
+                    <span>{{ option.name }}</span>
+                </button>
+            }
+        </mat-menu>
     </div>
-    <table id="reportTable" class="min-w-full border-collapse border-spacing-y-2 border-spacing-x-2">
-      <thead class="border-b lg:table-header-group">
-        <tr class="bg-gray-200">
-          @for (col of columns(); track col.label){
-            <td class="whitespace-normal py-4 font-medium text-gray-500 sm:px-3">
-                <span>
-                {{col.label}}
-                </span>
-            </td>
-          }
-        </tr>
-      </thead>
-      <tbody class="bg-white lg:border-gray-300">
-        @if (filteredRequests(); as requests){
-            @for (request of requests; track request.requestNumber){
+    <div class="max-h-[500px] overflow-auto shadow-md">
+        <table id="reportTable" class="min-w-full border-collapse border-spacing-y-2 border-spacing-x-2">
+            <thead class="border-b lg:table-header-group">
+                <tr class="bg-[#FAFAFA]">
+                    @for (col of columns(); track col.label){
+                    <td class="whitespace-normal py-4 text-sm font-medium text-gray-500 sm:px-3">
+                        <span>
+                            {{col.label}}
+                        </span>
+                    </td>
+                    }
+                </tr>
+            </thead>
+            <tbody class="bg-white lg:border-gray-300">
+                @if (paginatedRequests(); as requests){
+                @for (request of requests; track request.requestNumber){
                 <tr class="py-2 transition-all duration-150 odd:bg-white even:bg-gray-50 hover:bg-gray-100">
                     <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
                         {{ request.trackingNumber }}
                     </td>
                     <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
-                        {{ request.created_at | date }}
+                        {{ request.created_at | date: createdAtFormat() }}
+                    </td>
+                    <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                        {{ request.user.userName }}
                     </td>
                     <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
                         {{ request.itemsWithValues | weightCalculator : WeightTypeEnum.GROSS }} KG
@@ -40,17 +55,11 @@
                         {{ request.itemsWithValues | weightCalculator : WeightTypeEnum.NET }} KG
                     </td>
                     <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
-                        {{ request.currency }}
-                    </td>
-                    <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
-                        {{ request.shipPoint.shipPoint }}
-                    </td>
-                    <!-- <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
                         {{ request.shipPoint.shipPoint }}
                     </td>
                     <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
-                        {{ request.shipPoint.shipPoint }}
-                    </td> -->
+                        {{ request.deliveryAddress.deliveryAddress }}
+                    </td>
                     <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
                         {{ request.incoterm }}
                     </td>
@@ -60,38 +69,102 @@
                     <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
                         {{ request.modeOfTransport }}
                     </td>
+                    <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                        {{ request.itemsWithValues | totalAmount | currency : request.currency }}
+                    </td>
                 </tr>
-            }
-            @empty {
-            <tr>
-            <td [attr.colspan]="columnsLength()" class="text-center p-4">
-                <span class="font-semibold text-lg text-red-500 p-4">No requests found.</span>
-            </td>
-            </tr>
-            }
-        }
-        @if (filteredRequests() === null) {
-            <tr>
-            <td [attr.colspan]="columnsLength()" class="text-center p-4">
-                <span class="font-semibold text-lg text-red-500 p-3">No requests found.</span>
-            </td>
-            </tr>
-        }
-        @if (filteredRequests() === undefined) {
-            <tr>
-            <td [attr.colspan]="columnsLength()" class="p-0">
-                <loading-dots></loading-dots>
-            </td>
-            </tr>
-        }
-      </tbody>
-    </table>
+                }
+                @empty {
+                <tr>
+                    <td [attr.colspan]="columnsLength()" class="text-center p-4">
+                        <span class="font-semibold text-lg text-red-500 p-4">No requests found.</span>
+                    </td>
+                </tr>
+                }
+                }
+                @if (paginatedRequests() === null) {
+                <tr>
+                    <td [attr.colspan]="columnsLength()" class="text-center p-4">
+                        <span class="font-semibold text-lg text-red-500 p-3">No requests found.</span>
+                    </td>
+                </tr>
+                }
+                @if (paginatedRequests() === undefined) {
+                <tr>
+                    <td [attr.colspan]="columnsLength()" class="p-0">
+                        <loading-dots></loading-dots>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 <div class="m-8 text-center sm:mt-12 ">
-    <button type="button" class="p-2 focus:shadow inline-flex cursor-pointer items-center justify-center rounded text-xs font-bold uppercase tracking-widest text-gray-500 transition-all duration-200 ease-in-out hover:text-gray-900">
-        <svg class="mr-3 block h-4 w-4 align-middle uppercase tracking-wider" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" class="uppercase"></path>
-        </svg>
-        Load more requests
-    </button>
+    <mat-paginator [length]="totalRecords()" [pageSize]="rows()" [showFirstLastButtons]="true"
+        (page)="onPageChange($event)" [pageSizeOptions]="[10, 25, 50, 100]" aria-label="Select page">
+    </mat-paginator>
 </div>
+
+
+
+<!--
+    Ng template of report table used to export the report to an excel sheet
+    depending on the requestsToExport() array of request which is set dynamically.
+-->
+<ng-template #exportTable>
+    <table id="reportTable" class="min-w-full border-collapse border-spacing-y-2 border-spacing-x-2">
+        <thead class="border-b lg:table-header-group">
+            <tr class="bg-[#FAFAFA]">
+                @for (col of columns(); track col.label){
+                <td class="whitespace-normal py-4 text-sm font-medium text-gray-500 sm:px-3">
+                    <span>
+                        {{col.label}}
+                    </span>
+                </td>
+                }
+            </tr>
+        </thead>
+        <tbody class="bg-white lg:border-gray-300">
+            @if (requestsToExport(); as requests){
+            @for (request of requests; track request.requestNumber){
+            <tr class="py-2 transition-all duration-150 odd:bg-white even:bg-gray-50 hover:bg-gray-100">
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.trackingNumber }}
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.created_at | date: createdAtFormat() }}
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.user.userName }}
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.itemsWithValues | weightCalculator : WeightTypeEnum.GROSS }} KG
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.itemsWithValues | weightCalculator : WeightTypeEnum.NET }} KG
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.shipPoint.shipPoint }}
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.deliveryAddress.deliveryAddress }}
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.incoterm }}
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.invoicesTypes }}
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.modeOfTransport }}
+                </td>
+                <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                    {{ request.itemsWithValues | totalAmount | currency : request.currency }}
+                </td>
+            </tr>
+            }
+            }
+        </tbody>
+    </table>
+</ng-template>

@@ -1,10 +1,9 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from '../../services/user.service';
-import { AuthService } from '../../services/auth.service';
-import { subscribe } from 'diagnostics_channel';
-import { UserStoreService } from '../../services/user-store.service';
 import { MenuItem } from 'primeng/api';
+import { AuthService } from '../../services/auth.service';
+import { UserStoreService } from '../../services/user-store.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-header',
@@ -14,6 +13,8 @@ import { MenuItem } from 'primeng/api';
 export class HeaderComponent implements OnInit{
   @Output() toggleSidebarForMe: EventEmitter<any> = new EventEmitter();
 
+  userStore = inject(UserStoreService)
+
   public fullName: string = " ";
   public users: any = [];
   public role!: string;
@@ -21,8 +22,7 @@ export class HeaderComponent implements OnInit{
 
   constructor(private router: Router,
               private api: UserService,
-              private authservice: AuthService,
-              private userStore: UserStoreService) { }
+              private authservice: AuthService) { }
 
   ngOnInit() {
     this.api.getUsers()
@@ -57,7 +57,5 @@ export class HeaderComponent implements OnInit{
 
   logout() {
     this.authservice.SignOut();
-    localStorage.clear();
-
   }
 }

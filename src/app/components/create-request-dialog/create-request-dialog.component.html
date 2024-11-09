@@ -106,7 +106,7 @@
       </mat-form-field>
     </div>
    
-    @if (items.controls.length !== 0) {
+    @if (items.length !== 0 && items.controls.length !== 0) {
       <div class="border border-gray-200 rounded-md overflow-hidden">
         <div class="bg-orange-200 p-2 mb-2 text-center">
           <span class="font-mono text-md w-fit text-orange-600">
@@ -121,7 +121,13 @@
             <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
               <div class="flex items-center justify-between mb-2">
                 <span class="font-bold">Item {{ i + 1 }}</span>
-                <button mat-icon-button color="warn" matTooltipPosition="above" matTooltip="Remove this item" (click)="removeItem(i)" type="button">
+                <button 
+                  mat-icon-button color="warn" 
+                  matTooltipPosition="above" 
+                  [matTooltip]="items.length === 1 ? 'A request should have at least one item' : 'Remove this item'"
+                  type="button"
+                  (click)="removeItem(i)"
+                >
                   <mat-icon>remove_circle</mat-icon>
                 </button>
               </div>

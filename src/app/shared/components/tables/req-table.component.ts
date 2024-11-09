@@ -1,29 +1,30 @@
-import { Component, computed, effect, ElementRef, inject, input, Signal, signal, ViewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, Renderer2, signal, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthService } from '../../../services/auth.service';
-import { getRequestModificationComponent, getStatusClass } from './helpers';
-import { adminRequestColumns, otherUsersRequestColumns, RequestModel } from '../../../models/request.model';
-import { UserStoreService } from '../../../services/user-store.service';
-import { RequestStrategyFactory } from '../../services/requests-strategies/requests-strategies-factory';
-import { RoleEnum } from '../../../models/user/user.model';
-import { CreateRequestDialogComponent } from '../../../components/create-request-dialog/create-request-dialog.component';
-import { MessageService } from 'primeng/api';
-import { RequestStatus, RequestStatusLabelMapping } from '../../../models/requeststatus.model';
-import { PaginatorState } from 'primeng/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { delay, filter, switchMap } from 'rxjs';
-import { Column } from '../../../models/table.model';
-import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
-import { RequestService } from '../../../services/request.service';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas-pro';
-import { InvoiceComponent } from '../invoice/invoice.component';
+import { CreateRequestDialogComponent } from '../../../components/create-request-dialog/create-request-dialog.component';
 import { RequestsReportComponent } from '../../../components/requests-report/requests-report.component';
-
+import { createdAtFormat, otherUsersRequestColumns, RequestModel, sharedRequestColumns } from '../../../models/request.model';
+import { RequestStatus, RequestStatusLabelMapping } from '../../../models/requeststatus.model';
+import { RoleEnum } from '../../../models/user/user.model';
+import { AuthService } from '../../../services/auth.service';
+import { RequestService } from '../../../services/request.service';
+import { UserStoreService } from '../../../services/user-store.service';
+import { createRequestSorter, sortRequestsByDate } from '../../helpers/request-sorting.helper';
+import { InvoiceService } from '../../services/invoice.service';
+import { RequestStrategyFactory } from '../../services/requests-strategies/requests-strategies-factory';
+import { ToasterService } from '../../services/toaster.service';
+import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { getRequestModificationComponent, getStatusClass } from './helpers';
+import { DatePipe } from '@angular/common';
+import { SideNavService } from '../../services/side-nav.service';
+import { HTTP_REQUEST_DELAY } from '../../constants/http-requests.constant';
 
 @Component({
   selector: 'app-reqs-table',
   templateUrl: './req-table.component.html',
-  styleUrl: './req-table.component.css'
+  styleUrl: './req-table.component.css',
+  providers: [DatePipe]
 })
 export class RequestsTableComponent {
 
@@ -33,31 +34,54 @@ export class RequestsTableComponent {
   userStore = inject(UserStoreService)
   requestFactory = inject(RequestStrategyFactory)
   requestService = inject(RequestService)
-  messageService = inject(MessageService)
+  toasterService = inject(ToasterService)
+  renderer = inject(Renderer2)
+  elementRef = inject(ElementRef)
+  invoiceService = inject(InvoiceService)
+  datePipe = inject(DatePipe)
+  sideNavService = inject(SideNavService)
 
   // Enums and constants
   RoleEnum = RoleEnum
 
+  // View refs
+  @ViewChild('invoiceElement') invoiceElement!: TemplateRef<any>;
+
   // Signals and computed values
   loggedInUser = this.userStore.loggedInUser
-  request = this.requestService.invoiceRequest
+  invoiceRequest = this.requestService.invoiceRequest
   searchValue = signal('')
   requests = signal<RequestModel[] | undefined | null>(undefined)
   rows = signal(10)
   first = signal(0)
+  isDownloading = signal(false)
+  createdAtFormat = signal(createdAtFormat)
+  requestSortingOrder = signal<'asc' | 'desc'>('desc')
+  requestSortingIconVisible = signal(true)
+
+  sortedRequests = computed(() => {
+    const requests = this.requests()
+    const loggedInUserRole = this.loggedInUser()?.role as RoleEnum;
+    if (!requests) return
+    const order = this.requestSortingOrder()
+    return createRequestSorter(requests)
+      .byRoleRelevance(loggedInUserRole)
+      .byDate(order)
+      .build()
+  }, undefined)
 
   filteredRequests = computed(() => {
-    const requests = this.requests()
+    const requests = this.sortedRequests()
     const searchValue = this.searchValue()
 
     if (requests?.length === 0) return []
-    else if (requests?.length != 0){
+    else if (requests?.length != 0) {
       if (searchValue.length === 0) return requests
-      return this.filterRequests(searchValue, requests as RequestModel[])
+      return this.filterRequests(searchValue.toLowerCase(), requests as RequestModel[])
     }
     return null
   }, undefined)
-  
+
   paginatedRequests = computed(() => {
     const filteredRequests = this.filteredRequests()
     return filteredRequests?.slice(this.first(), this.first() + this.rows())
@@ -72,7 +96,7 @@ export class RequestsTableComponent {
     const loggedInUser = this.loggedInUser()
     return loggedInUser && loggedInUser.role == RoleEnum.REQUESTER
   })
-  
+
   showUpdateButton = computed(() => {
     const loggedInUser = this.loggedInUser()
     return loggedInUser && loggedInUser.role != RoleEnum.ADMIN
@@ -81,12 +105,12 @@ export class RequestsTableComponent {
   columns = computed(() => {
     const loggedInUser = this.loggedInUser()
 
-    if (loggedInUser?.role == RoleEnum.ADMIN){
-      return adminRequestColumns
+    if (loggedInUser?.role == RoleEnum.ADMIN) {
+      return sharedRequestColumns
     }
     return otherUsersRequestColumns
   })
-  
+
   columnsLength = computed(() => {
     const columns = this.columns()
     return columns.length
@@ -94,23 +118,16 @@ export class RequestsTableComponent {
 
   constructor() {
     effect(() => {
-      const requests = this.paginatedRequests()
-      console.log('paginated requests: ', requests)
-    })
-
-    effect(() => {
       const loggedInUser = this.loggedInUser()
-      console.log('loggedInUser: ', loggedInUser)
       if (loggedInUser) {
-        console.log('Getting the requests...')
         this.requestFactory.getRequests(loggedInUser)
-        .pipe(delay(1000))
-        .subscribe({
-          next: requests => {
-            this.requests.set(requests)
-            console.log('Got following requests: ', requests)
-          }
-        })
+          .pipe(delay(HTTP_REQUEST_DELAY))
+          .subscribe({
+            next: requests => {
+              this.requests.set(requests)
+              this.sideNavService.requests.set(requests)
+            }
+          })
       }
     })
   }
@@ -118,7 +135,6 @@ export class RequestsTableComponent {
   ngOnInit() {
     const userId = this.auth.getUserIdFromToken()
     this.userStore.getLoggedInUser(userId)
-    console.log('UserId: ', userId)
   }
 
   // Methods
@@ -127,7 +143,6 @@ export class RequestsTableComponent {
   loadRequests() {
     const userId = this.auth.getUserIdFromToken()
     this.userStore.getLoggedInUser(userId)
-    console.log('UserId: ', userId)
   }
 
   openUpdateRequestDialog(requestNumber: number): void {
@@ -147,45 +162,34 @@ export class RequestsTableComponent {
     });
   }
 
-  openDownloadDialog(req: any) {
-    const request = req as RequestModel
-
-    const dialogRef = this.dialog.open(InvoiceComponent, {
-      width: '800px',
-      data: { request }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed ', result)
-      if (result) this.loadRequests()
-    });
-  }
-
   openCreateRequestDialog(): void {
     const dialogRef = this.dialog.open(CreateRequestDialogComponent, {
       width: '800px'
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request created successfully' });
+        this.toasterService.showSuccessMessage('Request created successfully')
         this.loadRequests();
       }
     });
   }
 
   onOpenReportDialog() {
-    const dialogRef = this.dialog.open(RequestsReportComponent, {
+    this.dialog.open(RequestsReportComponent, {
       minWidth: '800px',
-      maxWidth: '1400px',
-      data: {requests: this.requests()}
+      maxWidth: '1500px',
+      data: { requests: this.requests() }
     });
   }
 
-  private filterRequests(searchValue: string, requests: RequestModel[]): RequestModel[] {    
+  private filterRequests(searchValue: string, requests: RequestModel[]): RequestModel[] {
+
+    const formatedDate = this.datePipe.transform('')
+
     return requests.filter(request =>
       request.requestNumber.toString().toLowerCase().includes(searchValue) ||
       RequestStatusLabelMapping[request.status as RequestStatus].toLowerCase().includes(searchValue) ||
-      request.created_at.toLowerCase().includes(searchValue)
+      this.datePipe.transform(request.created_at)?.toLowerCase().includes(searchValue)
     );
   }
 
@@ -202,30 +206,56 @@ export class RequestsTableComponent {
       switchMap(_ => this.requestService.deleteRequest(reqNumber))
     ).subscribe({
       next: () => {
-        this.showSuccessMessage('Request Deleted successfully.')
+        this.toasterService.showSuccessMessage('Request Deleted successfully.')
         this.loadRequests();
       },
       error: () => {
-        this.showErrorMessage('Error in deleting ship point')
+        this.toasterService.showErrorMessage('Error in deleting ship point')
       }
     })
   }
 
-  private showErrorMessage(message: string) {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
+  triggerDownload() {
+    this.isDownloading.set(true)
   }
 
-  private showSuccessMessage(message: string) {
-    this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
-  }
+  async download(req: any) {
+    this.invoiceRequest.set(req)
 
-  onPageChange(event: PaginatorState) {
-    const first = event.first
-    const rows = event.rows
-
-    if (first !== undefined && rows !== undefined) {
-      this.first.set(first);
-      this.rows.set(rows);
+    let resolved = false
+    try {
+        resolved = await this.invoiceService.downloadInvoice(req.requestNumber, this.invoiceElement, this.renderer, this.elementRef)
+    } catch (error) {
+      console.error('error generating pdf: ', error)
+      this.isDownloading.set(false)
     }
+
+    while (1){
+      if (resolved) {
+        this.isDownloading.set(false)
+        break
+      }
+    }
+  }
+
+  /**
+   * Pagination using angular material
+   */
+  onPageChange(event: PageEvent) {
+    const { pageIndex, pageSize } = event;
+
+    if (typeof pageIndex === 'number' && typeof pageSize === 'number') {
+      this.first.set(pageIndex * pageSize)
+      this.rows.set(pageSize)
+    }
+  }
+
+  onToggleSortingOrder(sortingOrder: 'asc' | 'desc') {
+    this.requestSortingIconVisible.set(false)
+    const newOrder: 'asc' | 'desc' = sortingOrder === 'asc' ? 'desc' : 'asc'
+    setTimeout(() => {
+      this.requestSortingOrder.set(newOrder)
+      this.requestSortingIconVisible.set(true)
+    }, 150);
   }
 }

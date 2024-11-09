@@ -1,7 +1,11 @@
-
-  <button (click)="downloadInvoice()">Download</button>
+<div class="relative">
+  <!-- <button class="w-fit bg-orange-400 rounded-md px-3 py-2 text-gray-50 transition-all duration-200 hover:bg-orange-500 shadow-sm" (click)="downloadInvoice()"> -->
+    <button class="absolute translate-x-[-50%] top-[90px] left-[50%] z-20 bg-orange-400 rounded-md px-3 py-2 text-gray-50 transition-all duration-200 hover:bg-orange-500 shadow-sm" (click)="downloadInvoice()">
+    <span>Download</span>
+    <i class="pi pi-cloud-download ml-2"></i>
+  </button>
   @if (data.request; as request) {
-  <div class="invoice" #invoiceElement>
+  <div class="invoice blur-sm" #invoiceElement>
     <div class="mb-1 class flex items-center justify-between">
       <div class="flex flex-col">
         <img width="200" height="200" src="assets/te-logo.png" alt="">
@@ -77,7 +81,7 @@
       <tfoot>
         <tr class="">
           <td colspan="7" class="total-label p-2">Total</td>
-          <td class="bg-gray-300 p-2">{{ calculateTotal() | number:'1.2-2' | currency : 'MAD' }}</td>
+          <td class="bg-gray-300 p-2">{{ calculateTotal() | number:'1.2-2' | currency : request.currency }}</td>
         </tr>
       </tfoot>
     </table>
@@ -107,3 +111,4 @@
     </div>
   </div>
 }
+</div>

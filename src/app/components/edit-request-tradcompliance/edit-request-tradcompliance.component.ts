@@ -1,18 +1,17 @@
-import { Component, computed, effect, inject, Inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, OnInit } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import _, { get } from 'lodash';
+import { MessageService } from 'primeng/api';
+import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
+import { FieldTypeEnum, ItemModel } from '../../models/request-item.model';
+import { currencyCodes, RequestModel } from '../../models/request.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
-import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
-import { MessageService } from 'primeng/api';
-import { Item, RequestModel, StandardFieldEnum } from '../../models/request.model';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, filter, shareReplay, switchMap } from 'rxjs';
-import { FieldTypeEnum, ItemModel } from '../../models/request-item.model';
 import { ScenarioService } from '../../services/scenario.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
-import _ from 'lodash';
+import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
 
 @Component({
   selector: 'app-edit-request-tradcompliance',
@@ -29,6 +28,9 @@ export class EditRequestTradcomplianceComponent implements OnInit {
   public dialogRef = inject(MatDialogRef<EditRequestTradcomplianceComponent>)
   data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
   dialog = inject(MatDialog)
+
+  currencyCodes = currencyCodes
+  filteredOptions!: Observable<string[]>;
 
   additionalItems: ItemModel[] = [
     {
@@ -123,12 +125,23 @@ export class EditRequestTradcomplianceComponent implements OnInit {
 
     formItems.forEach((item: ItemModel) => {
       const fieldData = this.findDataOfItem(item.nameItem, data?.values) ?? undefined;
-      group[item.nameItem] = this.fb.group({
-        name: item.nameItem,
-        value: [fieldData ? fieldData?.value : '', (fieldData?.isMandatory || item.isMandatory) ? Validators.required : null],
-        type: [fieldData ? fieldData?.type : item.type],
-        isMandatory: [fieldData?.isMandatory]
-      });
+      if (item.nameItem == 'COO'){
+        group[item.nameItem] = this.fb.group({
+          name: item.nameItem,
+          value: [fieldData ? {'alpha2Code': fieldData.value} : '', (fieldData?.isMandatory || item.isMandatory) ? Validators.required : null],
+          type: [fieldData ? fieldData?.type : item.type],
+          isMandatory: [fieldData?.isMandatory]
+        });
+      }
+      else {
+        group[item.nameItem] = this.fb.group({
+          name: item.nameItem,
+          value: [fieldData ? fieldData?.value : '', (fieldData?.isMandatory || item.isMandatory) ? Validators.required : null],
+          type: [fieldData ? fieldData?.type : item.type],
+          isMandatory: [fieldData?.isMandatory]
+        });
+      }
+      
     });
     console.log(this.fb.group(group))
     return this.fb.group(group);
@@ -152,6 +165,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
       deliveryAddress: [{ value: '', disabled: true }],
       modeOfTransport: [{ value: '', disabled: true }],
       incoterm: [{ value: '', disabled: true }],
+      currency: ['', Validators.required],
       dhlAccount: [{ value: '', disabled: true }],
       items: this.fb.array([]) // Ajout du FormArray pour les items
     });
@@ -163,6 +177,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
           shippingPoint: request.shipPoint.shipPoint,
           deliveryAddress: request.deliveryAddress.deliveryAddress,
           incoterm: request.incoterm,
+          currency: request.currency,
           modeOfTransport: request.modeOfTransport,
           dhlAccount: request.dhlAccount,
         });
@@ -190,9 +205,11 @@ export class EditRequestTradcomplianceComponent implements OnInit {
     if (this.requestForm.valid) {
       const userId = this.authService.getUserIdFromToken();
       const existingItemsData = this.existingItemsData() ?? []
-      const itemsCopy = _.cloneDeep(this.requestForm.value.items)
+      let itemsCopy = transformCooValue(_.cloneDeep(this.requestForm.value.items))
+      
       const updateData = {
         itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
+        currency: this.requestForm.value.currency,
         userId: userId
       };
 
@@ -262,7 +279,30 @@ export class EditRequestTradcomplianceComponent implements OnInit {
     );
   }
 
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.currencyCodes.filter(option => option.toLowerCase().includes(filterValue));
+  }
+
+  onCurrencyChange(text: string) {
+    this.filteredOptions = of(text).pipe(
+      startWith(''),
+      map((value: string) => this._filter(value || ''))
+    );
+  }
+
   onNoClick(): void {
     this.dialogRef.close();
   }
+}
+
+function transformCooValue(items: any[]): any[] {
+  return items.map((item) => ({
+    ...item,
+    COO: {
+      ...item.COO,
+      value: get(item, 'COO.value.alpha2Code', null),
+    },
+  }));
 }

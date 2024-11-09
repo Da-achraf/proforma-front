@@ -60,7 +60,7 @@ export class AuthService {
     if(isPlatformBrowser(this.platformId)){ // Check if the platform is browser
       localStorage.clear();
       this.router.navigateByUrl("/login").then(() => {
-        //window.location.reload(); // Reload the page after navigating to login
+        window.location.reload(); // Reload the page after navigating to login
       });
     }
   }

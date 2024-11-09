@@ -31,4 +31,9 @@ export class SearchBarComponent {
   onChange(){
     this.searchSubject.next(this.searchValue);
   }
+
+  clearSearch() {
+    this.searchValue = ''
+    if (this.searchSubject.value.length != 0) this.searchSubject.next('')
+  }
 }

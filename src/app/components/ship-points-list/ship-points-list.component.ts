@@ -9,6 +9,7 @@ import { TableNameEnum } from '../../models/table.model';
 import { MessageService } from 'primeng/api';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
 
 @Component({
   selector: 'app-ship-points-list',
@@ -30,7 +31,7 @@ export class ShipPointsListComponent implements OnInit {
   createShipPointForm!: FormGroup
 
   shipPoints$ = this.shipPointService.getShipPoints().pipe(
-    delay(1000)
+    delay(HTTP_REQUEST_DELAY)
   )
 
   tableProperties = shipPointTableProperties

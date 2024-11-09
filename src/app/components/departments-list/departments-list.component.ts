@@ -8,6 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MessageService } from 'primeng/api';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
 
 @Component({
   selector: 'app-departments-list',
@@ -31,7 +32,7 @@ export class DepartmentsListComponent implements OnInit {
   managerControl = new FormControl()
 
   departments$ = this.departmentService.getDepartements().pipe(
-    delay(1000)
+    delay(HTTP_REQUEST_DELAY)
   )
 
   filtereddepartements: any[] = [];

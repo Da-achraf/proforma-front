@@ -74,9 +74,10 @@ import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
 import { TooltipModule } from 'primeng/tooltip';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import {MatPaginatorModule} from '@angular/material/paginator';
 import { CarouselModule } from 'primeng/carousel';
 import { CardModule } from 'primeng/card';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -101,6 +102,12 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { TruncateTextPipe } from './shared/pipes/truncate-text.pipe';
 import { RequestsReportComponent } from './components/requests-report/requests-report.component';
 import { WeightCalculatorPipe } from './shared/pipes/report-table/gross-weight-calculator.pipe';
+import { TheInvoiceComponent } from './shared/components/the-invoice/the-invoice.component';
+import { MatSelectCountryModule } from "@angular-material-extensions/select-country";
+import { CountryPipe } from './shared/pipes/country.pipe';
+import { GenerateArrayPipe } from './shared/pipes/generate-array.pipe';
+import { ItemAmountPipe } from './shared/pipes/item-amount.pipe';
+import { TotalAmountPipe } from './shared/pipes/total-amount.pipe';
 
 
 @NgModule({
@@ -156,7 +163,12 @@ import { WeightCalculatorPipe } from './shared/pipes/report-table/gross-weight-c
     InvoiceComponent,
     TruncateTextPipe,
     RequestsReportComponent,
-    WeightCalculatorPipe
+    WeightCalculatorPipe,
+    TheInvoiceComponent,
+    CountryPipe,
+    GenerateArrayPipe,
+    ItemAmountPipe,
+    TotalAmountPipe
   ],
   imports: [
     BrowserModule,
@@ -186,6 +198,8 @@ import { WeightCalculatorPipe } from './shared/pipes/report-table/gross-weight-c
     MatMenuModule,
     MatIconModule,
     MatDividerModule,
+    MatPaginatorModule,
+    MatSelectCountryModule.forRoot('en'),
     MatListModule,
     FormsModule,
     MatButtonModule,
@@ -202,7 +216,8 @@ import { WeightCalculatorPipe } from './shared/pipes/report-table/gross-weight-c
     DialogModule,
     ToastModule,
     PaginatorModule,
-    MatChipsModule
+    MatChipsModule,
+    NgOptimizedImage
   ],
   exports: [
     MatDialogModule

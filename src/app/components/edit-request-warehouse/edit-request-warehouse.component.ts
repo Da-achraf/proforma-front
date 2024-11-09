@@ -112,8 +112,6 @@ export class EditRequestWarehouseComponent implements OnInit {
       deliveryAddress: [{ value: '', disabled: true }],
       incoterm: [{ value: '', disabled: true }],
       dhlAccount: [{ value: '', disabled: true }],
-      // htsCode: [{ value: '', disabled: true }],
-      // coo: [{ value: '', disabled: true }],
       trackingNumber: ['', Validators.required],
       numberOfBoxes: ['', Validators.required],
       dimension: ['', Validators.required],
@@ -140,9 +138,6 @@ export class EditRequestWarehouseComponent implements OnInit {
           shippedVia: request.shippedVia,
           currency: request.currency,
         });
-
-        // Populate items
-        // (request.items || []).forEach((item: any) => this.addItem(item));
       },
       (error) => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error fetching request data' });
@@ -225,6 +220,7 @@ export class EditRequestWarehouseComponent implements OnInit {
         trackingNumber: this.requestForm.get('trackingNumber')?.value,
         numberOfBoxes: this.requestForm.get('numberOfBoxes')?.value,
         dimension: this.requestForm.get('dimension')?.value,
+        currency: this.requestForm.get('currency')?.value,
         itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
         userId: userId
       };
@@ -260,7 +256,7 @@ export class EditRequestWarehouseComponent implements OnInit {
     return this.currencyCodes.filter(option => option.toLowerCase().includes(filterValue));
   }
 
-  onChange(text: string) {
+  onCurrencyChange(text: string) {
     this.filteredOptions = of(text).pipe(
       startWith(''),
       map((value: string) => this._filter(value || ''))

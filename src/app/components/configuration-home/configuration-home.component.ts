@@ -1,4 +1,4 @@
-import { Component, effect, OnInit, signal } from '@angular/core';
+import { Component, effect, OnInit, signal, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api'; // Import MessageService
@@ -9,6 +9,7 @@ import { RequestItemService } from '../../services/request-item.service';
 import { ScenarioItemConfigurationService } from '../../services/scenario-item-configuration.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { CreateItemDialogComponent } from '../create-item-dialog/create-item-dialog.component';
+import { MatSelect } from '@angular/material/select';
 
 export type Item = {
   id: string;
@@ -21,12 +22,15 @@ export type Item = {
   styleUrls: ['./configuration-home.component.css']
 })
 export class ConfigurationHomeComponent implements OnInit {
+
   scenarioForm: FormGroup;
   itemsAvailable: any[] = [];
   roles: string[] = Roles
   classes: number[] = [0, 1, 2, 3, 4];
 
   mandatoryFor = new FormControl('');
+
+  selectedValue = ''
 
   myItems = signal<RequestItemModel[]>([])
   constructor(
@@ -46,16 +50,12 @@ export class ConfigurationHomeComponent implements OnInit {
 
     effect(() => {
       const myItems = this.myItems();
-      console.log('items: ', myItems);
-
       if (myItems.length === 0) return;
 
       // Clear the existing form array
       this.items.clear();
 
       const standardFieldsMap = new Map(standardFields.map(f => [f.name, f]));
-
-      const standardFieldsNames = standardFields.map(f => f.name)
 
       // Create form group for each item and patch the form array
       myItems.forEach((item: RequestItemModel) => {
@@ -120,6 +120,15 @@ export class ConfigurationHomeComponent implements OnInit {
     }
   }
 
+  onItemFieldSelected(itemField: any, index: number) {
+    const itemFieldId = itemField.value.requestItemId
+    const itemFieldsIds = this.items.controls.map(control => control.value.requestItemId)
+    console.log(itemFieldsIds)
+    if (itemFieldsIds.length !== new Set(itemFieldsIds).size){
+      this.items.removeAt(index)
+    }
+  }
+
   createItem(): void {
     const dialogRef = this.dialog.open(CreateItemDialogComponent, {
       width: '800px',
@@ -141,6 +150,7 @@ export class ConfigurationHomeComponent implements OnInit {
       }
     });
   }
+
 
   onSubmit(): void {
     if (this.scenarioForm.valid) {

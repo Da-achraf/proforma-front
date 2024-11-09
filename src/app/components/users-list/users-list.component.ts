@@ -1,13 +1,15 @@
-import { Component, inject, model, signal } from '@angular/core';
+import { Component, inject, model, OnInit, signal } from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { emptyUser, Roles, User, userTableColumns, userTableProperties } from '../../models/user/user.model';
 import { TableNameEnum } from '../../models/table.model';
-import { defaultIfEmpty, delay, filter, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { defaultIfEmpty, delay, filter, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { MessageService } from 'primeng/api';
+import { SideNavService } from '../../shared/services/side-nav.service';
+import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
 
 
 @Component({
@@ -15,10 +17,11 @@ import { MessageService } from 'primeng/api';
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.css'
 })
-export class UsersListComponent {
+export class UsersListComponent implements OnInit {
   userService = inject(UserService)
   departmentService = inject(DepartementService)
   plantService = inject(PlantService)
+  sideNavService = inject(SideNavService)
   dialog = inject(MatDialog)
   messageService = inject(MessageService)
 
@@ -27,7 +30,7 @@ export class UsersListComponent {
 
   // Observables
   users$ = this.userService.getUsers().pipe(
-    delay(1000)
+    delay(HTTP_REQUEST_DELAY)
   )
   departments$ = this.departmentService.getDepartements()
   plants$ = this.plantService.getPlants().pipe( 
@@ -44,6 +47,10 @@ export class UsersListComponent {
   userTableColumns = userTableColumns
 
   TableNameEnum = TableNameEnum
+
+  ngOnInit(): void {
+    this.loadUsers()
+  }
 
   onUpdate(user: User): void {
     this.user = user
@@ -69,7 +76,9 @@ export class UsersListComponent {
   }
 
   loadUsers(): void {
-    this.users$ = this.userService.getUsers()
+    this.users$ = this.userService.getUsers().pipe(
+      tap(this.sideNavService.users.set)
+    )
   }
 
   updateUser(): void {

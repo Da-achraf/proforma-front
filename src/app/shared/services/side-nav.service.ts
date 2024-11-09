@@ -1,67 +1,64 @@
-import { Injectable } from '@angular/core';
-import { RoleEnum } from '../../models/user/user.model';
-
-export type Menu = {
-  label: string
-  icon: string
-  routerLink: string
-  roles?: string[]
-}
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { RequestModel } from '../../models/request.model';
+import { RequestStatus } from '../../models/requeststatus.model';
+import { SidenavItem } from '../../models/sidenav-item.model';
+import { RoleEnum, User } from '../../models/user/user.model';
+import { AuthService } from '../../services/auth.service';
+import { UserStoreService } from '../../services/user-store.service';
+import { UserService } from '../../services/user.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SideNavService {
 
-  private menuItems: Menu[] = [
-    {
-      label: 'Dashboard',
-      icon: 'pi pi-fw pi-chart-bar',
-      routerLink: '/home/dashboard',
-      roles: [RoleEnum.ADMIN]
-    },
-    {
-      label: 'Requests',
-      icon: 'pi pi-copy',
-      routerLink: '/home/requests',
-      roles: [RoleEnum.ALL]
-    },
-    {
-      label: 'User Management',
-      icon: 'pi pi-fw pi-user',
-      routerLink: '/home/usermanagement',
-      roles: [RoleEnum.ADMIN]
-    },
-    {
-      label: 'Plant Management',
-      icon: 'pi pi-fw pi-building',
-      routerLink: '/home/plantmanagement',
-      roles: [RoleEnum.ADMIN]
-    },
-    {
-      label: 'Department Management',
-      icon: 'pi pi-fw pi-sitemap',
-      routerLink: '/home/departementmanagement',
-      roles: [RoleEnum.ADMIN]
-    },
-    {
-      label: 'Shipping Point',
-      icon: 'pi pi-fw pi-truck',
-      routerLink: '/home/ShipPoint',
-      roles: [RoleEnum.ADMIN]
-    },
-    {
-      label: 'Configuration Section',
-      icon: 'pi pi-fw pi-cog',
-      routerLink: '/home/ConfigurationSection',
-      roles: [RoleEnum.ADMIN]
-    }
-  ];
+  // Injected dependencies
+  auth = inject(AuthService)
+  userStore = inject(UserStoreService)
+  userService = inject(UserService)
 
-  getMenuItemsBaseOnRole(role: RoleEnum): Menu[] {
-    return this.menuItems.filter((item: Menu) => {
+  // Signals and computed values
+  requests = signal<RequestModel[]>([])
+  users = signal<User[]>([])
+  loggedInUserRole = this.userStore.userRole
+
+  inActivatedAcountsCount = computed(() => {
+    const users = this.users()
+    console.log('users: ', users)
+    return users.filter(u => !u.role).length
+  })
+
+  pendingRequestsCount = computed(() => {
+    const requests = this.requests()
+    const role = this.loggedInUserRole()
+    console.log('State in sidenav service: ')
+    console.log('Requests: ', requests)
+    console.log('Role: ', role)
+
+    if (!requests || !role) return 0
+
+    return this.getPendingRequestsCountByRole(requests, role as RoleEnum)
+  })
+
+  // Methods
+  getMenuItemsBasedOnRole(allItems: any[], role: RoleEnum): SidenavItem[] {
+    return allItems.filter((item: SidenavItem) => {
       return item.roles?.includes(role) || item.roles?.includes(RoleEnum.ALL)
     })
+  }
+
+  private getPendingRequestsCountByRole(requests: RequestModel[], role: RoleEnum): number {
+    switch (role) {
+      case RoleEnum.FINANCE_APPROVER:
+        return requests.filter(r => r.status === RequestStatus.PendingInFinance).length
+      case RoleEnum.TRADECOMPLIANCE_APPROVER:
+        return requests.filter(r => r.status === RequestStatus.PendingInTradCompliance).length
+      case RoleEnum.WAREHOUSE_APPROVER:
+        return requests.filter(r => r.status === RequestStatus.InShipping).length
+      default:
+        return 0
+    }
   }
 
 }

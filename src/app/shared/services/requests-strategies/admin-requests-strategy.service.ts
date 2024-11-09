@@ -12,7 +12,7 @@ export class AdminRequestStrategy implements IRequestStrategy {
     
     constructor(private requestService: RequestService){}
 
-    getRequests(user: User): Observable<RequestModel[]> {
+    getRequests(_: User): Observable<RequestModel[]> {
         return this.requestService.getAllRequests()
     }
 

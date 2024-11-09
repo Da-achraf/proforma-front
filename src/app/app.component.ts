@@ -1,4 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { UserService } from './services/user.service';
+import { tap } from 'rxjs';
+import { User } from './models/user/user.model';
+import { SideNavService } from './shared/services/side-nav.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +10,13 @@ import { Component } from '@angular/core';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'ProformaInvoice';
+  
+  userService = inject(UserService)
+  sideNavService = inject(SideNavService)
+
+  constructor() {
+    this.userService.getUsers().pipe(
+      tap(this.sideNavService.users.set)
+    ).subscribe()
+  }
 }

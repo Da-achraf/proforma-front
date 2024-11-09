@@ -11,9 +11,11 @@ export class HomeComponent implements OnInit{
   ngOnInit(){
 
   }
+
   logout(){
     this.auth.SignOut();
   }
+
   sideBarOpen = true;
 
   sideBarToggler() {

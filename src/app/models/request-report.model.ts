@@ -10,6 +10,10 @@ export const requestReportTableColumns: Column[] = [
         isSortable: false
     },
     {
+        label: 'Requester',
+        isSortable: false
+    },
+    {
         label: 'Gross Weight',
         isSortable: false
     },
@@ -18,21 +22,13 @@ export const requestReportTableColumns: Column[] = [
         isSortable: false
     },
     {
-        label: 'Currency',
+        label: 'Shipped from',
         isSortable: false
     },
     {
         label: 'Shipped to',
         isSortable: false
     },
-    // {
-    //     label: 'Plant',
-    //     isSortable: false
-    // },
-    // {
-    //     label: 'Plant name',
-    //     isSortable: false
-    // },
     {
         label: 'Incoterm',
         isSortable: false
@@ -43,6 +39,10 @@ export const requestReportTableColumns: Column[] = [
     },
     {
         label: 'Carrier name',
+        isSortable: false
+    },
+    {
+        label: 'Total',
         isSortable: false
     },
 ]

@@ -73,3 +73,9 @@ button.reject-button {
 button.reject-button:hover {
   background-color: #b71c1c;
 }
+
+
+.test {
+  width: 10px;
+  background-color: red;
+}

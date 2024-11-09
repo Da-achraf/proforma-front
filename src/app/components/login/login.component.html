@@ -35,7 +35,6 @@
 
 <div class="responsive-background" fxLayout="column" fxLayoutAlign="center center">
     <div class="wrapper">
-        <!-- <div class="logo-container"></div> -->
 
         <img src="assets/pro.png" width="200" height="200" alt="">
         
@@ -71,13 +70,19 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary" [disabled]="LoginForm.invalid">Login</button>
+            <button 
+                type="submit" 
+                [disabled]="!LoginForm.valid"
+                class="bg-orange-400 text-gray-50 hover:bg-transparent hover:text-gray-500"
+                [ngClass]="{
+                    'cursor-not-allowed': !LoginForm.valid
+                }"
+            >
+                Login
+            </button>
             <div class="signup-route">
                 <span>Don't have an account? <a routerLink="/sign-up"><u>Sign Up</u></a></span>
             </div>
-            <!-- <div class="form-group forgot-password">
-                <a href="#">Forgot password?</a>
-            </div> -->
         </form>
     </div>
 </div>

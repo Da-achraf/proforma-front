@@ -9,6 +9,7 @@ import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { MessageService } from 'primeng/api';
+import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
 
 @Component({
   selector: 'app-plants-list',
@@ -30,7 +31,7 @@ export class PlantsListComponent implements AfterViewInit, OnInit {
 
   // Observables
   plants$ = this.plantService.getPlants().pipe(
-    delay(1000),
+    delay(HTTP_REQUEST_DELAY),
   );
   departments$ = this.departmentService.getDepartements()
 

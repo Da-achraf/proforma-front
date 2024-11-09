@@ -1,16 +1,16 @@
-import { Component, computed, effect, model, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
-import { FieldTypeEnum, ItemField, ItemModel } from '../../models/request-item.model';
+import { BehaviorSubject, filter, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { ItemModel } from '../../models/request-item.model';
 import { CreateRequest, currencyCodes, INCOTERMES, InvoicesTypes, ModesOfTransports } from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
-import { BehaviorSubject, filter, map, Observable, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-create-request-dialog',
@@ -121,7 +121,7 @@ export class CreateRequestDialogComponent implements OnInit {
     if (this.existingItemsData.length > 0) {
       this.patchExistingData();
     } else {
-      this.addItem();
+      // this.addItem();
     }
   }
 
@@ -161,10 +161,12 @@ export class CreateRequestDialogComponent implements OnInit {
   }
 
   addItem() {
+    console.log('addItem called...')
     this.items.push(this.createItem());
   }
 
   removeItem(index: number) {
+    if (this.items.length <= 1) return 
     this.items.removeAt(index);
   }
 

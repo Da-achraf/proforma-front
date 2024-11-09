@@ -15,6 +15,13 @@ export class DashboardComponent implements OnInit {
     responsive: true,
     scales: {
       y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+          callback: function(value) {
+            return Number.isInteger(value) ? value : null;
+          }
+        },
         title: {
           display: true,
           text: 'Request Count'
@@ -29,8 +36,8 @@ export class DashboardComponent implements OnInit {
     scales: {
       y: {
         ticks: {
-          precision: 0, // Affiche uniquement les entiers
-          stepSize: 1   // Incréments de 1
+          precision: 0,
+          stepSize: 1
         },
         title: {
           display: true,
@@ -98,7 +105,7 @@ export class DashboardComponent implements OnInit {
 
   loadScenarioData(): void {
     this.kpiService.getRequestCountByAllScenarios().subscribe(data => {
-      const labels = Object.keys(data).map(key => `Scenario ${key}`);
+      const labels = Object.keys(data);
       const counts = Object.values(data);
       this.scenarioCount = counts.reduce((a, b) => a + b, 0);
 

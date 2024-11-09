@@ -2,6 +2,7 @@ import { Component, computed, input, OnInit, output, signal } from '@angular/cor
 import { Column, TableNameEnum, TableProperty } from '../../../models/table.model';
 import { ISearchFilterStrategy, searchFilterStrategyFactory } from '../../helpers/table-search-filters.helper';
 import { PaginatorState } from 'primeng/paginator';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-management-tables',
@@ -92,13 +93,22 @@ export class ManagementTablesComponent<T> implements OnInit {
   }
 
   // Methods
-  onPageChange(event: PaginatorState) {
-    const first = event.first
-    const rows = event.rows
+  // onPageChange(event: PaginatorState) {
+  //   const first = event.first
+  //   const rows = event.rows
 
-    if (first !== undefined && rows !== undefined) {
-      this.first.set(first);
-      this.rows.set(rows);
+  //   if (first !== undefined && rows !== undefined) {
+  //     this.first.set(first);
+  //     this.rows.set(rows);
+  //   }
+  // }
+
+  onPageChange(event: PageEvent) {
+    const { pageIndex, pageSize } = event;
+  
+    if (typeof pageIndex === 'number' && typeof pageSize === 'number') {
+      this.first.set(pageIndex * pageSize)
+      this.rows.set(pageSize)
     }
   }
 }

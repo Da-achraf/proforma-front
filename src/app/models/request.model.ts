@@ -143,10 +143,15 @@ export enum ModeOfTransportEnum {
 
 export const ModesOfTransports:string[] = Object.values(ModeOfTransportEnum)
 
-export const adminRequestColumns: Column[] = [
+export const sharedRequestColumns: Column[] = [
   {label: 'Request Number', isSortable: false},
   {label: 'Date of Submission', isSortable: true},
   {label: 'Status', isSortable: false},
+]
+
+export const otherUsersRequestColumns: Column[] = [
+  ... sharedRequestColumns,
+  {label: 'Actions', isSortable: false},
 ]
 
 export const INCOTERMES = [
@@ -163,14 +168,6 @@ export enum InvoiceTypeEnum {
   COMMERCIAL = 'Manual Commercial'
 }
 
-export const otherUsersRequestColumns: Column[] = [
-  {label: 'Request Number', isSortable: false},
-  {label: 'Date of Submission', isSortable: true},
-  {label: 'Status', isSortable: false},
-  {label: 'Actions', isSortable: false},
-]
-
-
 export enum StandardFieldEnum {
   QUANTITY = "Quantity",
   UNIT_VALUE = "Unit Value",
@@ -183,6 +180,9 @@ export enum StandardFieldEnum {
 }
 
 export const standardFieldsNames: string[] = Object.values(StandardFieldEnum)
+
+// Target date format of created_at field of the request
+export const createdAtFormat = "MMM d, y 'at' h:mm a"
 
 export const currencyCodes: string[] = [
   "MAD", // Moroccan Dirham

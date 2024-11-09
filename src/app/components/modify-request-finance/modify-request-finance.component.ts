@@ -1,17 +1,17 @@
-import { Component, computed, effect, inject, Inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, OnInit } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import _ from 'lodash';
+import { MessageService } from 'primeng/api';
+import { BehaviorSubject, combineLatestWith, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
+import { financeMandatoryFields, ItemModel } from '../../models/request-item.model';
+import { currencyCodes, INCOTERMES, ModeOfTransportEnum, RequestModel, StandardFieldEnum, UpdateFinanceRequestDTO } from '../../models/request.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
-import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
-import { MessageService } from 'primeng/api';
-import { currencyCodes, INCOTERMES, Item, ModeOfTransportEnum, RequestModel, StandardFieldEnum, standardFieldsNames, UpdateFinanceRequestDTO } from '../../models/request.model';
-import { BehaviorSubject, combineLatestWith, filter, map, Observable, of, shareReplay, startWith, switchMap, tap } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FieldTypeEnum, financeMandatoryFields, ItemModel, standardFields } from '../../models/request-item.model';
 import { ScenarioService } from '../../services/scenario.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
-import _ from 'lodash';
+import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
 
 @Component({
   selector: 'app-modify-request-finance',
@@ -37,6 +37,8 @@ export class ModifyRequestFinanceComponent implements OnInit {
   data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
   dialog = inject(MatDialog)
 
+  filteredOptions!: Observable<string[]>;
+
   request$ = this.requestService.getRequestById(this.data.requestNumber).pipe(
     shareReplay(1)
   )
@@ -44,7 +46,6 @@ export class ModifyRequestFinanceComponent implements OnInit {
     filter((request: RequestModel) => request != undefined),
     switchMap((request: RequestModel) => of(request.modeOfTransport))
   )
-
 
   requestSig = toSignal(this.request$)
   selectedScenario = computed(() => {
@@ -72,7 +73,6 @@ export class ModifyRequestFinanceComponent implements OnInit {
       return {
         ...item,
         readOnly: item.nameItem != StandardFieldEnum.UNIT_VALUE,
-        // isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false)
         isMandatory: financeMandatoryFields.includes(item.nameItem) ? true : matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false) 
       };
     });
@@ -88,7 +88,6 @@ export class ModifyRequestFinanceComponent implements OnInit {
   ModeOfTransportEnum = ModeOfTransportEnum
 
   constructor() {
-
     effect(() => {
       const formItems = this.formItems()
       const existingItemsData = this.existingItemsData()
@@ -103,8 +102,6 @@ export class ModifyRequestFinanceComponent implements OnInit {
       }
     })
   }
-  filteredOptions!: Observable<string[]>;
-
 
   patchExistingData(data: any[]) {
     this.items.clear();
