@@ -18,6 +18,6 @@ export class SideNavComponent {
   // Signals and computed values
   items = signal(this.sideNavService.getMenuItemsBasedOnRole(
     allMenuItems,
-    this.auth.getRoleFromToken() as RoleEnum)
-  )
+    this.auth.getRoleFromToken() as RoleEnum
+  ))
 }

@@ -233,6 +233,7 @@ export class RequestsTableComponent {
     while (1){
       if (resolved) {
         this.isDownloading.set(false)
+        this.invoiceRequest.set(undefined)
         break
       }
     }

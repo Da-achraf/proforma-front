@@ -1,15 +1,15 @@
-import { Component, inject, model, OnInit, signal } from '@angular/core';
-import { UserService } from '../../services/user.service';
-import { emptyUser, Roles, User, userTableColumns, userTableProperties } from '../../models/user/user.model';
+import { Component, inject, model, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MessageService } from 'primeng/api';
+import { delay, filter, map, of, switchMap, tap } from 'rxjs';
 import { TableNameEnum } from '../../models/table.model';
-import { defaultIfEmpty, delay, filter, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
+import { emptyUser, mainRoles, User, userTableColumns, userTableProperties } from '../../models/user/user.model';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
-import { MatDialog } from '@angular/material/dialog';
+import { UserService } from '../../services/user.service';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
-import { MessageService } from 'primeng/api';
-import { SideNavService } from '../../shared/services/side-nav.service';
 import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
+import { SideNavService } from '../../shared/services/side-nav.service';
 
 
 @Component({
@@ -41,7 +41,7 @@ export class UsersListComponent implements OnInit {
       }));
     })
   );
-  roles$ = of(Roles)
+  roles$ = of(mainRoles)
 
   userTableProperties = userTableProperties
   userTableColumns = userTableColumns

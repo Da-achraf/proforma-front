@@ -167,7 +167,12 @@ export enum RoleEnum {
 }
 
 export const Roles: string[] = Object.values(RoleEnum);
+
+// All roles except admin and *
 export const pureRoles: string[] = Roles.filter(r => r != RoleEnum.ALL && r != RoleEnum.ADMIN)
+
+// 
+export const mainRoles: string[] = Roles.filter(r => r != RoleEnum.ALL)
 
 export const getUserRoleToDisplay = (role : any) => {
   switch (role) {

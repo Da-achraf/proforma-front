@@ -85,5 +85,15 @@ export class RequestService {
     console.log('query: ', queryParams)
     return this.http.get<RequestModel[]>(`${this.baseUrl}/by-plants?${queryParams}`)
   }
+
+  getAllRequestsByShipPoints(shipIds: number[]): Observable<RequestModel[]> {
+    let queryParams: string = ''
+    shipIds?.forEach((shipId, index) => {
+      queryParams += `shipId=${shipId}&`
+      if (index == shipIds.length -1 ) queryParams += `shipId=${shipId}`
+    });
+    console.log('ship Ids: ', shipIds)
+    return this.http.get<RequestModel[]>(`${this.baseUrl}/by-shippoint?${queryParams}`)
+  }
 }
 
