@@ -54,6 +54,7 @@ export class UserService {
       backUp: user.backUp,
       role: user.role,
       departementId: user.departementId,
-      plantsIds: user.userPlants.map((plant: any) => plant.id_plant)
+      plantsIds: user.userPlants.map((plant: any) => plant.id_plant),
+      shipPointsIds: user.userShipPoints.map((shipPoint: any) => shipPoint.id_ship)
   }}
 }

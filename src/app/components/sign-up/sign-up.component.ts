@@ -6,6 +6,7 @@ import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
 import { UserService } from '../../services/user.service';
 import { pureRoles } from '../../models/user/user.model';
+import { ShippointService } from '../../services/shippoint.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -19,6 +20,7 @@ export class SignUpComponent implements OnInit {
   isAccountCreated: boolean = false;
   departements: any[] = [];
   plants: any[] = [];
+  shipPoints: any[] = [];
   SignUpForm!: FormGroup;
 
   roles = pureRoles
@@ -28,6 +30,7 @@ export class SignUpComponent implements OnInit {
     private userService: UserService,
     private departementservice: DepartementService,
     private plantService: PlantService,
+    private shipPointService: ShippointService,
     private fb: FormBuilder,
     private router: Router
   ) { }
@@ -35,6 +38,7 @@ export class SignUpComponent implements OnInit {
   ngOnInit(): void {
     console.log('test: ', this.authService.baseServerUrl)
     this.loadPlants();
+    this.loadShipPoints();
     this.loadDepartements();
     this.initializeForm();
   }
@@ -47,6 +51,22 @@ export class SignUpComponent implements OnInit {
           value: plant.id_plant
         }));
         console.log('Loaded plants:', this.plants); // Log loaded plants
+      },
+      (error) => {
+        console.error('Erreur lors du chargement des plantes:', error);
+        this.showErrorMessage('Error when loading plants: ' + error);
+      }
+    );
+  }
+
+  loadShipPoints() {
+    this.shipPointService.getShipPoints().subscribe(
+      (shipPoints) => {
+        this.shipPoints = shipPoints.map((shipPoint) => ({
+          label: shipPoint.shipPoint,
+          value: shipPoint.id_ship
+        }));
+        console.log('Loaded ship points:', this.shipPoints); // Log loaded plants
       },
       (error) => {
         console.error('Erreur lors du chargement des plantes:', error);
@@ -83,7 +103,8 @@ export class SignUpComponent implements OnInit {
       backup: ['', Validators.required],
       role: [''],
       yourpassword: ['', [Validators.required, Validators.minLength(8)]],
-      plantId: [[], Validators.required]
+      plantId: [[]],
+      shipId: [[], Validators.required],
     });
   }
 
@@ -105,6 +126,11 @@ export class SignUpComponent implements OnInit {
   get plantId(): FormArray {
     return this.SignUpForm.get('plantId') as FormArray;
   }
+
+  get shipId(): FormArray {
+    return this.SignUpForm.get('shipId') as FormArray;
+  }
+
   get nPlus1(): FormControl {
     return this.SignUpForm.get('nPlus1') as FormControl;
   }
@@ -117,7 +143,8 @@ export class SignUpComponent implements OnInit {
 
   SignUpSubmited() {
     if (this.SignUpForm.valid) {
-      const plantId = this.SignUpForm.get('plantId')!.value.map((plant: { value: number }) => plant.value);
+      const plantId = this.SignUpForm.get('plantId')!.value?.map((plant: { value: number }) => plant.value) ?? [];
+      const shipId = this.SignUpForm.get('shipId')!.value.map((ship: { value: number }) => ship.value) ?? [];
 
       const userPayload = {
         // user: {
@@ -129,9 +156,8 @@ export class SignUpComponent implements OnInit {
         role: this.SignUpForm.value.role || null,
         pwd: this.SignUpForm.get('yourpassword')!.value,
         departementId: Number(this.SignUpForm.value.departementId),
-        plants: plantId
-        // },
-        // plantId: plantId // array of numbers
+        plants: plantId,
+        shipPoints: shipId,
       };
 
       console.log('Payload to send:', JSON.stringify(userPayload, null, 2)); // Good for debugging

@@ -50,7 +50,7 @@ export class ShipPointsListComponent implements OnInit {
     this.createShipPointForm = this.fb.group({
       shipPoint: ['', Validators.required],
       fullAddress: ['', Validators.required],
-      isTe: [true, Validators.required]
+      isTe: [true]
     });
   }
 

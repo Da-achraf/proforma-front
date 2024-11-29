@@ -113,11 +113,24 @@
                                         Invalid email format
                                     </div>
                                 </div>
-                                <div class="mb-4 relative">
+                                <!-- Old version using plants -->
+                                <!-- <div class="mb-4 relative">
                                     <label for="plants">Plant</label>
                                     <p-multiSelect [options]="plants" formControlName="plantId" optionLabel="label" placeholder="" (onChange)="loadPlants()"></p-multiSelect>
                                     <div 
                                         *ngIf="plantId.errors?.['required'] && plantId.touched" 
+                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                                    >
+                                        Plant is required
+                                    </div>
+                                </div> -->
+
+                                <!-- New version using ship points -->
+                                <div class="mb-4 relative">
+                                    <label for="plants">Plant(s)</label>
+                                    <p-multiSelect [options]="shipPoints" formControlName="shipId" optionLabel="label" placeholder="" (onChange)="loadShipPoints()"></p-multiSelect>
+                                    <div 
+                                        *ngIf="shipId.errors?.['required'] && shipId.touched" 
                                         class="text-red-400 text-xs font-semibold absolute top-[102%]"
                                     >
                                         Plant is required

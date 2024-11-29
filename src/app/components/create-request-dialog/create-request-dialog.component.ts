@@ -248,7 +248,6 @@ export class CreateRequestDialogComponent implements OnInit {
         console.log('Request Data:', requestData);
         this.requestService.createRequest(requestData).subscribe(
           (response) => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request created successfully' });
             console.log('Request created:', response);
             this.dialogRef.close(response);
           },

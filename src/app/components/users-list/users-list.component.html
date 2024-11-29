@@ -55,9 +55,17 @@
           </select>
         </label>
         <br>
-        <label>
+        <!-- Old version using plants -->
+        <!-- <label>
           Plants:
           <p-multiSelect [(ngModel)]="user.plantsIds" name="plantId" [options]="(plants$ | async) ?? []" optionLabel="label" optionValue="value" (onChange)="loadPlants()"></p-multiSelect>
+        </label>
+        <br> -->
+        
+        <!-- New version using ship points -->
+        <label>
+          Plants:
+          <p-multiSelect [(ngModel)]="user.shipPointsIds" name="shipId" [options]="(shipPoints$ | async) ?? []" optionLabel="label" optionValue="value" (onChange)="loadShipPoints()"></p-multiSelect>
         </label>
         <br>
         <div class="button-SR">

@@ -10,6 +10,8 @@ import { UserService } from '../../services/user.service';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
 import { SideNavService } from '../../shared/services/side-nav.service';
+import { ShippointService } from '../../services/shippoint.service';
+import { Ship } from '../../models/ship.model';
 
 
 @Component({
@@ -21,6 +23,7 @@ export class UsersListComponent implements OnInit {
   userService = inject(UserService)
   departmentService = inject(DepartementService)
   plantService = inject(PlantService)
+  shipPointService = inject(ShippointService)
   sideNavService = inject(SideNavService)
   dialog = inject(MatDialog)
   messageService = inject(MessageService)
@@ -41,6 +44,14 @@ export class UsersListComponent implements OnInit {
       }));
     })
   );
+  shipPoints$ = this.shipPointService.getShipPoints().pipe( 
+    map((data: any[]) => {
+      return data.map((shipPoint: Ship) => ({
+        label: shipPoint.shipPoint as string,
+        value: shipPoint.id_ship
+      }));
+    })
+  );
   roles$ = of(mainRoles)
 
   userTableProperties = userTableProperties
@@ -55,6 +66,7 @@ export class UsersListComponent implements OnInit {
   onUpdate(user: User): void {
     this.user = user
     this.user.plantsIds = user.plantsIds;
+    this.user.shipPointsIds = user.shipPointsIds;
     this.user.departementId = user.departementId;
     this.displayUpdateDialog.set(true)
   }
@@ -65,6 +77,17 @@ export class UsersListComponent implements OnInit {
   }
 
   loadPlants(): void {
+    this.plants$ = this.plantService.getPlants().pipe( 
+      map((data: any[]) => {
+        return data.map((plant) => ({
+          label: plant.location as string,
+          value: plant.id_plant as string
+        }));
+      })
+    );
+  }
+
+  loadShipPoints(): void {
     this.plants$ = this.plantService.getPlants().pipe( 
       map((data: any[]) => {
         return data.map((plant) => ({
@@ -90,7 +113,8 @@ export class UsersListComponent implements OnInit {
       backUp: this.user.backUp,
       role: this.user.role,
       departementId: this.user.departementId,
-      plantId: this.user.plantsIds
+      plantId: this.user.plantsIds,
+      shipId: this.user.shipPointsIds,
     };
 
     console.log('Payload to update user:', payload);

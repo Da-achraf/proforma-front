@@ -185,6 +185,7 @@ export class InvoiceService {
   ) {
     const embeddedView: EmbeddedViewRef<any> = invoiceElementRef.createEmbeddedView({});
     embeddedView.detectChanges();
+
   
     const invoiceContainer = renderer.createElement('div');
     renderer.appendChild(elementRef.nativeElement, invoiceContainer);
@@ -194,6 +195,22 @@ export class InvoiceService {
     renderer.removeChild(elementRef.nativeElement, invoiceContainer);
   
     try {
+      // Ensure images are fully loaded before processing
+      // const images = invoiceElement.querySelectorAll('img');
+      // await Promise.all(
+      //   Array.from(images).map((img: any) => new Promise((resolve, reject) => {
+      //     if (img.complete) {
+      //       resolve(true);
+      //     } else {
+      //       img.onload = () => resolve(true);
+      //       img.onerror = () => {
+      //         console.warn('Image failed to load:', img.src);
+      //         resolve(true); // Resolve even if image fails to load
+      //       };
+      //     }
+      //   }))
+      // );
+
       // Create a temporary container with fixed width
       const tempContainer = document.createElement('div');
       tempContainer.style.width = '210mm'; // A4 width
@@ -204,6 +221,14 @@ export class InvoiceService {
   
       // Clone and prepare the invoice element
       const clonedInvoice = invoiceElement.cloneNode(true) as HTMLElement;
+
+      // Additional image preparation
+      // const clonedImages = clonedInvoice.querySelectorAll('img');
+      // clonedImages.forEach(img => {
+      //   img.style.maxWidth = '100%';
+      //   img.style.height = 'auto';
+      //   img.style.objectFit = 'contain';
+      // });
       
       // Apply specific styles to prevent text cutting
       const styles = `

@@ -8,6 +8,7 @@ import { ByPlantsRequestStrategy } from "./by-plants-requests-strategy.service";
 import { inject, Injectable, Signal } from "@angular/core";
 import { IRequestStrategy } from "./requests-strategies";
 import { RequestService } from "../../../services/request.service";
+import { ByShipPointRequestStrategy } from "./by-shippoints-requests-strategy.service";
 
 
 @Injectable({
@@ -26,7 +27,7 @@ export class RequestStrategyFactory {
         case RoleEnum.FINANCE_APPROVER:
         case RoleEnum.TRADECOMPLIANCE_APPROVER:
         case RoleEnum.WAREHOUSE_APPROVER:
-            return new ByPlantsRequestStrategy(this.requestService);
+            return new ByShipPointRequestStrategy(this.requestService);
         default:
             throw new Error('Role not supported');
     }

@@ -49,6 +49,7 @@ import { Column, TableProperty } from "../table.model";
   role : string;
   departementId : number ;
   plantsIds?: number[];
+  shipPointsIds?: number[];
  }
 
 
