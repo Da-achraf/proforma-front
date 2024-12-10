@@ -108,6 +108,7 @@ import { CountryPipe } from './shared/pipes/country.pipe';
 import { GenerateArrayPipe } from './shared/pipes/generate-array.pipe';
 import { ItemAmountPipe } from './shared/pipes/item-amount.pipe';
 import { TotalAmountPipe } from './shared/pipes/total-amount.pipe';
+import { AutoComplete, AutoCompleteModule } from 'primeng/autocomplete';
 
 
 @NgModule({
@@ -217,7 +218,7 @@ import { TotalAmountPipe } from './shared/pipes/total-amount.pipe';
     ToastModule,
     PaginatorModule,
     MatChipsModule,
-    NgOptimizedImage
+    NgOptimizedImage,
   ],
   exports: [
     MatDialogModule

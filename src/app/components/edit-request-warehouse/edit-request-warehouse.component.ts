@@ -12,6 +12,8 @@ import { ItemModel } from '../../models/request-item.model';
 import { ScenarioService } from '../../services/scenario.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import _ from 'lodash'
+import { AutoComplete } from 'primeng/autocomplete';
+import { MatAutocomplete } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-edit-request-warehouse',
@@ -22,6 +24,7 @@ export class EditRequestWarehouseComponent implements OnInit {
   requestForm!: FormGroup;
 
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
+  @ViewChild('auto') auto!: MatAutocomplete;
 
 
   scenarioService = inject(ScenarioService)
@@ -139,7 +142,7 @@ export class EditRequestWarehouseComponent implements OnInit {
           dimension: request.dimension,
           numberOfBoxes: request.numberOfBoxes,
           shippedVia: request.shippedVia,
-          currency: request.currency,
+          currency: request.currency
         });
       },
       (error) => {
@@ -274,4 +277,6 @@ export class EditRequestWarehouseComponent implements OnInit {
     const filterValue = this.input?.nativeElement.value.toLowerCase();
     this.filteredOptions = of(this.currencyCodes.filter(o => o.toLowerCase().includes(filterValue)));
   }
+
+
 }
