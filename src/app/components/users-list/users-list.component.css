@@ -96,4 +96,13 @@
   p-dialog .ui-dialog-content {
     padding: 20px;
   }
+
+  .p-multiselect {
+    width: 100% !important;
+  }
   
+  .p-multiselect-panel {
+    position: absolute !important;
+    z-index: 9999 !important;
+    overflow: visible !important;
+  }

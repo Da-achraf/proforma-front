@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, Inject, OnInit, Signal } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, Inject, OnInit, Signal, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -6,7 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { MessageService } from 'primeng/api'; // Import MessageService
 import { currencyCodes, StandardFieldEnum } from '../../models/request.model';
-import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
+import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, Subject, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ItemModel } from '../../models/request-item.model';
 import { ScenarioService } from '../../services/scenario.service';
@@ -20,6 +20,9 @@ import _ from 'lodash'
 })
 export class EditRequestWarehouseComponent implements OnInit {
   requestForm!: FormGroup;
+
+  @ViewChild('input') input!: ElementRef<HTMLInputElement>;
+
 
   scenarioService = inject(ScenarioService)
   currencyCodes = currencyCodes
@@ -261,5 +264,14 @@ export class EditRequestWarehouseComponent implements OnInit {
       startWith(''),
       map((value: string) => this._filter(value || ''))
     );
+  }
+
+  compareCurrency(c1: string, c2: string): boolean {
+    return c1 === c2;
+  }
+
+  filter(): void {
+    const filterValue = this.input?.nativeElement.value.toLowerCase();
+    this.filteredOptions = of(this.currencyCodes.filter(o => o.toLowerCase().includes(filterValue)));
   }
 }

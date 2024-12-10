@@ -40,6 +40,7 @@
                #currencyInput
                (input)="onCurrencyChange(currencyInput.value)"
                matInput
+               required
                formControlName="currency"
                [matAutocomplete]="auto">
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
@@ -48,6 +49,23 @@
           }
         </mat-autocomplete>
       </mat-form-field>
+
+      <!-- <mat-form-field>
+        <mat-label>Currency</mat-label>
+        <input #input
+               type="text"
+               placeholder="Pick one"
+               matInput
+               formControlName="currency"
+               required
+               [matAutocomplete]="auto"
+               (input)="filter()">
+        <mat-autocomplete requireSelection #auto="matAutocomplete">
+          @for (option of filteredOptions | async; track option) {
+            <mat-option [value]="option">{{option}}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field> -->
 
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Shipped Via</mat-label>

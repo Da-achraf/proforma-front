@@ -1,7 +1,7 @@
 import { Component, inject, model, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
-import { delay, filter, map, of, switchMap, tap } from 'rxjs';
+import { delay, filter, map, Observable, of, switchMap, tap } from 'rxjs';
 import { TableNameEnum } from '../../models/table.model';
 import { emptyUser, mainRoles, User, userTableColumns, userTableProperties } from '../../models/user/user.model';
 import { DepartementService } from '../../services/departement.service';
@@ -12,6 +12,8 @@ import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constan
 import { SideNavService } from '../../shared/services/side-nav.service';
 import { ShippointService } from '../../services/shippoint.service';
 import { Ship } from '../../models/ship.model';
+import { ToasterService } from '../../shared/services/toaster.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 
 @Component({
@@ -20,6 +22,7 @@ import { Ship } from '../../models/ship.model';
   styleUrl: './users-list.component.css'
 })
 export class UsersListComponent implements OnInit {
+  fb = inject(FormBuilder)
   userService = inject(UserService)
   departmentService = inject(DepartementService)
   plantService = inject(PlantService)
@@ -27,9 +30,12 @@ export class UsersListComponent implements OnInit {
   sideNavService = inject(SideNavService)
   dialog = inject(MatDialog)
   messageService = inject(MessageService)
+  toastr = inject(ToasterService)
 
   displayUpdateDialog = model(false)
   user: User = emptyUser
+
+  userUpdateForm: FormGroup;
 
   // Observables
   users$ = this.userService.getUsers().pipe(
@@ -53,14 +59,44 @@ export class UsersListComponent implements OnInit {
     })
   );
   roles$ = of(mainRoles)
+  filteredShipPoints$ = Observable<Ship[]>
 
   userTableProperties = userTableProperties
   userTableColumns = userTableColumns
 
   TableNameEnum = TableNameEnum
 
+
+  constructor() {
+    this.userUpdateForm = this.fb.group({
+      teId: [''],
+      userName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      nPlus1: [''],
+      backUp: [''],
+      role: ['', Validators.required],
+      departementId: [''],
+      shipPointsIds: [[], Validators.required]
+    });
+  }
+
   ngOnInit(): void {
     this.loadUsers()
+
+    // this.filteredShipPoints$ = this.user.shipPointsIds
+  }
+
+  populateForm(user: any) {
+    this.userUpdateForm.patchValue({
+      teId: user.teId,
+      userName: user.userName,
+      email: user.email,
+      nPlus1: user.nPlus1,
+      backUp: user.backUp,
+      role: user.role,
+      departementId: user.departementId,
+      shipPointsIds: user.shipPointsIds || []
+    });
   }
 
   onUpdate(user: User): void {
@@ -69,6 +105,8 @@ export class UsersListComponent implements OnInit {
     this.user.shipPointsIds = user.shipPointsIds;
     this.user.departementId = user.departementId;
     this.displayUpdateDialog.set(true)
+
+    this.populateForm(user)
   }
 
 
@@ -144,20 +182,29 @@ export class UsersListComponent implements OnInit {
       switchMap(_ => this.userService.deleteUser(id))
     ).subscribe({
       next: () => {
-        this.showSuccessMessage('User Deleted successfully.')
+        this.toastr.showSuccessMessage('User Deleted successfully.')
         this.loadUsers();
       },
       error: () => {
-        this.showErrorMessage('Error in deleting ship point')
+        this.toastr.showErrorMessage('Error in deleting ship point')
       }
     })
   }
 
-  private showErrorMessage(message: string) {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
+  private _filter(shipPoints: Ship[], shipPointName: string): any[] {
+    const filterValue = shipPointName.toLowerCase();
+
+    return shipPoints.filter(option => option.shipPoint.toLowerCase().includes(filterValue));
   }
 
-  private showSuccessMessage(message: string) {
-    this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
+  // Helper method to mark all controls as touched
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
   }
 }
