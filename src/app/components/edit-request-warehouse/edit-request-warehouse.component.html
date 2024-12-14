@@ -76,6 +76,12 @@
         <mat-label>Shipped Via</mat-label>
         <input matInput formControlName="shippedVia" type="text">
       </mat-form-field>
+
+      <mat-form-field appearance="fill" class="small-form-field">
+        <mat-label>Gross Weight</mat-label>
+        <input matInput formControlName="grossWeight" type="number" min="0">
+      </mat-form-field>
+      
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Tracking Number</mat-label>
         <input matInput formControlName="trackingNumber" type="text">
@@ -115,7 +121,7 @@
             <div [formGroupName]="field.nameItem">
               <mat-form-field appearance="fill" class="w-full mb-2">
                 <mat-label>{{ field.nameItem }}</mat-label>
-                <input matInput formControlName="value" [type]="field.type" [required]="field.isMandatory ?? false"
+                <input matInput formControlName="value" [type]="field.type" [required]="field.isMandatory"
                   [readonly]="field.readOnly">
               </mat-form-field>
             </div>

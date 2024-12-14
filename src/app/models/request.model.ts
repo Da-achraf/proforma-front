@@ -22,6 +22,7 @@ export interface CreateRequest {
   shipPointId?: number;
   deliveryAddressId?: number;
   incoterm?: string;
+  costCenter?: string;
   userId?: number;
   scenarioId?: number;
   dhlAccount?: string;
@@ -123,7 +124,9 @@ export interface RequestModel {
   exporterAddress: string;
   modeOfTransport: string;
   currency: string;
+  costCenter: string;
   shippedVia: string;
+  grossWeight?: number,
   itemsWithValues: {values: JsonItemModel[]}[]
   items: RequestItem[];
 }

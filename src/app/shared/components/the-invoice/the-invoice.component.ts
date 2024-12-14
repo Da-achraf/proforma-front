@@ -1,5 +1,5 @@
 import { Component, computed, input, signal } from '@angular/core';
-import { createdAtFormat, InvoiceTypeEnum, StandardFieldEnum } from '../../../models/request.model';
+import { createdAtFormat, InvoiceTypeEnum, RequestModel, StandardFieldEnum } from '../../../models/request.model';
 import { getFieldValue, getWeight } from '../../helpers/invoice.helper';
 
 @Component({
@@ -16,33 +16,18 @@ export class TheInvoiceComponent {
 
   InvoiceTypeEnum = InvoiceTypeEnum
 
-  data = input<any>()
+  request = input.required<RequestModel | undefined>()
 
   createdAtFormat = signal(createdAtFormat)
 
-  request = computed(() => {
-    const data = this.data()
-    if (!data) return
-    return data
-  })
-
   itemsWithValues = computed(() => {
     const request = this.request()
-    return request?.itemsWithValues
+    return request?.itemsWithValues ?? []
   })
 
   values = computed(() => {
-    const itemsWithValues: any[] = this.itemsWithValues()
+    const itemsWithValues: any[] = this.itemsWithValues() ?? []
     return itemsWithValues?.map((i: any) => i.values)
-  })
-
-  grossWeight = computed(() => {
-    const items = this.itemsWithValues(); // Get the items with values
-    const total = items.reduce((total: any, item: any) => {
-      const grossWeightValue = item.values.find((v: any) => v.name === 'Gross Weight')?.value;
-      return total + (grossWeightValue ? parseFloat(grossWeightValue) : 0);
-    }, 0);
-    return total.toFixed(3);
   })
 
   netWeight = computed(() => {

@@ -68,11 +68,6 @@ export const standardFields: ItemField[] = [
         isMandatory: false
     },
     {
-        name: 'Gross Weight',
-        type: FieldTypeEnum.NUMBER,
-        isMandatory: false
-    },
-    {
         name: 'Quantity',
         type: FieldTypeEnum.NUMBER,
         isMandatory: true

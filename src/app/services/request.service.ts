@@ -16,7 +16,7 @@ export class RequestService {
 
   constructor(private http: HttpClient) { }
 
-  invoiceRequest = signal<any>(null)
+  invoiceRequest = signal<RequestModel| undefined>(undefined)
 
   getRequests(): Observable<RequestModel[]> {
     return this.http.get<RequestModel[]>(`${this.baseUrl}`);

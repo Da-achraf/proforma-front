@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { MessageService } from 'primeng/api'; // Import MessageService
-import { CURRENCY_CODES, StandardFieldEnum } from '../../models/request.model';
+import { CURRENCY_CODES, RequestModel, StandardFieldEnum } from '../../models/request.model';
 import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, Subject, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ItemModel } from '../../models/request-item.model';
@@ -13,6 +13,7 @@ import { ScenarioService } from '../../services/scenario.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import _ from 'lodash'
 import { MatAutocomplete } from '@angular/material/autocomplete';
+import { notZeroValidator } from '../../shared/helpers/form-validator.helper';
 
 @Component({
   selector: 'app-edit-request-warehouse',
@@ -119,6 +120,7 @@ export class EditRequestWarehouseComponent implements OnInit {
       dhlAccount: [{ value: '', disabled: true }],
       trackingNumber: ['', Validators.required],
       numberOfBoxes: ['', Validators.required],
+      grossWeight: ['', [Validators.required, notZeroValidator()]],
       dimension: ['', Validators.required],
       currency: ['', Validators.required],
       modeOfTransport: [{value: '', disabled: true}],
@@ -128,7 +130,7 @@ export class EditRequestWarehouseComponent implements OnInit {
 
 
     this.requestService.getRequestById(this.data.requestNumber).subscribe(
-      (request: any) => {
+      (request: RequestModel) => {
           console.log('req: ',request )
         this.requestForm.patchValue({
           invoicesTypes: request.invoicesTypes,
@@ -138,6 +140,7 @@ export class EditRequestWarehouseComponent implements OnInit {
           incoterm: request.incoterm,
           dhlAccount: request.dhlAccount,
           trackingNumber: request.trackingNumber,
+          grossWeight: request.grossWeight,
           dimension: request.dimension,
           numberOfBoxes: request.numberOfBoxes,
           shippedVia: request.shippedVia,
@@ -223,16 +226,13 @@ export class EditRequestWarehouseComponent implements OnInit {
 
       const updateData = {
         trackingNumber: this.requestForm.get('trackingNumber')?.value,
+        grossWeight: this.requestForm.get('grossWeight')?.value,
         numberOfBoxes: this.requestForm.get('numberOfBoxes')?.value,
         dimension: this.requestForm.get('dimension')?.value,
         currency: this.requestForm.get('currency')?.value,
         itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
         userId: userId
       };
-
-      // console.log('existing: ', existingItemsData)
-      // console.log('req form: ', this.requestForm.value.items)
-      // console.log('Update data: ', updateData)
 
       this.requestService.updateRequestByWarehouse(this.data.requestNumber, updateData).subscribe(
         (response) => {

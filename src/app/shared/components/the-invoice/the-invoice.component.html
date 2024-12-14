@@ -40,9 +40,9 @@
   </div>
 
   <div [ngClass]="borderStyle" class="mb-2 p-2 flex flex-col">
-    <span><span class="font-semibold text-sm">Mode of transport: </span> {{ request.modeOfTransport ?? '---' }}</span>
-    <span><span class="font-semibold text-sm">Incoterms: </span> {{ request.incoterm ?? '---' }}</span>
-    <span><span class="font-semibold text-sm">Shipped via: </span> {{ request.shippedVia ?? '---' }}</span>
+    <span><span class="font-semibold text-sm">Mode of transport: </span> {{ request.modeOfTransport || '---' }}</span>
+    <span><span class="font-semibold text-sm">Incoterms: </span> {{ request.incoterm || '---' }}</span>
+    <span><span class="font-semibold text-sm">Shipped via: </span> {{ request.shippedVia || '---' }}</span>
   </div>
   <table class="border-collapse border-2 border-gray-600 table rounded-sm">
     <thead>
@@ -99,7 +99,7 @@
   </table>
 
   <div [ngClass]="borderStyle" class="footer flex flex-col p-2">
-    <span><span class="font-semibold text-sm">Gross Weight:</span> {{ grossWeight() || '---' }} KG</span>
+    <span><span class="font-semibold text-sm">Gross Weight:</span> {{ request.grossWeight || '---' }} KG</span>
     <span><span class="font-semibold text-sm">Net Weight:</span> {{ netWeight() || '---' }} KG </span>
     <span><span class="font-semibold text-sm">Number of parcels:</span> {{ request.numberOfBoxes }} </span>
     <span><span class="font-semibold text-sm">Dimension:</span> {{ request.dimension }} </span>

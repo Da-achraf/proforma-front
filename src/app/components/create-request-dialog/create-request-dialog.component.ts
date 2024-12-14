@@ -119,6 +119,7 @@ export class CreateRequestDialogComponent implements OnInit {
       numberOfBoxes: [''],
       modeOfTransport: ['', Validators.required],
       shippedVia: ['', Validators.required],
+      costCenter: ['', Validators.required],
       currency: ['', Validators.required],
       items: this.fb.array([])
     });
@@ -244,6 +245,7 @@ export class CreateRequestDialogComponent implements OnInit {
           shipPointId: shippingPointId,
           deliveryAddressId: deliveryAddressId,
           incoterm: this.requestForm.value.incoterm,
+          costCenter: this.requestForm.value.costCenter,
           userId: userId,
           scenarioId: scenarioId,
           shippedvia: this.requestForm.value.shippedVia,
