@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -6,7 +6,7 @@ import _, { get } from 'lodash';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 import { FieldTypeEnum, ItemModel } from '../../models/request-item.model';
-import { currencyCodes, RequestModel } from '../../models/request.model';
+import { CURRENCY_CODES, RequestModel } from '../../models/request.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
@@ -29,7 +29,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
   data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
   dialog = inject(MatDialog)
 
-  currencyCodes = currencyCodes
+  currencyCodes = signal(CURRENCY_CODES)
   filteredOptions!: Observable<string[]>;
 
   additionalItems: ItemModel[] = [
@@ -282,7 +282,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.currencyCodes.filter(option => option.toLowerCase().includes(filterValue));
+    return this.currencyCodes().filter(option => option.toLowerCase().includes(filterValue));
   }
 
   onCurrencyChange(text: string) {

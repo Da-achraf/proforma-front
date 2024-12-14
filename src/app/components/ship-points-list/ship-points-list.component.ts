@@ -10,6 +10,8 @@ import { MessageService } from 'primeng/api';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
+import { ToasterService } from '../../shared/services/toaster.service';
+import { ShippointCrudComponent } from '../shippoints/shippoint-crud/shippoint-crud.component';
 
 @Component({
   selector: 'app-ship-points-list',
@@ -23,6 +25,7 @@ export class ShipPointsListComponent implements OnInit {
   messageService = inject(MessageService)
   fb = inject(FormBuilder)
   dialog = inject(MatDialog)
+  toastr = inject(ToasterService)
 
   displayUpdateDialog = model(false)
   displayCreateDialog = model(false)
@@ -78,37 +81,66 @@ export class ShipPointsListComponent implements OnInit {
   }
 
   onUpdate(shipPoint: ShipPointModel): void {
-    this.shipPoint = shipPoint
-    this.displayUpdateDialog.set(true)
+    // this.shipPoint = shipPoint
+    // this.displayUpdateDialog.set(true)
+
+    const dialogRef = this.dialog.open(ShippointCrudComponent, {
+      width: '800px',
+      data: {
+        isUpdateMode: true,
+        shipPoint
+      }
+    });
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.loadShipPoints()
+      }
+    });
+
   }
 
   onCreate(): void {
-    this.createShipPointForm.reset()
-    this.displayCreateDialog.set(true)
+    const dialogRef = this.dialog.open(ShippointCrudComponent, {
+      width: '800px',
+      data: {
+        isUpdateMode: false
+      }
+    });
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.loadShipPoints()
+      }
+    });
   }
 
-  createShipPoint() {
-    if (this.createShipPointForm.valid) {
-      const newShipPoint: ShipPointModel = {
-        id_ship: 0,  
-        shipPoint: this.createShipPointForm.value.shipPoint,
-        fullAddress: this.createShipPointForm.value.fullAddress,
-        isTe: this.createShipPointForm.value.isTe
-      };
+  // onCreate(): void {
 
-      this.shipPointService.CreateShipPoint(newShipPoint).subscribe({
-        next: (response) => {
-          this.showSuccessMessage('Ship Point successfully created!');
-          this.resetFormAndNavigate();
-        },
-        error: (error) => {
-          this.showErrorMessage('Failed to create ship point: ' + error.message);
-        }
-      });
-    } else {
-      console.log('Formulaire invalide', this.createShipPointForm);
-    }
-  }
+  //   this.createShipPointForm.reset()
+  //   this.displayCreateDialog.set(true)
+  // }
+
+  // createShipPoint() {
+  //   if (this.createShipPointForm.valid) {
+  //     const newShipPoint: ShipPointModel = {
+  //       id_ship: 0,  
+  //       shipPoint: this.createShipPointForm.value.shipPoint,
+  //       fullAddress: this.createShipPointForm.value.fullAddress,
+  //       isTe: this.createShipPointForm.value.isTe
+  //     };
+
+  //     this.shipPointService.CreateShipPoint(newShipPoint).subscribe({
+  //       next: (response) => {
+  //         this.showSuccessMessage('Ship Point successfully created!');
+  //         this.resetFormAndNavigate();
+  //       },
+  //       error: (error) => {
+  //         this.showErrorMessage('Failed to create ship point: ' + error.message);
+  //       }
+  //     });
+  //   } else {
+  //     console.log('Formulaire invalide', this.createShipPointForm);
+  //   }
+  // }
 
   updateShipPoint(): void {
     this.shipPointService.updateShipPoint(this.shipPoint.id_ship, this.shipPoint).subscribe(

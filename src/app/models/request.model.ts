@@ -158,7 +158,11 @@ export const INCOTERMES = [
   'FCA', 'DAP', 'DDP'
 ]
 
-export const InvoicesTypes = [
+export const SHIPPED_VIA_OPTIONS = [
+  'Van', 'Trailer', 'Container', 'Plant'
+]
+
+export const INVOICE_TYPES = [
   'Proforma Invoice',
   'Manual Commercial'
 ]
@@ -184,7 +188,7 @@ export const standardFieldsNames: string[] = Object.values(StandardFieldEnum)
 // Target date format of created_at field of the request
 export const createdAtFormat = "MMM d, y 'at' h:mm a"
 
-export const currencyCodes: string[] = [
+export const CURRENCY_CODES: string[] = [
   "MAD", // Moroccan Dirham
   "USD", // United States Dollar
   "EUR", // Euro

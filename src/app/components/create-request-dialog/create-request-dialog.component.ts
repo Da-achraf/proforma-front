@@ -1,16 +1,18 @@
-import { Component, computed, effect, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject, filter, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { ItemModel } from '../../models/request-item.model';
-import { CreateRequest, currencyCodes, INCOTERMES, InvoicesTypes, ModesOfTransports } from '../../models/request.model';
+import { CreateRequest, CURRENCY_CODES, INCOTERMES, INVOICE_TYPES, ModesOfTransports, SHIPPED_VIA_OPTIONS } from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
+import { ToasterService } from '../../shared/services/toaster.service';
+import { ShippointCrudComponent } from '../shippoints/shippoint-crud/shippoint-crud.component';
 
 @Component({
   selector: 'app-create-request-dialog',
@@ -18,11 +20,17 @@ import { ShippointService } from '../../services/shippoint.service';
   styleUrls: ['./create-request-dialog.component.css']
 })
 export class CreateRequestDialogComponent implements OnInit {
+
+  // Injected dependencies
+  dialog = inject(MatDialog)
+  toastr = inject(ToasterService)
+
   requestForm!: FormGroup;
   shipPoints: Ship[] = [];
-  currencyCodes = currencyCodes
-  invoiceTypes: string[] = InvoicesTypes
-  incoterms: string[] = INCOTERMES
+  currencyCodes = signal<string[]>(CURRENCY_CODES)
+  invoiceTypes = signal<string[]>(INVOICE_TYPES)
+  incotermOptions = signal<string[]>(INCOTERMES)
+  shippedViaOptions = signal<string[]>(SHIPPED_VIA_OPTIONS)
   modesOfTransports: string[] = ModesOfTransports
 
   filteredOptions!: Observable<string[]>;
@@ -30,7 +38,7 @@ export class CreateRequestDialogComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.currencyCodes.filter(option => option.toLowerCase().includes(filterValue));
+    return this.currencyCodes().filter(option => option.toLowerCase().includes(filterValue));
   }
 
   // Signals
@@ -266,11 +274,6 @@ export class CreateRequestDialogComponent implements OnInit {
     }
   }
 
-
-  getShippingPointName(id: number): string {
-    return this.shipPoints.find(point => point.id_ship === id)?.fullAddress ?? 'Unknown';
-  }
-
   onNoClick(): void {
     this.dialogRef.close();
   }
@@ -297,6 +300,34 @@ export class CreateRequestDialogComponent implements OnInit {
       this.requestForm.patchValue({ incoterm: 'FCA' });
     } else {
       this.requestForm.patchValue({ incoterm: '' });
+    }
+  }
+
+  private patchFormProperty(property: string, value: any) {
+    this.requestForm.patchValue({
+      [property]: value
+    })
+  }
+
+  private openAddShipPointDialog(formControlName: 'shippingPoint' | 'deliveryAddress'): void {
+    const dialogRef = this.dialog.open(ShippointCrudComponent, {
+      width: '800px',
+      data: {
+        isUpdateMode: false
+      }
+    });
+
+    dialogRef.afterClosed().subscribe({
+      next: (shipPointId: number) => {
+        this.loadShipPoints()
+        this.patchFormProperty(formControlName, shipPointId)
+      }
+    })
+  }
+
+  onShipPointChange(choice: string | number, formControlName: 'shippingPoint' | 'deliveryAddress') {
+    if (choice == 'other'){
+      this.openAddShipPointDialog(formControlName)
     }
   }
 }

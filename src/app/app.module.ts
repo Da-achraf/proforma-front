@@ -108,8 +108,7 @@ import { CountryPipe } from './shared/pipes/country.pipe';
 import { GenerateArrayPipe } from './shared/pipes/generate-array.pipe';
 import { ItemAmountPipe } from './shared/pipes/item-amount.pipe';
 import { TotalAmountPipe } from './shared/pipes/total-amount.pipe';
-import { AutoComplete, AutoCompleteModule } from 'primeng/autocomplete';
-
+import { ShippointCrudComponent } from './components/shippoints/shippoint-crud/shippoint-crud.component';
 
 @NgModule({
   declarations: [
@@ -169,7 +168,8 @@ import { AutoComplete, AutoCompleteModule } from 'primeng/autocomplete';
     CountryPipe,
     GenerateArrayPipe,
     ItemAmountPipe,
-    TotalAmountPipe
+    TotalAmountPipe,
+    ShippointCrudComponent
   ],
   imports: [
     BrowserModule,
@@ -239,4 +239,4 @@ import { AutoComplete, AutoCompleteModule } from 'primeng/autocomplete';
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

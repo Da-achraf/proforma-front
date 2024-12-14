@@ -23,7 +23,7 @@
       <mat-form-field appearance="fill">
         <mat-label>Select Invoice Type</mat-label>
         <mat-select formControlName="invoicesTypes">
-          <mat-option *ngFor="let type of invoiceTypes" [value]="type">{{
+          <mat-option *ngFor="let type of invoiceTypes()" [value]="type">{{
             type
             }}</mat-option>
         </mat-select>
@@ -37,20 +37,22 @@
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Shipping Point</mat-label>
-        <mat-select formControlName="shippingPoint">
+        <mat-select (selectionChange)="onShipPointChange(sp.value, 'shippingPoint')" #sp formControlName="shippingPoint">
+          <mat-option value="other">Other</mat-option>
           <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Delivery Address</mat-label>
-        <mat-select formControlName="deliveryAddress">
+        <mat-select (selectionChange)="onShipPointChange(da.value, 'deliveryAddress')" #da formControlName="deliveryAddress">
+          <mat-option value="other">Other</mat-option>
           <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Incoterm</mat-label>
         <mat-select formControlName="incoterm">
-          <mat-option *ngFor="let term of incoterms" [value]="term">{{
+          <mat-option *ngFor="let term of incotermOptions()" [value]="term">{{
             term
             }}</mat-option>
         </mat-select>
@@ -77,16 +79,27 @@
       <mat-form-field>
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
-          @for (option of currencyCodes; track option) {
+          @for (option of currencyCodes(); track option) {
             <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
+
+      <mat-form-field>
+        <mat-label>Shiped Via</mat-label>
+        <mat-select formControlName="shippedVia" name="shippedVia">
+          @for (option of shippedViaOptions(); track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- <mat-form-field appearance="fill">
         <mat-label>Shiped Via</mat-label>
         <input matInput formControlName="shippedVia" />
-      </mat-form-field>
+      </mat-form-field> -->
+
       <mat-form-field appearance="fill">
         <mat-label>Number of Boxes</mat-label>
         <input matInput formControlName="numberOfBoxes" />

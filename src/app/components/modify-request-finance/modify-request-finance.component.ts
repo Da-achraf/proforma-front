@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject, combineLatestWith, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 import { financeMandatoryFields, ItemModel } from '../../models/request-item.model';
-import { currencyCodes, INCOTERMES, ModeOfTransportEnum, RequestModel, StandardFieldEnum, UpdateFinanceRequestDTO } from '../../models/request.model';
+import { CURRENCY_CODES, INCOTERMES, ModeOfTransportEnum, RequestModel, StandardFieldEnum, UpdateFinanceRequestDTO } from '../../models/request.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
@@ -26,7 +26,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
   scenarios: any
   shipPoints: any
   incoterms: string[] = INCOTERMES
-  currencyCodes = currencyCodes
+  currencyCodes = signal(CURRENCY_CODES)
 
   requestForm!: FormGroup;
   fb = inject(FormBuilder)
@@ -120,7 +120,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.currencyCodes.filter(option => option.toLowerCase().includes(filterValue));
+    return this.currencyCodes().filter(option => option.toLowerCase().includes(filterValue));
   }
 
   createItem(data?: any): FormGroup {

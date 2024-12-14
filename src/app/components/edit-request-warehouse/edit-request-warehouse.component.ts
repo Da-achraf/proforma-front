@@ -1,18 +1,17 @@
-import { Component, computed, effect, ElementRef, inject, Inject, OnInit, Signal, ViewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, Inject, OnInit, signal, Signal, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { MessageService } from 'primeng/api'; // Import MessageService
-import { currencyCodes, StandardFieldEnum } from '../../models/request.model';
+import { CURRENCY_CODES, StandardFieldEnum } from '../../models/request.model';
 import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, Subject, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ItemModel } from '../../models/request-item.model';
 import { ScenarioService } from '../../services/scenario.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import _ from 'lodash'
-import { AutoComplete } from 'primeng/autocomplete';
 import { MatAutocomplete } from '@angular/material/autocomplete';
 
 @Component({
@@ -28,7 +27,7 @@ export class EditRequestWarehouseComponent implements OnInit {
 
 
   scenarioService = inject(ScenarioService)
-  currencyCodes = currencyCodes
+  currencyCodes = signal(CURRENCY_CODES)
 
   modeOfTransport = computed(() => {
     const request = this.requestSig()
@@ -259,7 +258,7 @@ export class EditRequestWarehouseComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.currencyCodes.filter(option => option.toLowerCase().includes(filterValue));
+    return this.currencyCodes().filter(option => option.toLowerCase().includes(filterValue));
   }
 
   onCurrencyChange(text: string) {
@@ -275,7 +274,7 @@ export class EditRequestWarehouseComponent implements OnInit {
 
   filter(): void {
     const filterValue = this.input?.nativeElement.value.toLowerCase();
-    this.filteredOptions = of(this.currencyCodes.filter(o => o.toLowerCase().includes(filterValue)));
+    this.filteredOptions = of(this.currencyCodes().filter(o => o.toLowerCase().includes(filterValue)));
   }
 
 

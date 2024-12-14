@@ -42,6 +42,7 @@
     "lodash": "^4.17.21",
     "ng-angular-popup": "^0.5.2",
     "ngx-build-plus": "^17.0.0",
+    "ngx-ldrs": "^17.1.0",
     "path-browserify": "^1.0.1",
     "pdfmake": "^0.2.14",
     "primeflex": "^3.3.1",
