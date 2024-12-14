@@ -304,32 +304,4 @@ export class CreateRequestDialogComponent implements OnInit {
       this.requestForm.patchValue({ incoterm: '' });
     }
   }
-
-  private patchFormProperty(property: string, value: any) {
-    this.requestForm.patchValue({
-      [property]: value
-    })
-  }
-
-  private openAddShipPointDialog(formControlName: 'shippingPoint' | 'deliveryAddress'): void {
-    const dialogRef = this.dialog.open(ShippointCrudComponent, {
-      width: '800px',
-      data: {
-        isUpdateMode: false
-      }
-    });
-
-    dialogRef.afterClosed().subscribe({
-      next: (shipPointId: number) => {
-        this.loadShipPoints()
-        this.patchFormProperty(formControlName, shipPointId)
-      }
-    })
-  }
-
-  onShipPointChange(choice: string | number, formControlName: 'shippingPoint' | 'deliveryAddress') {
-    if (choice == 'other'){
-      this.openAddShipPointDialog(formControlName)
-    }
-  }
 }

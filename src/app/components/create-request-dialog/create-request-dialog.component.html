@@ -37,15 +37,13 @@
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Shipping Point</mat-label>
-        <mat-select (selectionChange)="onShipPointChange(sp.value, 'shippingPoint')" #sp formControlName="shippingPoint">
-          <mat-option value="other">Other</mat-option>
+        <mat-select formControlName="shippingPoint">
           <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Delivery Address</mat-label>
-        <mat-select (selectionChange)="onShipPointChange(da.value, 'deliveryAddress')" #da formControlName="deliveryAddress">
-          <mat-option value="other">Other</mat-option>
+        <mat-select formControlName="deliveryAddress">
           <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
         </mat-select>
       </mat-form-field>
