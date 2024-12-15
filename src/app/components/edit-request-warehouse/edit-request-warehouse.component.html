@@ -86,14 +86,13 @@
         <mat-label>Tracking Number</mat-label>
         <input matInput formControlName="trackingNumber" type="text">
       </mat-form-field>
-      <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>Number Of Boxes</mat-label>
-        <input matInput formControlName="numberOfBoxes" type="text">
-      </mat-form-field>
+
       <mat-form-field appearance="fill">
-        <mat-label>Dimension</mat-label>
+        <mat-label>Volume</mat-label>
         <input matInput formControlName="dimension" />
       </mat-form-field>
+
+      <app-parcels />
     </div>
 
     <!-- Items Array -->

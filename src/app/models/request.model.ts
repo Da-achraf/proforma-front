@@ -116,7 +116,6 @@ export interface RequestModel {
   deliveryAddress: DeliveryAddressModel;
   incoterm: string;
   scenarioId: number;
-  numberOfBoxes: string;
   dhlAccount: string;
   trackingNumber: string;
   dimension: string;
@@ -126,7 +125,9 @@ export interface RequestModel {
   currency: string;
   costCenter: string;
   shippedVia: string;
-  grossWeight?: number,
+  grossWeight?: number;
+  boxes?: number;
+  pallets?: number;
   itemsWithValues: {values: JsonItemModel[]}[]
   items: RequestItem[];
 }
@@ -162,7 +163,7 @@ export const INCOTERMES = [
 ]
 
 export const SHIPPED_VIA_OPTIONS = [
-  'Van', 'Trailer', 'Container', 'Plant'
+  'Van', 'Trailer', 'Container', 'Plan'
 ]
 
 export const INVOICE_TYPES = [

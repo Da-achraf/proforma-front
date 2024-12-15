@@ -109,6 +109,7 @@ import { GenerateArrayPipe } from './shared/pipes/generate-array.pipe';
 import { ItemAmountPipe } from './shared/pipes/item-amount.pipe';
 import { TotalAmountPipe } from './shared/pipes/total-amount.pipe';
 import { ShippointCrudComponent } from './components/shippoints/shippoint-crud/shippoint-crud.component';
+import { ParcelsComponent } from './shared/components/parcels/parcels.component';
 
 @NgModule({
   declarations: [
@@ -169,7 +170,8 @@ import { ShippointCrudComponent } from './components/shippoints/shippoint-crud/s
     GenerateArrayPipe,
     ItemAmountPipe,
     TotalAmountPipe,
-    ShippointCrudComponent
+    ShippointCrudComponent,
+    ParcelsComponent
   ],
   imports: [
     BrowserModule,

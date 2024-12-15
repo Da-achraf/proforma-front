@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-home',
@@ -16,10 +16,10 @@ export class HomeComponent implements OnInit{
     this.auth.SignOut();
   }
 
-  sideBarOpen = true;
+  sideBarOpen = signal(false);
 
   sideBarToggler() {
-    this.sideBarOpen = !this.sideBarOpen;
+    this.sideBarOpen.update(val => !val);
   }
 
 }

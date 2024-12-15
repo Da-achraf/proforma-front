@@ -26,11 +26,6 @@ export class ManagementTablesComponent<T> implements OnInit {
   onUpdate = output<T>()
 
   // Computed signals
-  tableTitle = computed(() => {
-    const tableName = this.tableName()
-    return `${tableName.charAt(0).toUpperCase()}${tableName.slice(1)}s list`
-  })
-
   itemUniqueKey = computed(() => {
     const tableProperties = this.tableProperties()
     return tableProperties[0].name

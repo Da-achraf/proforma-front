@@ -101,8 +101,15 @@
   <div [ngClass]="borderStyle" class="footer flex flex-col p-2">
     <span><span class="font-semibold text-sm">Gross Weight:</span> {{ request.grossWeight || '---' }} KG</span>
     <span><span class="font-semibold text-sm">Net Weight:</span> {{ netWeight() || '---' }} KG </span>
-    <span><span class="font-semibold text-sm">Number of parcels:</span> {{ request.numberOfBoxes }} </span>
-    <span><span class="font-semibold text-sm">Dimension:</span> {{ request.dimension }} </span>
+    <span class="text-sm">
+      <span class="font-semibold">
+        Number of parcels:
+      </span>
+      <span class="font-semibold text-sm">{{ request.boxes || 0 }}</span> Boxe(s) 
+      /
+      <span class="font-semibold text-sm">{{ request.pallets || 0 }}</span> Pallet(s)
+    </span> 
+    <span><span class="font-semibold text-sm">Volume:</span> {{ request.dimension }} </span>
     <div class="text-center mt-3">
       <p class="vat-note text-sm font-semibold">VAT: Value for customs purpose only</p>
       <p class="terms-note text-xs font-semibold">Our General Terms and Conditions of Business will apply. They are

@@ -116,7 +116,6 @@ export class CreateRequestDialogComponent implements OnInit {
       deliveryAddress: ['', Validators.required],
       incoterm: ['', Validators.required],
       dhlAccount: [''],
-      numberOfBoxes: [''],
       modeOfTransport: ['', Validators.required],
       shippedVia: ['', Validators.required],
       costCenter: ['', Validators.required],
@@ -251,7 +250,6 @@ export class CreateRequestDialogComponent implements OnInit {
           shippedvia: this.requestForm.value.shippedVia,
           currency: this.requestForm.value.currency,
           modeOfTransport: this.requestForm.value.modeOfTransport,
-          numberOfBoxes: this.requestForm.value.numberOfBoxes,
           dimension: this.requestForm.value.dimension,
           itemsWithValuesJson: JSON.stringify(this.requestForm.value.items)
         };

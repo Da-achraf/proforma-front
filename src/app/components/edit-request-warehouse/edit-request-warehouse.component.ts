@@ -14,6 +14,7 @@ import { mergeArrays } from '../../shared/components/tables/helpers';
 import _ from 'lodash'
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { notZeroValidator } from '../../shared/helpers/form-validator.helper';
+import { ParcelsComponent } from '../../shared/components/parcels/parcels.component';
 
 @Component({
   selector: 'app-edit-request-warehouse',
@@ -119,7 +120,6 @@ export class EditRequestWarehouseComponent implements OnInit {
       incoterm: [{ value: '', disabled: true }],
       dhlAccount: [{ value: '', disabled: true }],
       trackingNumber: ['', Validators.required],
-      numberOfBoxes: ['', Validators.required],
       grossWeight: ['', [Validators.required, notZeroValidator()]],
       dimension: ['', Validators.required],
       currency: ['', Validators.required],
@@ -142,7 +142,8 @@ export class EditRequestWarehouseComponent implements OnInit {
           trackingNumber: request.trackingNumber,
           grossWeight: request.grossWeight,
           dimension: request.dimension,
-          numberOfBoxes: request.numberOfBoxes,
+          boxes: request.boxes,
+          pallets: request.pallets,
           shippedVia: request.shippedVia,
           currency: request.currency
         });
@@ -227,11 +228,12 @@ export class EditRequestWarehouseComponent implements OnInit {
       const updateData = {
         trackingNumber: this.requestForm.get('trackingNumber')?.value,
         grossWeight: this.requestForm.get('grossWeight')?.value,
-        numberOfBoxes: this.requestForm.get('numberOfBoxes')?.value,
         dimension: this.requestForm.get('dimension')?.value,
         currency: this.requestForm.get('currency')?.value,
         itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
-        userId: userId
+        userId: userId,
+        boxes: this.requestForm.get('boxes')?.value,
+        pallets: this.requestForm.get('pallets')?.value,
       };
 
       this.requestService.updateRequestByWarehouse(this.data.requestNumber, updateData).subscribe(
@@ -276,6 +278,4 @@ export class EditRequestWarehouseComponent implements OnInit {
     const filterValue = this.input?.nativeElement.value.toLowerCase();
     this.filteredOptions = of(this.currencyCodes().filter(o => o.toLowerCase().includes(filterValue)));
   }
-
-
 }

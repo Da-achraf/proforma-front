@@ -1,31 +1,31 @@
 <div class="mx-auto max-w-screen-xl bg-transparent">
   <div class="bg-transparent">
-    <div class="mx-auto max-w-screen-2xl px-2 py-9">
-      <div class="mt-4 w-full">
+    <div class="mx-auto max-w-screen-2xl px-2 py-1">
+      <div class="mt-1 w-full">
         <p class="font-bold w-fit font-mono text-orange-500 text-md mb-5 border-b-2 opacity-75 border-b-blue-400">
-          requests list</p>
+          Requests</p>
         <div class="flex w-full flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0">
           <app-search-bar (searchTerm)="searchValue.set($event)" />
           @if (showCreateButton()){
-          <button (click)="openCreateRequestDialog()" class='create-btn' matTooltip="Create a new request"
-            matTooltipPosition="above">
-            <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none"
-              xmlns="http://www.w3.org/2000/svg">
-              <path stroke-width="2" stroke="#fffffff"
-                d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125"
-                stroke-linejoin="round" stroke-linecap="round"></path>
-              <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#fffffff"
-                d="M17 15V18M17 21V18M17 18H14M17 18H20"></path>
-            </svg>
-            Create
-          </button>
+            <button (click)="openCreateRequestDialog()" class='create-btn' matTooltip="Create a new request"
+              matTooltipPosition="above">
+              <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-width="2" stroke="#fffffff"
+                  d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125"
+                  stroke-linejoin="round" stroke-linecap="round"></path>
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#fffffff"
+                  d="M17 15V18M17 21V18M17 18H14M17 18H20"></path>
+              </svg>
+              Create
+            </button>
           }
           <!-- View report button -->
           @if (loggedInUser(); as loggedUser) {
             @if (loggedUser.role === RoleEnum.ADMIN) {
               <i
               (click)="onOpenReportDialog()"
-              matTooltip="Show report" 
+              matTooltip="View report" 
               matTooltipPosition="above" 
               class="pi pi-window-maximize cursor-pointer text-gray-500 hover:text-gray-700"
               ></i>
@@ -34,31 +34,31 @@
         </div>
       </div>
 
-      <div class="mt-6 overflow-auto rounded-xl py-3 bg-white px-6 shadow-md lg:px-4">
+      <div class="mt-6 rounded-xl py-3 bg-white px-6 shadow-md lg:px-4">
         <table class="min-w-full border-collapse border-spacing-y-2 border-spacing-x-2">
-          <thead class="border-b lg:table-header-group">
-            <tr class="">
+          <thead class="p-1 lg:table-header-group">
+            <tr>
               @for (col of columns(); track col.label){
-              <td class="whitespace-normal py-4 font-medium text-gray-500 sm:px-3">
-                <span>
-                  {{col.label}}
-                  @if (col.isSortable && col.label === 'Date of Submission') {
-                    @if (requestSortingOrder(); as order){
-                      <i 
-                        class="pi text-sm font-bold ml-1 transition-opacity duration-300"
-                        [ngClass]="{
-                          'pi-sort-amount-down': order === 'desc',
-                          'pi-sort-amount-up': order === 'asc',
-                          'cursor-pointer hover:text-gray-800': col.isSortable
-                        }"
-                        [style.opacity]="requestSortingIconVisible() ? '1' : '0.5'"
-                        (click)="onToggleSortingOrder(order)"
-                        (transitionend)="requestSortingIconVisible.set(true)">
-                      </i>
+                <td class="whitespace-normal py-2 font-medium text-gray-500 sm:px-3">
+                  <span>
+                    {{col.label}}
+                    @if (col.isSortable && col.label === 'Date of Submission') {
+                      @if (requestSortingOrder(); as order){
+                        <i 
+                          class="pi text-sm font-bold ml-1 transition-opacity duration-300"
+                          [ngClass]="{
+                            'pi-sort-amount-down': order === 'desc',
+                            'pi-sort-amount-up': order === 'asc',
+                            'cursor-pointer hover:text-gray-800': col.isSortable
+                          }"
+                          [style.opacity]="requestSortingIconVisible() ? '1' : '0.5'"
+                          (click)="onToggleSortingOrder(order)"
+                          (transitionend)="requestSortingIconVisible.set(true)">
+                        </i>
+                      }
                     }
-                  }
-                </span>
-              </td>
+                  </span>
+                </td>
               }
             </tr>
           </thead>

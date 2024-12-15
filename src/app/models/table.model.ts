@@ -4,10 +4,10 @@ export type Column = {
 }
 
 export enum TableNameEnum {
-  USER = 'user',
-  PLANT = 'plant',
-  DEPARTMENT = 'department',
-  SHIP_POINT = 'ship point'
+  USER = 'users',
+  PLANT = 'plants',
+  DEPARTMENT = 'departments',
+  SHIP_POINT = 'ship points'
 } 
 
 export type TableProperty = {
