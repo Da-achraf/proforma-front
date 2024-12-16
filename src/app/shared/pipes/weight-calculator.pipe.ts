@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { calculatTotalNetWeight } from '../../helpers/invoice.helper';
+import { calculatTotalNetWeight } from '../helpers/invoice.helper';
 
 export enum WeightTypeEnum {
   GROSS = 'Gross Weight',
