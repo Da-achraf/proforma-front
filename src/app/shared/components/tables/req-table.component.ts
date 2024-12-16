@@ -177,7 +177,8 @@ export class RequestsTableComponent {
   onOpenReportDialog() {
     this.dialog.open(RequestsReportComponent, {
       minWidth: '800px',
-      maxWidth: '1500px',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
       data: { requests: this.requests() }
     });
   }

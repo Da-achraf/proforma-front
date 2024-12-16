@@ -1,19 +1,19 @@
-import { Component, computed, ElementRef, inject, Renderer2, signal, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, Renderer2, signal, TemplateRef, viewChild, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { requestReportTableColumns } from '../../models/request-report.model';
-import { createdAtFormat, RequestModel } from '../../models/request.model';
-import { RequestStatus, RequestStatusLabelMapping } from '../../models/requeststatus.model';
+import { createdAtFormat, RequestModel, TransformedRequestModel } from '../../models/request.model';
 import { exportMenuOptions, ExportMenuOptionsEnum } from '../../models/table.model';
 import { getStatusClass } from '../../shared/components/tables/helpers';
-import { TableUtil } from '../../shared/helpers/table-util';
-import { WeightTypeEnum } from '../../shared/pipes/report-table/gross-weight-calculator.pipe';
+import { filterRequests, transformRequest } from '../../shared/helpers/report-table.helper';
+import { WeightTypeEnum } from '../../shared/pipes/report-table/weight-calculator.pipe';
+import { TableExportService } from '../../shared/services/table-export.service';
 
 @Component({
   selector: 'app-requests-report',
   templateUrl: './requests-report.component.html',
   styleUrl: './requests-report.component.css',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class RequestsReportComponent {
 
@@ -21,9 +21,10 @@ export class RequestsReportComponent {
   private data = inject(MAT_DIALOG_DATA)
   private renderer = inject(Renderer2)
   private elementRef = inject(ElementRef)
+  private tableExportService = inject(TableExportService)
 
   // View refs
-  @ViewChild('exportTable') exportTableRef!: TemplateRef<any>;
+  exportTableRef = viewChild<TemplateRef<any>>('exportTable')
 
   // Enums and Constants
   readonly WeightTypeEnum = WeightTypeEnum;
@@ -33,19 +34,23 @@ export class RequestsReportComponent {
   columns = signal(requestReportTableColumns)
   columnsLength = computed(() => this.columns().length)
   searchValue = signal('')
-  bruteRequests = signal(this.data.requests)
-  requestsToExport = signal<any[]>([])
+  bruteRequests = signal<RequestModel[]>(this.data.requests)
   rows = signal(10)
   first = signal(0)
+  selectedExportMenuOption = signal<ExportMenuOptionsEnum | undefined>(undefined)
   isExporting = signal(false)
   exportMenuOpened = signal(false)
   createdAtFormat = signal(createdAtFormat)
-  
+
+  transformedRequests = computed(() =>
+    this.bruteRequests().flatMap(req => transformRequest(req))
+  )
+
   // Sorted request (by date of creation 'desc')
   requests = computed(() => {
-    const bruteRequests = this.bruteRequests()
-    return bruteRequests.slice().sort((a: any, b: any) => {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    return this.transformedRequests().slice().sort(
+      (a: TransformedRequestModel, b: TransformedRequestModel) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     })
   })
 
@@ -55,66 +60,56 @@ export class RequestsReportComponent {
 
     if (!requests || requests.length === 0) return [];
     if (searchValue.length === 0) return requests;
-    return this.filterRequests(searchValue, requests as RequestModel[]);
+    return filterRequests(searchValue, requests);
   });
 
   paginatedRequests = computed(() => {
-    const filteredRequests = this.filteredRequests()
-    return filteredRequests?.slice(this.first(), this.first() + this.rows())
+    return this.filteredRequests()?.slice(this.first(), this.first() + this.rows())
   }, undefined)
 
   totalRecords = computed(() => this.filteredRequests()?.length ?? 0);
 
+  requestsToExport = computed(() => {
+    switch (this.selectedExportMenuOption()) {
+      case ExportMenuOptionsEnum.CURRENT_PAGE:
+        return this.paginatedRequests()
+      case ExportMenuOptionsEnum.FILTERED_ITEMS:
+        return this.filteredRequests()
+      case ExportMenuOptionsEnum.FULL_EXPORT:
+        return this.transformedRequests()
+      default:
+        return
+    }
+  })
+
+
+  // Effects
+  requestsToExportSetEffect = effect(async () => {
+    const requestsToExport = this.requestsToExport()
+
+    if (!requestsToExport) return
+
+    await this.onExport()
+
+  }, {allowSignalWrites: true})
+
+
   // Methods
   getStatusClass = getStatusClass;
-
-  private filterRequests(searchValue: string, requests: RequestModel[]): RequestModel[] {
-    const searchKeyword = searchValue.trim().toLowerCase();
-    return requests.filter(request =>
-      request.requestNumber.toString().toLowerCase().includes(searchKeyword) ||
-      RequestStatusLabelMapping[request.status as RequestStatus].toLowerCase().includes(searchKeyword) ||
-      request.created_at.toLowerCase().includes(searchKeyword) ||
-      request.trackingNumber.toLowerCase().includes(searchKeyword) ||
-      request.currency.toLowerCase().includes(searchKeyword) ||
-      request.incoterm.toLowerCase().includes(searchKeyword) ||
-      request.invoicesTypes.toLowerCase().includes(searchKeyword) ||
-      request.modeOfTransport.toLowerCase().includes(searchKeyword) ||
-      request.shipPoint.shipPoint.toLocaleLowerCase().includes(searchKeyword) ||
-      request.deliveryAddress.deliveryAddress.toLocaleLowerCase().includes(searchKeyword) ||
-      request.user.userName.toLocaleLowerCase().includes(searchKeyword)
-    );
-  }
-
-  setRequestsToExport(selectedMenuItem: ExportMenuOptionsEnum) {
-    switch (selectedMenuItem) {
-      case ExportMenuOptionsEnum.CURRENT_PAGE:
-        this.requestsToExport.set(this.paginatedRequests())
-        break;
-      case ExportMenuOptionsEnum.FILTERED_ITEMS:
-        this.requestsToExport.set(this.filteredRequests())
-        break;
-      case ExportMenuOptionsEnum.FULL_EXPORT:
-        this.requestsToExport.set(this.bruteRequests())
-        break;
-    }
-  }
-
-  async onExportMenuItemSelected(selectedMenuItem: ExportMenuOptionsEnum) {
-    this.setRequestsToExport(selectedMenuItem)
-    if (this.requestsToExport().length != 0) await this.onExport()
-  }
-
-  async onExport() {
+  
+  private async onExport() {
     this.isExporting.set(true)
-    setTimeout(async () => {
-      TableUtil.exportTemplateToExcel(
-        this.exportTableRef,
+    try {
+      this.tableExportService.exportTemplateToExcel(
+        this.exportTableRef(),
         this.renderer,
         this.elementRef,
-        'FullExport'
+        'Export'
       );
+    } finally {
       this.isExporting.set(false)
-    }, 700);
+      this.selectedExportMenuOption.set(undefined)
+    }
   }
 
   onPageChange(event: PageEvent) {

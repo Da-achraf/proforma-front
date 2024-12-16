@@ -2,6 +2,10 @@ import { Column } from "./table.model";
 
 export const requestReportTableColumns: Column[] = [
     {
+        label: 'Id',
+        isSortable: false
+    },
+    {
         label: 'Tracking no',
         isSortable: false
     },
@@ -22,6 +26,14 @@ export const requestReportTableColumns: Column[] = [
         isSortable: false
     },
     {
+        label: 'Boxes',
+        isSortable: false
+    },
+    {
+        label: 'Pallets',
+        isSortable: false
+    },
+    {
         label: 'Shipped from',
         isSortable: false
     },
@@ -38,11 +50,35 @@ export const requestReportTableColumns: Column[] = [
         isSortable: false
     },
     {
-        label: 'Carrier name',
+        label: 'Transport Mode',
         isSortable: false
     },
     {
         label: 'Total',
+        isSortable: false
+    },
+    {
+        label: 'Currency',
+        isSortable: false
+    },
+    {
+        label: 'Cost Center',
+        isSortable: false
+    },
+    {
+        label: 'Material',
+        isSortable: false
+    },
+    {
+        label: 'Description',
+        isSortable: false
+    },
+    {
+        label: 'HTS Code',
+        isSortable: false
+    },
+    {
+        label: 'COO',
         isSortable: false
     },
 ]

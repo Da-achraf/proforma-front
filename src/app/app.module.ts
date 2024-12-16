@@ -101,7 +101,7 @@ import { NewlinePipe } from './shared/pipes/new-line.pipe';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { TruncateTextPipe } from './shared/pipes/truncate-text.pipe';
 import { RequestsReportComponent } from './components/requests-report/requests-report.component';
-import { WeightCalculatorPipe } from './shared/pipes/report-table/gross-weight-calculator.pipe';
+import { WeightCalculatorPipe } from './shared/pipes/report-table/weight-calculator.pipe';
 import { TheInvoiceComponent } from './shared/components/the-invoice/the-invoice.component';
 import { MatSelectCountryModule } from "@angular-material-extensions/select-country";
 import { CountryPipe } from './shared/pipes/country.pipe';
@@ -110,6 +110,7 @@ import { ItemAmountPipe } from './shared/pipes/item-amount.pipe';
 import { TotalAmountPipe } from './shared/pipes/total-amount.pipe';
 import { ShippointCrudComponent } from './components/shippoints/shippoint-crud/shippoint-crud.component';
 import { ParcelsComponent } from './shared/components/parcels/parcels.component';
+import { TrackingColorPipe } from './shared/pipes/report-table/tracking-color.pipe';
 
 @NgModule({
   declarations: [
@@ -171,7 +172,8 @@ import { ParcelsComponent } from './shared/components/parcels/parcels.component'
     ItemAmountPipe,
     TotalAmountPipe,
     ShippointCrudComponent,
-    ParcelsComponent
+    ParcelsComponent,
+    TrackingColorPipe
   ],
   imports: [
     BrowserModule,

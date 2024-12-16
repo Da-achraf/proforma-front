@@ -30,13 +30,11 @@ export class TheInvoiceComponent {
     return itemsWithValues?.map((i: any) => i.values)
   })
 
-  netWeight = computed(() => {
-    const items = this.itemsWithValues(); // Get the items with values
-    const total = items.reduce((total: any, item: any) => {
-      const grossWeightValue = item.values.find((v: any) => v.name === 'Net Weight')?.value;
-      return total + (grossWeightValue ? parseFloat(grossWeightValue) : 0);
+  netWeight = computed<number>(() => {
+    return this.itemsWithValues().reduce((total: any, item: any) => {
+      const netWeightValue = item.values.find((v: any) => v.name === 'Net Weight')?.value;
+      return total + (netWeightValue ? parseFloat(netWeightValue) : 0);
     }, 0);
-    return total.toFixed(3);
   })
 
   // Methods

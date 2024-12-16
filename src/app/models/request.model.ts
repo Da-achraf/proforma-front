@@ -139,6 +139,39 @@ export type JsonItemModel = {
   isMandatory: boolean
 }
 
+export interface TransformedRequestModel {
+  requestNumber: number;
+  createdAt: string;
+  status: number;
+  requesterName: string;
+  invoicesTypes: string;
+  invoicesAddress: string | null;
+  incoterm: string;
+  trackingNumber: string;
+  dimension: string;
+  invoiceAddress: string;
+  exporterAddress: string;
+  modeOfTransport: string;
+  shippedVia: string;
+  currency: string;
+  grossWeight?: number;
+  netWeight?: number;
+  totalAmount?: number;
+  costCenter: string;
+  boxes?: number;
+  pallets?: number;
+  shipPoint: string;
+  deliveryAddress: string;
+
+  // Differentiated fields for each request
+  material?: string;
+  description?: string;
+  htsCode?: string;
+  coo?: string;
+}
+
+
+
 export enum ModeOfTransportEnum {
   BY_AIR = 'By Air',
   BY_ROAD = 'By Road',

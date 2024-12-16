@@ -99,8 +99,8 @@
   </table>
 
   <div [ngClass]="borderStyle" class="footer flex flex-col p-2">
-    <span><span class="font-semibold text-sm">Gross Weight:</span> {{ request.grossWeight || '---' }} KG</span>
-    <span><span class="font-semibold text-sm">Net Weight:</span> {{ netWeight() || '---' }} KG </span>
+    <span><span class="font-semibold text-sm">Gross Weight:</span> {{ ((request.grossWeight || 0) | number:'1.3-3') || '---' }} KG</span>
+    <span><span class="font-semibold text-sm">Net Weight:</span> {{ ((netWeight() || 0) | number:'1.3-3') || '---' }} KG </span>
     <span class="text-sm">
       <span class="font-semibold">
         Number of parcels:
