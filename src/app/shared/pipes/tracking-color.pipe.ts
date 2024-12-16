@@ -1,5 +1,5 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { ReportCellColorService } from '../../services/report-cell-color.service';
+import { ReportCellColorService } from '../services/report-cell-color.service';
 
 @Pipe({
   name: 'trackingColor',

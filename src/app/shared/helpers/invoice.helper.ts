@@ -1,5 +1,5 @@
 import { TransformedRequestModel } from "../../models/request.model";
-import { WeightTypeEnum } from "../pipes/report-table/weight-calculator.pipe";
+import { WeightTypeEnum } from "../pipes/weight-calculator.pipe";
 
 export const getFieldValue = (item: any, fieldName: string): string => {
     const field = item?.find((f: any) => f.name === fieldName);

@@ -6,8 +6,8 @@ import { createdAtFormat, RequestModel, TransformedRequestModel } from '../../mo
 import { exportMenuOptions, ExportMenuOptionsEnum } from '../../models/table.model';
 import { getStatusClass } from '../../shared/components/tables/helpers';
 import { filterRequests, transformRequest } from '../../shared/helpers/report-table.helper';
-import { WeightTypeEnum } from '../../shared/pipes/report-table/weight-calculator.pipe';
 import { TableExportService } from '../../shared/services/table-export.service';
+import { WeightTypeEnum } from '../../shared/pipes/weight-calculator.pipe';
 
 @Component({
   selector: 'app-requests-report',
@@ -27,7 +27,7 @@ export class RequestsReportComponent {
   exportTableRef = viewChild<TemplateRef<any>>('exportTable')
 
   // Enums and Constants
-  readonly WeightTypeEnum = WeightTypeEnum;
+  readonly WeightTypeEnum = WeightTypeEnum
   readonly exportMenuOptions = signal(exportMenuOptions)
 
   // Signals and Computed Values
