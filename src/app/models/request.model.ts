@@ -42,6 +42,19 @@ export interface CreateRequest {
   itemsWithValuesJson?: string
 }
 
+export interface UpdateRequestByRequester {
+  invoicesTypes?: string;
+  shipPointId?: number;
+  deliveryAddressId?: number;
+  incoterm?: string;
+  costCenter?: string;
+  scenarioId?: number;
+  shippedvia?: string;
+  modeOfTransport?: string;
+  currency?: string;
+  itemsWithValuesJson?: string
+}
+
 export interface UpdateFinanceRequestDTO {
   userId: number;
   incoterm: string;

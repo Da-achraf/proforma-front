@@ -5,11 +5,12 @@ import { EditRequestTradcomplianceComponent } from "../../../components/edit-req
 import { EditRequestWarehouseComponent } from "../../../components/edit-request-warehouse/edit-request-warehouse.component"
 import { RequestStatus } from "../../../models/requeststatus.model"
 import { JsonItemModel } from "../../../models/request.model"
+import { EditRequestRequesterComponent } from "../../../components/edit-request-requester/edit-request-requester.component"
 
 export const getRequestModificationComponent = (role: RoleEnum): ComponentType<any> | undefined => {
     switch (role){
       case RoleEnum.REQUESTER:
-        return ModifyRequestFinanceComponent
+        return EditRequestRequesterComponent
       case RoleEnum.FINANCE_APPROVER:
         return ModifyRequestFinanceComponent
       case RoleEnum.TRADECOMPLIANCE_APPROVER:

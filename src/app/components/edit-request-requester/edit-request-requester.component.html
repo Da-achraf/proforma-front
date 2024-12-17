@@ -1,0 +1,157 @@
+<h1 mat-dialog-title>Edit Request</h1>
+<div mat-dialog-content>
+  <form [formGroup]="requestForm">
+    <div class="notes-container">
+      <div class="note">
+        <mat-icon>info</mat-icon>
+        <p>
+          Proforma Invoice:<br />
+          • Used for free of charges transactions<br />
+          • Used for customs purpose only
+        </p>
+      </div>
+      <div class="note">
+        <mat-icon>info</mat-icon>
+        <p>
+          Manual Commercial Invoice:<br />
+          • Indicates the actual sale of goods<br />
+          • Serves as a demand for payment <br />from the buyer
+        </p>
+      </div>
+    </div>
+    <div class="form-grid">
+      <mat-form-field appearance="fill">
+        <mat-label>Select Invoice Type</mat-label>
+        <mat-select formControlName="invoicesTypes">
+          <mat-option *ngFor="let type of invoiceTypes()" [value]="type">{{
+            type
+            }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Scenario</mat-label>
+        <mat-select formControlName="scenarioId" (selectionChange)="onScenarioChange()">
+          <mat-option *ngFor="let scenario of scenarios()" [value]="scenario.id_scenario">{{ scenario.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Shipping Point</mat-label>
+        <mat-select formControlName="shippingPoint">
+          <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Delivery Address</mat-label>
+        <mat-select formControlName="deliveryAddress">
+          <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Incoterm</mat-label>
+        <mat-select formControlName="incoterm">
+          <mat-option *ngFor="let term of incotermOptions()" [value]="term">{{
+            term
+            }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Cost Center</mat-label>  
+        <input matInput formControlName="costCenter" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Mode Of Transport</mat-label>
+        <mat-select formControlName="modeOfTransport">
+          <mat-option *ngFor="let modeOfTransport of modesOfTransports" [value]="modeOfTransport">{{ modeOfTransport
+            }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- <mat-form-field>
+        <mat-label>Currency</mat-label>
+        <input type="text" placeholder="Pick one" #currencyInput (input)="onChange(currencyInput.value)" matInput
+          formControlName="currency" [matAutocomplete]="auto">
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+          @for (option of currencyCodes; track option) {
+          <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field> -->
+
+      <mat-form-field>
+        <mat-label>Currency</mat-label>
+        <mat-select formControlName="currency" name="currency">
+          @for (option of currencyCodes(); track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+
+      <mat-form-field>
+        <mat-label>Shiped Via</mat-label>
+        <mat-select formControlName="shippedVia" name="shippedVia">
+          @for (option of shippedViaOptions(); track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (items.length !== 0 && items.controls.length !== 0) {
+    <div class="border border-gray-200 rounded-md overflow-hidden">
+      <div class="bg-orange-200 p-2 mb-2 text-center">
+        <span class="font-mono text-md w-fit text-orange-600">
+          Items
+          <span class="font-bold text-xs text-gray-800">
+            ({{ items.length }})
+          </span>
+        </span>
+      </div>
+      <div class="p-2" formArrayName="items">
+        @for (itemGroup of items.controls; track itemGroup; let i = $index) {
+        <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold">Item {{ i + 1 }}</span>
+            <button mat-icon-button color="warn" matTooltipPosition="above"
+              [matTooltip]="items.length === 1 ? 'A request should have at least one item' : 'Remove this item'"
+              type="button" (click)="removeItem(i)">
+              <mat-icon>remove_circle</mat-icon>
+            </button>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            @for (field of formItems() || []; track field) {
+            <div [formGroupName]="field.nameItem">
+              <mat-form-field appearance="fill" class="w-full mb-2">
+                <mat-label>{{ field.nameItem }}</mat-label>
+                <input matInput formControlName="value" [type]="field.type" [required]="field.isMandatory">
+              </mat-form-field>
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+      <div class="p-2">
+        <button mat-icon-button color="primary" matTooltipPosition="above" matTooltip="Add another item"
+          (click)="addItem()" type="button">
+          <mat-icon>add_circle</mat-icon>
+        </button>
+      </div>
+    </div>
+    }
+
+
+
+    <div class="mt-2" mat-dialog-actions>
+      <button mat-raised-button class="cancel-button" (click)="onNoClick()">
+        Cancel
+      </button>
+      <button mat-raised-button [disabled]="!requestForm.valid" class="submit-button" (click)="onSubmit()">
+        Submit
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,24 +1,27 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
-import { BehaviorSubject, filter, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { Observable, BehaviorSubject, filter, switchMap, of, startWith, map, shareReplay } from 'rxjs';
 import { ItemModel } from '../../models/request-item.model';
-import { CreateRequest, CURRENCY_CODES, INCOTERMES, INVOICE_TYPES, ModesOfTransports, SHIPPED_VIA_OPTIONS } from '../../models/request.model';
+import { CURRENCY_CODES, INVOICE_TYPES, INCOTERMES, SHIPPED_VIA_OPTIONS, ModesOfTransports, CreateRequest, RequestModel, UpdateRequestByRequester } from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
 import { ToasterService } from '../../shared/services/toaster.service';
+import { CreateRequestDialogComponent } from '../create-request-dialog/create-request-dialog.component';
+import _ from 'lodash';
+import { mergeArrays } from '../../shared/components/tables/helpers';
 
 @Component({
-  selector: 'app-create-request-dialog',
-  templateUrl: './create-request-dialog.component.html',
-  styleUrls: ['./create-request-dialog.component.css']
+  selector: 'app-edit-request-requester',
+  templateUrl: './edit-request-requester.component.html',
+  styleUrl: './edit-request-requester.component.css'
 })
-export class CreateRequestDialogComponent implements OnInit {
+export class EditRequestRequesterComponent {
 
   // Injected dependencies
   dialog = inject(MatDialog)
@@ -34,6 +37,26 @@ export class CreateRequestDialogComponent implements OnInit {
 
   filteredOptions!: Observable<string[]>;
 
+  data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
+  request$ = this.requestService.getRequestById(this.data.requestNumber).pipe(
+      shareReplay(1)
+  )
+  requestSig = toSignal(this.request$)
+
+  selectedScenario = computed(() => {
+    const request = this.requestSig()
+    if (!request) return
+    this.scenearioIdSubject.next(request.scenario.id_scenario)
+    return request.scenario
+  })
+
+  scenearioIdSubject = new BehaviorSubject<number>(0)
+  scenarioAttributes$ = this.scenearioIdSubject.pipe(
+    filter((id: number) => id != 0),
+    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
+  )
+  scenarioAttributes = toSignal(this.scenarioAttributes$)
+  
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
@@ -43,29 +66,14 @@ export class CreateRequestDialogComponent implements OnInit {
   // Signals
   scenarios = toSignal(this.scenarioService.getScenarios())
   selectedScenarioId = signal(0)
-  selectedScenario = computed(() => {
-    const allSceanrios = this.scenarios()
-    const selectedScenarioId = this.selectedScenarioId()
-
-    if (allSceanrios &&selectedScenarioId != 0){
-      return allSceanrios.find(scenario => scenario.id_scenario === selectedScenarioId)
-    }
-    return undefined
-  })
-
-  scenearioIdSubject = new BehaviorSubject<number>(0)
-  scenarioAttributes$ = this.scenearioIdSubject.pipe(
-    filter((id: number) => id != 0),
-    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
-  )
-  scenarioAttributes = toSignal(this.scenarioAttributes$)
+  
 
   formItems = computed(() => {
     const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
     const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
-  
+
     if (!selectedScenarioItems.length || !scenarioAttributes.length) return [];
-  
+
     return selectedScenarioItems.map(item => {
       const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
       return {
@@ -75,7 +83,11 @@ export class CreateRequestDialogComponent implements OnInit {
     });
   });
 
-  existingItemsData = []
+  existingItemsData = computed(() => {
+    const request = this.requestSig()
+    if (!request) return
+    return request.itemsWithValues
+  })
 
   constructor(
     private fb: FormBuilder,
@@ -88,12 +100,14 @@ export class CreateRequestDialogComponent implements OnInit {
   ) {
 
     effect(() => {
-      const selectedScenario = this.selectedScenario()
+      const formItems = this.formItems()
+      const existingItemsData = this.existingItemsData()
 
-      if (!selectedScenario) return
+
+      if (existingItemsData?.length == 0) return
       this.items?.clear()
-      if (this.existingItemsData.length > 0) {
-        this.patchExistingData();
+      if (existingItemsData && existingItemsData.length > 0) {
+        this.patchExistingData(existingItemsData);
       } else {
         this.addItem();
       }
@@ -125,16 +139,27 @@ export class CreateRequestDialogComponent implements OnInit {
     this.onScenarioChange();
     this.onShippingOrDeliveryChange();
 
-    if (this.existingItemsData.length > 0) {
-      this.patchExistingData();
-    } else {
-      // this.addItem();
-    }
+    this.request$.subscribe(({
+      next: (request: RequestModel) => {
+        this.requestForm.patchValue({
+          invoicesTypes: request?.invoicesTypes,
+          scenarioId: request?.scenario.id_scenario,
+          shippingPoint: request?.shipPoint.id_ship,
+          deliveryAddress: request?.deliveryAddress.id_ship,
+          incoterm: request?.incoterm,
+          dhlAccount: request?.dhlAccount,
+          modeOfTransport: request?.modeOfTransport,
+          shippedVia: request?.shippedVia,
+          costCenter: request?.costCenter,
+          currency: request.currency
+        });
+      }
+    }))
   }
 
-  patchExistingData() {
+  patchExistingData(data: any[]) {
     this.items.clear();
-    this.existingItemsData.forEach(itemData => {
+    data?.forEach(itemData => {
       this.items.push(this.createItem(itemData));
     });
   }
@@ -159,7 +184,7 @@ export class CreateRequestDialogComponent implements OnInit {
 
   findDataOfItem(itemName: string, data: any[]) {
     console.log('data: ', data)
-    let foundData:any = null
+    let foundData: any = null
     data?.forEach(d => {
       if (d['name'] === itemName) foundData = d
     })
@@ -173,7 +198,7 @@ export class CreateRequestDialogComponent implements OnInit {
   }
 
   removeItem(index: number) {
-    if (this.items.length <= 1) return 
+    if (this.items.length <= 1) return
     this.items.removeAt(index);
   }
 
@@ -233,26 +258,28 @@ export class CreateRequestDialogComponent implements OnInit {
   onSubmit(): void {
     console.log('request form: ', this.requestForm.value)
     if (this.requestForm) {
-      const userId = this.authService.getUserIdFromToken();
       const scenarioId = this.requestForm.value.scenarioId;
       if (typeof scenarioId === 'number') {
         const shippingPointId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.shippingPoint)?.id_ship ?? 0;
         const deliveryAddressId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.deliveryAddress)?.id_ship ?? 0;
-        const requestData: CreateRequest = {
+
+        const existingItemsData = this.existingItemsData() ?? []
+        const itemsCopy = _.cloneDeep(this.requestForm.value.items)
+
+        const requestData: UpdateRequestByRequester = {
           invoicesTypes: this.requestForm.value.invoicesTypes,
           shipPointId: shippingPointId,
           deliveryAddressId: deliveryAddressId,
           incoterm: this.requestForm.value.incoterm,
           costCenter: this.requestForm.value.costCenter,
-          userId: userId,
           scenarioId: scenarioId,
           shippedvia: this.requestForm.value.shippedVia,
           currency: this.requestForm.value.currency,
           modeOfTransport: this.requestForm.value.modeOfTransport,
-          dimension: this.requestForm.value.dimension,
-          itemsWithValuesJson: JSON.stringify(this.requestForm.value.items)
+          itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
         };
-        this.requestService.createRequest(requestData).subscribe(
+
+        this.requestService.updateRequestByRequester(this.data.requestNumber, requestData).subscribe(
           (response) => {
             console.log('Request created:', response);
             this.dialogRef.close(response);
@@ -300,4 +327,5 @@ export class CreateRequestDialogComponent implements OnInit {
       this.requestForm.patchValue({ incoterm: '' });
     }
   }
+
 }

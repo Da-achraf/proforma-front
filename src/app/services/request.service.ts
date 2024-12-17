@@ -1,9 +1,9 @@
-import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
-import { CreateRequest, RequestModel, UpdateFinanceRequestDTO} from '../models/request.model';
+import { Injectable, inject, signal } from '@angular/core';
 import { saveAs } from 'file-saver';
+import { Observable, map } from 'rxjs';
 import { API_URL_TOKEN } from '../config/api.config';
+import { RequestModel, UpdateFinanceRequestDTO, UpdateRequestByRequester } from '../models/request.model';
 
 
 
@@ -24,6 +24,10 @@ export class RequestService {
 
   deleteRequest(requestNumber: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${requestNumber}`);
+  }
+
+  updateRequestByRequester(requestNumber: number, updateData: UpdateRequestByRequester): Observable<any> {
+    return this.http.put(`${this.baseUrl}/UpdateRequestByRequester/${requestNumber}`, updateData);
   }
 
   updateRequestByFinance(requestNumber: number, updateData: UpdateFinanceRequestDTO): Observable<any> {

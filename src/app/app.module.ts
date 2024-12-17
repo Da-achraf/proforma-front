@@ -111,6 +111,7 @@ import { ShippointCrudComponent } from './components/shippoints/shippoint-crud/s
 import { ParcelsComponent } from './shared/components/parcels/parcels.component';
 import { TrackingColorPipe } from './shared/pipes/tracking-color.pipe';
 import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
+import { EditRequestRequesterComponent } from './components/edit-request-requester/edit-request-requester.component';
 
 @NgModule({
   declarations: [
@@ -173,7 +174,8 @@ import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
     TotalAmountPipe,
     ShippointCrudComponent,
     ParcelsComponent,
-    TrackingColorPipe
+    TrackingColorPipe,
+    EditRequestRequesterComponent
   ],
   imports: [
     BrowserModule,
