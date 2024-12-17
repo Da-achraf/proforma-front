@@ -8,6 +8,8 @@ import { getStatusClass } from '../../shared/components/tables/helpers';
 import { filterRequests, transformRequest } from '../../shared/helpers/report-table.helper';
 import { TableExportService } from '../../shared/services/table-export.service';
 import { WeightTypeEnum } from '../../shared/pipes/weight-calculator.pipe';
+import { RequestStatus } from '../../models/requeststatus.model';
+import { ReportCellColorService } from '../../shared/services/report-cell-color.service';
 
 @Component({
   selector: 'app-requests-report',
@@ -22,6 +24,7 @@ export class RequestsReportComponent {
   private renderer = inject(Renderer2)
   private elementRef = inject(ElementRef)
   private tableExportService = inject(TableExportService)
+  private reportCellColorService = inject(ReportCellColorService)
 
   // View refs
   exportTableRef = viewChild<TemplateRef<any>>('exportTable')
@@ -30,11 +33,11 @@ export class RequestsReportComponent {
   readonly WeightTypeEnum = WeightTypeEnum
   readonly exportMenuOptions = signal(exportMenuOptions)
 
-  // Signals and Computed Values
+  // Signals
   columns = signal(requestReportTableColumns)
   columnsLength = computed(() => this.columns().length)
   searchValue = signal('')
-  bruteRequests = signal<RequestModel[]>(this.data.requests)
+  allRequests = signal<RequestModel[]>(this.data.requests)
   rows = signal(10)
   first = signal(0)
   selectedExportMenuOption = signal<ExportMenuOptionsEnum | undefined>(undefined)
@@ -42,8 +45,14 @@ export class RequestsReportComponent {
   exportMenuOpened = signal(false)
   createdAtFormat = signal(createdAtFormat)
 
+
+  // Computed Values
+  doneRequests = computed(() => 
+    this.allRequests().filter(req => req.status === RequestStatus.Done)  
+  )
+
   transformedRequests = computed(() =>
-    this.bruteRequests().flatMap(req => transformRequest(req))
+    this.doneRequests().flatMap(req => transformRequest(req))
   )
 
   // Sorted request (by date of creation 'desc')
@@ -66,6 +75,7 @@ export class RequestsReportComponent {
   paginatedRequests = computed(() => {
     return this.filteredRequests()?.slice(this.first(), this.first() + this.rows())
   }, undefined)
+
 
   totalRecords = computed(() => this.filteredRequests()?.length ?? 0);
 
@@ -118,6 +128,8 @@ export class RequestsReportComponent {
     if (typeof pageIndex === 'number' && typeof pageSize === 'number') {
       this.first.set(pageIndex * pageSize)
       this.rows.set(pageSize)
+
+      this.reportCellColorService.reset()
     }
   }
 }
