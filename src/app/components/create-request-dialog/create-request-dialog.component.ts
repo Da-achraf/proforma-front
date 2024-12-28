@@ -47,10 +47,9 @@ export class CreateRequestDialogComponent implements OnInit {
     const allSceanrios = this.scenarios()
     const selectedScenarioId = this.selectedScenarioId()
 
-    if (allSceanrios &&selectedScenarioId != 0){
-      return allSceanrios.find(scenario => scenario.id_scenario === selectedScenarioId)
-    }
-    return undefined
+    if (!allSceanrios || selectedScenarioId === 0) return
+
+    return allSceanrios.find(s => s.id_scenario === selectedScenarioId)
   })
 
   scenearioIdSubject = new BehaviorSubject<number>(0)

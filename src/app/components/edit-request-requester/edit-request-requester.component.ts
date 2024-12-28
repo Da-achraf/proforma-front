@@ -1,20 +1,20 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import _ from 'lodash';
 import { MessageService } from 'primeng/api';
-import { Observable, BehaviorSubject, filter, switchMap, of, startWith, map, shareReplay } from 'rxjs';
+import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 import { ItemModel } from '../../models/request-item.model';
-import { CURRENCY_CODES, INVOICE_TYPES, INCOTERMES, SHIPPED_VIA_OPTIONS, ModesOfTransports, CreateRequest, RequestModel, UpdateRequestByRequester } from '../../models/request.model';
+import { CURRENCY_CODES, INCOTERMES, INVOICE_TYPES, ModesOfTransports, RequestModel, SHIPPED_VIA_OPTIONS, UpdateRequestByRequester } from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
+import { mergeArrays } from '../../shared/components/tables/helpers';
 import { ToasterService } from '../../shared/services/toaster.service';
 import { CreateRequestDialogComponent } from '../create-request-dialog/create-request-dialog.component';
-import _ from 'lodash';
-import { mergeArrays } from '../../shared/components/tables/helpers';
 
 @Component({
   selector: 'app-edit-request-requester',
@@ -37,9 +37,9 @@ export class EditRequestRequesterComponent {
 
   filteredOptions!: Observable<string[]>;
 
-  data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
+  data: { requestNumber: number } = inject(MAT_DIALOG_DATA)
   request$ = this.requestService.getRequestById(this.data.requestNumber).pipe(
-      shareReplay(1)
+    shareReplay(1)
   )
   requestSig = toSignal(this.request$)
 
@@ -56,7 +56,7 @@ export class EditRequestRequesterComponent {
     switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
   )
   scenarioAttributes = toSignal(this.scenarioAttributes$)
-  
+
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
@@ -66,7 +66,8 @@ export class EditRequestRequesterComponent {
   // Signals
   scenarios = toSignal(this.scenarioService.getScenarios())
   selectedScenarioId = signal(0)
-  
+  selectedScenarioChanged = signal<number | undefined>(undefined)
+
 
   formItems = computed(() => {
     const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
@@ -98,6 +99,15 @@ export class EditRequestRequesterComponent {
     private messageService: MessageService,
     public dialogRef: MatDialogRef<CreateRequestDialogComponent>
   ) {
+
+    effect(() => {
+      const changed = this.selectedScenarioChanged()
+
+      if (changed) {
+        this.items?.clear()
+        this.addItem();
+      }
+    })
 
     effect(() => {
       const formItems = this.formItems()
@@ -227,6 +237,8 @@ export class EditRequestRequesterComponent {
     const scenarioIdControl = this.requestForm.get('scenarioId');
     this.selectedScenarioId.set(scenarioIdControl?.value ?? 0)
     this.scenearioIdSubject.next(scenarioIdControl?.value ?? 0)
+
+    this.selectedScenarioChanged.set(scenarioIdControl?.value ?? undefined)
   }
 
   setFormValidators(attributes: any[]): void {
