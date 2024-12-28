@@ -71,18 +71,18 @@
               </td>
               <td class="px-3">
                 @if (loggedInUser(); as loggedUser) {
-                @if (loggedUser.role != RoleEnum.ADMIN && loggedUser.role != RoleEnum.REQUESTER) {
+                @if (loggedUser.role != RoleEnum.ADMIN) {
                 <button (click)="openUpdateRequestDialog(request.requestNumber)" matTooltip="Edit the request">
                   <i class="pi pi-pen-to-square text-gray-500 hover:text-gray-700"></i>
                 </button>
                 }
                 @if (loggedUser.role == RoleEnum.REQUESTER) {
-                <button (click)="cancelRequest(request.requestNumber)" matTooltip="Cancel the request">
+                <button (click)="cancelRequest(request.requestNumber)" class="ml-3" matTooltip="Cancel the request">
                   <i class="pi pi-times-circle text-gray-500 hover:text-gray-700"></i>
                 </button>
                 }
                 @if (loggedUser.role == RoleEnum.WAREHOUSE_APPROVER) {
-                <button [disabled]="request.status != 3" class="ml-3" (click)="download(request)"
+                <button [disabled]="request.status != 3" (click)="download(request)"
                   [matTooltip]="request.status === 3 ? 'Download the invoice' : 'Invoice unavailable'">
                   <i (click)="triggerDownload()" class="pi text-gray-500 hover:text-gray-700" [ngClass]="{
                               'pi-spinner-dotted animate-spin': isDownloading() && invoiceRequest()?.requestNumber === request?.requestNumber,
