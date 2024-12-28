@@ -13,11 +13,15 @@ import { Injectable } from '@angular/core';
 
 
 export const ReportCellColor = {
-  LightBlue: '#f5f5f5', // Light Gray
-  LightCoral: '#e0e0e0', // Darker Gray
-
+  LightBlue: '#dddce0', // Light Blue
+  LightCoral: '#fbf8ff', // Light Coral
+  // LightGreen: '#99FF99', // Light Green
+  // LightYellow: '#FFFF99', // Light Yellow
+  // LightPink: '#FF99CC', // Light Pink
+  // LightPurple: '#CC99FF', // Light Purple
+  // LightOrange: '#FFCC99', // Light Orange
+  // LightTeal: '#99FFFF', // Light Teal
 };
-
 
 @Injectable({
   providedIn: 'root'
