@@ -7,29 +7,25 @@
         <div class="flex w-full flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0">
           <app-search-bar (searchTerm)="searchValue.set($event)" />
           @if (showCreateButton()){
-            <button (click)="openCreateRequestDialog()" class='create-btn' matTooltip="Create a new request"
-              matTooltipPosition="above">
-              <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path stroke-width="2" stroke="#fffffff"
-                  d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125"
-                  stroke-linejoin="round" stroke-linecap="round"></path>
-                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#fffffff"
-                  d="M17 15V18M17 21V18M17 18H14M17 18H20"></path>
-              </svg>
-              Create
-            </button>
+          <button (click)="openCreateRequestDialog()" class='create-btn' matTooltip="Create a new request"
+            matTooltipPosition="above">
+            <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path stroke-width="2" stroke="#fffffff"
+                d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125"
+                stroke-linejoin="round" stroke-linecap="round"></path>
+              <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#fffffff"
+                d="M17 15V18M17 21V18M17 18H14M17 18H20"></path>
+            </svg>
+            Create
+          </button>
           }
           <!-- View report button -->
           @if (loggedInUser(); as loggedUser) {
-            @if (loggedUser.role === RoleEnum.ADMIN) {
-              <i
-              (click)="onOpenReportDialog()"
-              matTooltip="View report" 
-              matTooltipPosition="above" 
-              class="pi pi-window-maximize cursor-pointer text-gray-500 hover:text-gray-700"
-              ></i>
-            }
+          @if (loggedUser.role === RoleEnum.ADMIN || loggedUser.role === RoleEnum.WAREHOUSE_APPROVER) {
+          <i (click)="onOpenReportDialog()" matTooltip="View report" matTooltipPosition="above"
+            class="pi pi-window-maximize cursor-pointer text-gray-500 hover:text-gray-700"></i>
+          }
           }
         </div>
       </div>
@@ -39,94 +35,86 @@
           <thead class="p-1 lg:table-header-group">
             <tr>
               @for (col of columns(); track col.label){
-                <td class="whitespace-normal py-2 font-medium text-gray-500 sm:px-3">
-                  <span>
-                    {{col.label}}
-                    @if (col.isSortable && col.label === 'Date of Submission') {
-                      @if (requestSortingOrder(); as order){
-                        <i 
-                          class="pi text-sm font-bold ml-1 transition-opacity duration-300"
-                          [ngClass]="{
+              <td class="whitespace-normal py-2 font-medium text-gray-500 sm:px-3">
+                <span>
+                  {{col.label}}
+                  @if (col.isSortable && col.label === 'Date of Submission') {
+                  @if (requestSortingOrder(); as order){
+                  <i class="pi text-sm font-bold ml-1 transition-opacity duration-300" [ngClass]="{
                             'pi-sort-amount-down': order === 'desc',
                             'pi-sort-amount-up': order === 'asc',
                             'cursor-pointer hover:text-gray-800': col.isSortable
-                          }"
-                          [style.opacity]="requestSortingIconVisible() ? '1' : '0.5'"
-                          (click)="onToggleSortingOrder(order)"
-                          (transitionend)="requestSortingIconVisible.set(true)">
-                        </i>
-                      }
-                    }
-                  </span>
-                </td>
+                          }" [style.opacity]="requestSortingIconVisible() ? '1' : '0.5'"
+                    (click)="onToggleSortingOrder(order)" (transitionend)="requestSortingIconVisible.set(true)">
+                  </i>
+                  }
+                  }
+                </span>
+              </td>
               }
             </tr>
           </thead>
 
           <tbody class="bg-white lg:border-gray-300">
             @if (paginatedRequests(); as requests){
-              @for (request of requests; track request.requestNumber){
-                <tr class="py-2 transition-all duration-150 odd:bg-white even:bg-gray-50 hover:bg-gray-100">
-                  <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
-                    {{ request.requestNumber }}</td>
-                  <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">{{
-                    request.created_at | date : createdAtFormat() }}</td>
-                  <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-500 sm:px-3 lg:table-cell">
-                    <span class="whitespace-nowrap rounded-md px-2 py-1 font-bold text-xs"
-                      [ngClass]="getStatusClass(request.status)">
-                      {{ request.status | statusMapper }}
-                    </span>
-                  </td>
-                  <td class="px-3">
-                    @if (loggedInUser(); as loggedUser) {
-                      @if (loggedUser.role != RoleEnum.ADMIN && loggedUser.role != RoleEnum.REQUESTER) {
-                        <button (click)="openUpdateRequestDialog(request.requestNumber)" matTooltip="Edit the request">
-                          <i class="pi pi-pen-to-square text-gray-500 hover:text-gray-700"></i>
-                        </button>
-                      }
-                      @if (loggedUser.role == RoleEnum.REQUESTER) {
-                        <button (click)="cancelRequest(request.requestNumber)" matTooltip="Cancel the request">
-                          <i class="pi pi-times-circle text-gray-500 hover:text-gray-700"></i>
-                        </button>
-                      }
-                      @if (loggedUser.role == RoleEnum.WAREHOUSE_APPROVER) {
-                        <button [disabled]="request.status != 3" class="ml-3" (click)="download(request)"
-                          [matTooltip]="request.status === 3 ? 'Download the invoice' : 'Invoice unavailable'">
-                          <i
-                            (click)="triggerDownload()"
-                            class="pi text-gray-500 hover:text-gray-700"
-                            [ngClass]="{
+            @for (request of requests; track request.requestNumber){
+            <tr class="py-2 transition-all duration-150 odd:bg-white even:bg-gray-50 hover:bg-gray-100">
+              <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
+                {{ request.requestNumber }}</td>
+              <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">{{
+                request.created_at | date : createdAtFormat() }}</td>
+              <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-500 sm:px-3 lg:table-cell">
+                <span class="whitespace-nowrap rounded-md px-2 py-1 font-bold text-xs"
+                  [ngClass]="getStatusClass(request.status)">
+                  {{ request.status | statusMapper }}
+                </span>
+              </td>
+              <td class="px-3">
+                @if (loggedInUser(); as loggedUser) {
+                @if (loggedUser.role != RoleEnum.ADMIN && loggedUser.role != RoleEnum.REQUESTER) {
+                <button (click)="openUpdateRequestDialog(request.requestNumber)" matTooltip="Edit the request">
+                  <i class="pi pi-pen-to-square text-gray-500 hover:text-gray-700"></i>
+                </button>
+                }
+                @if (loggedUser.role == RoleEnum.REQUESTER) {
+                <button (click)="cancelRequest(request.requestNumber)" matTooltip="Cancel the request">
+                  <i class="pi pi-times-circle text-gray-500 hover:text-gray-700"></i>
+                </button>
+                }
+                @if (loggedUser.role == RoleEnum.WAREHOUSE_APPROVER) {
+                <button [disabled]="request.status != 3" class="ml-3" (click)="download(request)"
+                  [matTooltip]="request.status === 3 ? 'Download the invoice' : 'Invoice unavailable'">
+                  <i (click)="triggerDownload()" class="pi text-gray-500 hover:text-gray-700" [ngClass]="{
                               'pi-spinner-dotted animate-spin': isDownloading() && invoiceRequest()?.requestNumber === request?.requestNumber,
                               'pi-cloud-download': !isDownloading() || invoiceRequest()?.requestNumber !== request?.requestNumber,
-                            }"
-                          ></i>
-                        </button>
-                      }
-                    }
-                  </td>
-                </tr>
-              }
-              @empty {
-                <tr>
-                  <td [attr.colspan]="columnsLength()" class="text-center p-4">
-                    <span class="font-semibold text-lg text-red-500 p-4">No requests found.</span>
-                  </td>
-                </tr>
-              }
+                            }"></i>
+                </button>
+                }
+                }
+              </td>
+            </tr>
+            }
+            @empty {
+            <tr>
+              <td [attr.colspan]="columnsLength()" class="text-center p-4">
+                <span class="font-semibold text-lg text-red-500 p-4">No requests found.</span>
+              </td>
+            </tr>
+            }
             }
             @if (paginatedRequests() === null) {
-              <tr>
-                <td [attr.colspan]="columnsLength()" class="text-center p-4">
-                  <span class="font-semibold text-lg text-red-500 p-3">No requests found.</span>
-                </td>
-              </tr>
+            <tr>
+              <td [attr.colspan]="columnsLength()" class="text-center p-4">
+                <span class="font-semibold text-lg text-red-500 p-3">No requests found.</span>
+              </td>
+            </tr>
             }
             @if (paginatedRequests() === undefined) {
-              <tr>
-                <td [attr.colspan]="columnsLength()" class="p-0">
-                  <loading-dots></loading-dots>
-                </td>
-              </tr>
+            <tr>
+              <td [attr.colspan]="columnsLength()" class="p-0">
+                <loading-dots></loading-dots>
+              </td>
+            </tr>
             }
           </tbody>
         </table>
@@ -137,19 +125,13 @@
   <!-- <p-paginator [rows]="rows()" [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 20, 30]"
     (onPageChange)="onPageChange($event)">
   </p-paginator> -->
-  
+
   <!-- Pagination using angular material -->
-  <mat-paginator
-    [color]="'primary'"
-    [length]="totalRecords()"
-    [pageSize]="rows()"
-    [showFirstLastButtons]="true"
-    (page)="onPageChange($event)"
-    [pageSizeOptions]="[10, 25, 50, 100]"
-    aria-label="Select page">
+  <mat-paginator [color]="'primary'" [length]="totalRecords()" [pageSize]="rows()" [showFirstLastButtons]="true"
+    (page)="onPageChange($event)" [pageSizeOptions]="[10, 25, 50, 100]" aria-label="Select page">
   </mat-paginator>
 
 
-<ng-template #invoiceElement>
-  <app-the-invoice [request]="invoiceRequest()" />
-</ng-template>
+  <ng-template #invoiceElement>
+    <app-the-invoice [request]="invoiceRequest()" />
+  </ng-template>

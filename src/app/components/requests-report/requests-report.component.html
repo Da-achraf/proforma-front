@@ -117,7 +117,6 @@
     @if(request; as request) {
         <tr 
             class="py-2 transition-all duration-150 border-[1px] border-gray-400 odd:bg-white even:bg-gray-50 hover:bg-gray-100"
-            [style.backgroundColor]="request.trackingNumber | trackingColor"
         >
             <td class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell">
                 {{ index + 1 }}
