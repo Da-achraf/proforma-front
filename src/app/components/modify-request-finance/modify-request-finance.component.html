@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>Modify Request (Finance)</h1>
 <div mat-dialog-content>
-  <form [formGroup]="requestForm">
+  <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
     <div fxLayout="row wrap" fxLayoutGap="16px">
       <!-- Normal fields -->
       <mat-form-field fxFlex="30%" appearance="fill">
@@ -79,46 +79,49 @@
             </span>
           </span>
         </div>
-        <div class="p-2" formArrayName="items">
-          @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-            <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
-              <div class="flex items-center justify-between mb-2">
-                <span class="font-bold">Item {{ i + 1 }}</span>
+
+        @defer {
+          <div class="p-2" formArrayName="items">
+            @for (itemGroup of items.controls; track itemGroup; let i = $index) {
+              <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-bold">Item {{ i + 1 }}</span>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  @for (field of formItems() || []; track field) {
+                    <div [formGroupName]="field.nameItem">
+                      <mat-form-field appearance="fill" class="w-full mb-2">
+                        <mat-label>{{ field.nameItem }}</mat-label>
+                        <input 
+                          matInput 
+                          formControlName="value"
+                          [type]="field.type"
+                          [readonly]="field.readOnly"
+                        >
+                      </mat-form-field>
+                    </div>
+                  }
+                </div>
               </div>
-              <div class="flex items-center gap-2 flex-wrap">
-                @for (field of formItems() || []; track field) {
-                  <div [formGroupName]="field.nameItem">
-                    <mat-form-field appearance="fill" class="w-full mb-2">
-                      <mat-label>{{ field.nameItem }}</mat-label>
-                      <input 
-                        matInput 
-                        formControlName="value"
-                        [type]="field.type"
-                        [readonly]="field.readOnly"
-                      >
-                    </mat-form-field>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-        </div>
-        <div class="p-2">
-          <!-- <button mat-icon-button color="primary" matTooltipPosition="above" matTooltip="Add another item" (click)="addItem()" type="button">
-            <mat-icon>add_circle</mat-icon>
-          </button> -->
-          <!-- <button mat-raised-button color="primary" matTooltip="" (click)="addItem()" type="button">
-            <mat-icon>add_circle</mat-icon>
-          </button> -->
-        </div>
+            }
+          </div>
+        }
+        @placeholder (minimum 700ms) {
+          <loading-dots [diameter]="25"  />
+        }
+        
       </div>
     }
   
     <!-- Actions -->
-    <div mat-dialog-actions>
+    <div class="form-actions" mat-dialog-actions>
+      <button mat-raised-button color="warn" type="button" (click)="openRejectDialog()">Reject</button>
+      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">Submit</button>
+    </div>
+    <!-- <div mat-dialog-actions>
       <button mat-raised-button color="warn" type="button" (click)="openRejectDialog()">Reject</button>
       <button mat-raised-button type="button" (click)="onSubmit()" [disabled]="!requestForm.valid">Submit</button>
-    </div>
+    </div> -->
   </form>
   
 </div>

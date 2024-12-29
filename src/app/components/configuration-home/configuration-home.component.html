@@ -9,12 +9,13 @@
       </mat-form-field>
     </div>
 
-    <div class="control-group">
+    <!-- <div class="control-group">
       <label for="quantity">Approver:</label>
       <button type="button" (click)="subtractApprover()">-</button>
       <span>{{ approvers.length }}</span>
       <button type="button" (click)="addApprover()">+</button>
     </div>
+
     <div id="dynamic-inputs" formArrayName="approvers">
       <div
         *ngFor="let approver of approvers.controls; let i = index"
@@ -34,7 +35,7 @@
           </option>
         </select>
       </div>
-    </div>
+    </div> -->
 
 
     <div class="control-group">
@@ -60,7 +61,15 @@
         </mat-form-field>
     
         <!-- Checkbox for marking mandatory -->
-        <mat-checkbox formControlName="isMandatory">Mandatory</mat-checkbox>
+        <!-- <mat-checkbox formControlName="isMandatory">Mandatory</mat-checkbox> -->
+        <mat-form-field appearance="fill">
+          <mat-label>Mandatory For</mat-label>
+          <mat-select formControlName="isMandatory" multiple (selectionChange)="onMandatoryForChange($event.value, i)">
+            <mat-option *ngFor="let option of mandatoryForOptions()" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
         <!-- Mandatory-for functionality -->
         <!-- <mat-form-field>

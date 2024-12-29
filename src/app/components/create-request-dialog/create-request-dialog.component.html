@@ -112,7 +112,7 @@
       </div>
       <div class="p-2" formArrayName="items">
         @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-        <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
+        <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
           <div class="flex items-center justify-between mb-2">
             <span class="font-bold">Item {{ i + 1 }}</span>
             <button mat-icon-button color="warn" matTooltipPosition="above"

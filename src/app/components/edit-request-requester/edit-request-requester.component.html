@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>Edit Request</h1>
 <div mat-dialog-content>
-  <form [formGroup]="requestForm">
+  <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
     <div class="notes-container">
       <div class="note">
         <mat-icon>info</mat-icon>
@@ -57,7 +57,7 @@
       </mat-form-field>
 
       <mat-form-field appearance="fill">
-        <mat-label>Cost Center</mat-label>  
+        <mat-label>Cost Center</mat-label>
         <input matInput formControlName="costCenter" />
       </mat-form-field>
 
@@ -84,7 +84,7 @@
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
           @for (option of currencyCodes(); track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
+          <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -94,7 +94,7 @@
         <mat-label>Shiped Via</mat-label>
         <mat-select formControlName="shippedVia" name="shippedVia">
           @for (option of shippedViaOptions(); track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
+          <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -110,9 +110,10 @@
           </span>
         </span>
       </div>
+      @defer {
       <div class="p-2" formArrayName="items">
         @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-        <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
+        <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
           <div class="flex items-center justify-between mb-2">
             <span class="font-bold">Item {{ i + 1 }}</span>
             <button mat-icon-button color="warn" matTooltipPosition="above"
@@ -126,7 +127,7 @@
             <div [formGroupName]="field.nameItem">
               <mat-form-field appearance="fill" class="w-full mb-2">
                 <mat-label>{{ field.nameItem }}</mat-label>
-                <input matInput formControlName="value" [type]="field.type" [required]="field.isMandatory">
+                <input matInput formControlName="value" [type]="field.type">
               </mat-form-field>
             </div>
             }
@@ -140,18 +141,26 @@
           <mat-icon>add_circle</mat-icon>
         </button>
       </div>
+      }
+      @placeholder (minimum 700ms) {
+      <loading-dots [diameter]="25" />
+      }
+
     </div>
     }
 
+    <div class="form-actions" mat-dialog-actions>
+      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">Submit</button>
+    </div>
 
 
-    <div class="mt-2" mat-dialog-actions>
+    <!-- <div class="mt-2" mat-dialog-actions>
       <button mat-raised-button class="cancel-button" (click)="onNoClick()">
         Cancel
       </button>
       <button mat-raised-button [disabled]="!requestForm.valid" class="submit-button" (click)="onSubmit()">
         Submit
       </button>
-    </div>
+    </div> -->
   </form>
 </div>

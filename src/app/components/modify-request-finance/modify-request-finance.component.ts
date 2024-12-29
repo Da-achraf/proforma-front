@@ -5,13 +5,14 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import _ from 'lodash';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject, combineLatestWith, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
-import { financeMandatoryFields, ItemModel } from '../../models/request-item.model';
+import { financeMandatoryFields, ItemModel, userRoleToMandatoryForMapper } from '../../models/request-item.model';
 import { CURRENCY_CODES, INCOTERMES, ModeOfTransportEnum, RequestModel, StandardFieldEnum, UpdateFinanceRequestDTO } from '../../models/request.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
+import { UserStoreService } from '../../services/user-store.service';
 
 @Component({
   selector: 'app-modify-request-finance',
@@ -36,6 +37,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
   public dialogRef = inject(MatDialogRef<ModifyRequestFinanceComponent>)
   data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
   dialog = inject(MatDialog)
+  userRole = inject(UserStoreService).userRole
 
   filteredOptions!: Observable<string[]>;
 
@@ -64,16 +66,19 @@ export class ModifyRequestFinanceComponent implements OnInit {
 
   formItems = computed(() => {
     const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
-    const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
+    const scenarioAttributes: { attributeName: string; mandatoryFor: string[]; }[] = this.scenarioAttributes() ?? [];
+    const userRole = this.userRole()
   
-    if (!selectedScenarioItems.length || !scenarioAttributes.length) return [];
+    if (!selectedScenarioItems.length || !scenarioAttributes.length || !userRole) return []
+
+    const mandatoryForUser = userRoleToMandatoryForMapper(userRole)
   
     return selectedScenarioItems.map(item => {
       const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
       return {
         ...item,
-        readOnly: item.nameItem != StandardFieldEnum.UNIT_VALUE,
-        isMandatory: financeMandatoryFields.includes(item.nameItem) ? true : matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false) 
+        readOnly: false,
+        isMandatory: matchingAttribute && mandatoryForUser ? matchingAttribute.mandatoryFor.includes(mandatoryForUser) : false
       };
     });
   });
@@ -127,6 +132,8 @@ export class ModifyRequestFinanceComponent implements OnInit {
     const formItems = this.formItems()
     if (!formItems) return this.fb.group({});
     const group: { [key: string]: FormGroup } = {};
+
+    console.log('form items: ', formItems)
 
     formItems.forEach((item: ItemModel) => {
       const fieldData = this.findDataOfItem(item.nameItem, data?.values) ?? undefined;

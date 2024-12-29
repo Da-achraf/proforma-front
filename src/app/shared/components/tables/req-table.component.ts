@@ -152,19 +152,20 @@ export class RequestsTableComponent {
       return
 
     const dialogRef = this.dialog.open(component, {
-      width: '800px',
+      width: '70vw',
+      maxHeight: '90vh',
       data: { requestNumber }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed ', result)
       if (result) this.loadRequests()
     });
   }
 
   openCreateRequestDialog(): void {
     const dialogRef = this.dialog.open(CreateRequestDialogComponent, {
-      width: '800px'
+      width: '70vw',
+      maxHeight: '90vh'
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
@@ -177,7 +178,7 @@ export class RequestsTableComponent {
   onOpenReportDialog() {
     this.dialog.open(RequestsReportComponent, {
       minWidth: '800px',
-      maxWidth: '95vw',
+      maxWidth: '85vw',
       maxHeight: '95vh',
       data: { requests: this.requests() }
     });

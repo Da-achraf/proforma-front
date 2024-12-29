@@ -5,13 +5,14 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import _, { get } from 'lodash';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
-import { FieldTypeEnum, ItemModel } from '../../models/request-item.model';
+import { FieldTypeEnum, ItemModel, userRoleToMandatoryForMapper } from '../../models/request-item.model';
 import { CURRENCY_CODES, RequestModel } from '../../models/request.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
+import { UserStoreService } from '../../services/user-store.service';
 
 @Component({
   selector: 'app-edit-request-tradcompliance',
@@ -28,6 +29,8 @@ export class EditRequestTradcomplianceComponent implements OnInit {
   public dialogRef = inject(MatDialogRef<EditRequestTradcomplianceComponent>)
   data: {requestNumber: number} = inject(MAT_DIALOG_DATA)
   dialog = inject(MatDialog)
+  userRole = inject(UserStoreService).userRole
+  
 
   currencyCodes = signal(CURRENCY_CODES)
   filteredOptions!: Observable<string[]>;
@@ -73,16 +76,21 @@ export class EditRequestTradcomplianceComponent implements OnInit {
 
   formItems = computed(() => {
     const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
-    const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
+    const scenarioAttributes: { attributeName: string; mandatoryFor: string[]; }[] = this.scenarioAttributes() ?? [];
+    const userRole = this.userRole()
+    // const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
   
-    if (!selectedScenarioItems.length || !scenarioAttributes.length) return [];
+    if (!selectedScenarioItems.length || !scenarioAttributes.length || !userRole) return [];
+
+    const mandatoryForUser = userRoleToMandatoryForMapper(userRole)
   
     const items = selectedScenarioItems.map(item => {
       const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
       return {
         ...item,
         readOnly: (item.nameItem != 'HTS Code' && item.nameItem != 'COO'),
-        isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false)
+        isMandatory: matchingAttribute && mandatoryForUser ? matchingAttribute.mandatoryFor.includes(mandatoryForUser) : false
+        // isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false)
       };
     });
 

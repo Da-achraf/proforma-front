@@ -28,8 +28,8 @@
   
   .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Réduit la largeur minimale */
+    gap: 10px; /* Réduit l'espace */
   }
   
   .mat-form-field {
@@ -79,4 +79,11 @@
 
   button.mat-button.submit-button:hover {
     background-color: #1a6e1a;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px; /* Ajoute de l'espace entre les boutons */
+    margin-top: 20px;
   }

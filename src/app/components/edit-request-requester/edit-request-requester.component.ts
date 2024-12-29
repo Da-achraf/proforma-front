@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import _ from 'lodash';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
-import { ItemModel } from '../../models/request-item.model';
+import { ItemModel, userRoleToMandatoryForMapper } from '../../models/request-item.model';
 import { CURRENCY_CODES, INCOTERMES, INVOICE_TYPES, ModesOfTransports, RequestModel, SHIPPED_VIA_OPTIONS, UpdateRequestByRequester } from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
 import { AuthService } from '../../services/auth.service';
@@ -15,6 +15,7 @@ import { ShippointService } from '../../services/shippoint.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import { ToasterService } from '../../shared/services/toaster.service';
 import { CreateRequestDialogComponent } from '../create-request-dialog/create-request-dialog.component';
+import { UserStoreService } from '../../services/user-store.service';
 
 @Component({
   selector: 'app-edit-request-requester',
@@ -34,6 +35,7 @@ export class EditRequestRequesterComponent {
   incotermOptions = signal<string[]>(INCOTERMES)
   shippedViaOptions = signal<string[]>(SHIPPED_VIA_OPTIONS)
   modesOfTransports: string[] = ModesOfTransports
+  userRole = inject(UserStoreService).userRole
 
   filteredOptions!: Observable<string[]>;
 
@@ -71,15 +73,18 @@ export class EditRequestRequesterComponent {
 
   formItems = computed(() => {
     const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
-    const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
+    const scenarioAttributes: { attributeName: string; mandatoryFor: string[]; }[] = this.scenarioAttributes() ?? [];
+    const userRole = this.userRole()
 
-    if (!selectedScenarioItems.length || !scenarioAttributes.length) return [];
+    if (!selectedScenarioItems.length || !scenarioAttributes.length || !userRole) return [];
+
+    const mandatoryForUser = userRoleToMandatoryForMapper(userRole)
 
     return selectedScenarioItems.map(item => {
       const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
       return {
         ...item,
-        isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false)
+        isMandatory: matchingAttribute && mandatoryForUser ? matchingAttribute.mandatoryFor.includes(mandatoryForUser) : false
       };
     });
   });
@@ -294,7 +299,7 @@ export class EditRequestRequesterComponent {
         this.requestService.updateRequestByRequester(this.data.requestNumber, requestData).subscribe(
           (response) => {
             console.log('Request created:', response);
-            this.dialogRef.close(response);
+            this.dialogRef.close(true);
           },
           (error) => {
             this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating request' });

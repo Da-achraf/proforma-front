@@ -195,7 +195,7 @@ export class InvoiceService {
     renderer.removeChild(elementRef.nativeElement, invoiceContainer);
   
     try {
-      // Ensure images are fully loaded before processing
+      // Ensure images are fully loaded before processing [Reserver for invoice ui enhancments]
       // const images = invoiceElement.querySelectorAll('img');
       // await Promise.all(
       //   Array.from(images).map((img: any) => new Promise((resolve, reject) => {
@@ -222,7 +222,7 @@ export class InvoiceService {
       // Clone and prepare the invoice element
       const clonedInvoice = invoiceElement.cloneNode(true) as HTMLElement;
 
-      // Additional image preparation
+      // Additional image preparation [Reserver for invoice ui enhancments]
       // const clonedImages = clonedInvoice.querySelectorAll('img');
       // clonedImages.forEach(img => {
       //   img.style.maxWidth = '100%';
@@ -261,6 +261,7 @@ export class InvoiceService {
       const a4Height = 297; // mm
       const a4Width = 210; // mm
       const margin = 10; // mm
+      // const margin = 7; // mm // better value [for invoice ui enhancements]
       const innerHeight = a4Height - (margin * 2);
       
       // Enhanced html2canvas configuration

@@ -1,15 +1,14 @@
-import { Component, effect, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, effect, OnInit, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api'; // Import MessageService
-import { FieldTypeEnum, ItemModel, RequestItemModel, standardFields } from '../../models/request-item.model';
-import { RoleEnum, Roles } from '../../models/user/user.model';
+import { MANDATORY_FOR_OPTIONS, MandatoryForEnum, RequestItemModel, standardFields } from '../../models/request-item.model';
+import { Roles } from '../../models/user/user.model';
 import { ApproverService } from '../../services/approver.service';
 import { RequestItemService } from '../../services/request-item.service';
 import { ScenarioItemConfigurationService } from '../../services/scenario-item-configuration.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { CreateItemDialogComponent } from '../create-item-dialog/create-item-dialog.component';
-import { MatSelect } from '@angular/material/select';
 
 export type Item = {
   id: string;
@@ -29,6 +28,7 @@ export class ConfigurationHomeComponent implements OnInit {
   classes: number[] = [0, 1, 2, 3, 4];
 
   mandatoryFor = new FormControl('');
+  mandatoryForOptions = signal(MANDATORY_FOR_OPTIONS)
 
   selectedValue = ''
 
@@ -63,11 +63,11 @@ export class ConfigurationHomeComponent implements OnInit {
         if (standardField) {
           const itemFormGroup = this.fb.group({
             requestItemId: [item.id_request_item, Validators.required],
-            isMandatory: [standardField.isMandatory],
+            isMandatory: [standardField.mandatoryFor],
           });
           this.items.push(itemFormGroup);
         }
-        });
+      });
     });
   }
 
@@ -98,19 +98,19 @@ export class ConfigurationHomeComponent implements OnInit {
 
   loadItems() {
     this.requestItemService.getRequestItems()
-    .subscribe({
-      next: (items: RequestItemModel[]) => {
-        this.myItems.set(items)
-        this.itemsAvailable = items;
-      },
-      error: _ => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading items' })
-    });
+      .subscribe({
+        next: (items: RequestItemModel[]) => {
+          this.myItems.set(items)
+          this.itemsAvailable = items;
+        },
+        error: _ => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading items' })
+      });
   }
 
   addItem(): void {
     this.items.push(this.fb.group({
       requestItemId: ['', Validators.required],
-      isMandatory: [false],
+      isMandatory: [[MandatoryForEnum.None]],
     }));
   }
 
@@ -124,7 +124,7 @@ export class ConfigurationHomeComponent implements OnInit {
     const itemFieldId = itemField.value.requestItemId
     const itemFieldsIds = this.items.controls.map(control => control.value.requestItemId)
     console.log(itemFieldsIds)
-    if (itemFieldsIds.length !== new Set(itemFieldsIds).size){
+    if (itemFieldsIds.length !== new Set(itemFieldsIds).size) {
       this.items.removeAt(index)
     }
   }
@@ -138,7 +138,7 @@ export class ConfigurationHomeComponent implements OnInit {
       if (itemToSave) {
         this.requestItemService.saveRequestItem(itemToSave).subscribe({
           next: (response) => {
-            this.myItems.update(items => [...items, {...response}])
+            this.myItems.update(items => [...items, { ...response }])
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Item created successfully' });
             console.log('Item created successfully', response);
           },
@@ -177,7 +177,8 @@ export class ConfigurationHomeComponent implements OnInit {
             const itemConfig = {
               id_scenario: scenarioId,
               id_request_item: item.requestItemId,
-              isMandatory: item.isMandatory
+              isMandatory: false,
+              mandatoryFor: item.isMandatory.join(',')
             };
             this.scenarioItemConfigurationService.CreatescenarioItemsConfiguration(itemConfig).subscribe({
               next: (res) => {
@@ -191,23 +192,24 @@ export class ConfigurationHomeComponent implements OnInit {
             });
           });
 
-          formValue.approvers.forEach((approver: any) => {
-            const approverConfig = {
-              role: approver.role,
-              classe: approver.class,
-              scenarioId: scenarioId
-            };
-            this.approverService.createApprover(approverConfig).subscribe({
-              next: (res) => {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Approver configuration created successfully' });
-                console.log('Approver configuration created:', res);
-              },
-              error: (err) => {
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create approver configuration' });
-                console.error('Failed to create approver configuration:', err);
-              }
-            });
-          });
+          // Creating approvers
+          // formValue.approvers.forEach((approver: any) => {
+          //   const approverConfig = {
+          //     role: approver.role,
+          //     classe: approver.class,
+          //     scenarioId: scenarioId
+          //   };
+          //   this.approverService.createApprover(approverConfig).subscribe({
+          //     next: (res) => {
+          //       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Approver configuration created successfully' });
+          //       console.log('Approver configuration created:', res);
+          //     },
+          //     error: (err) => {
+          //       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create approver configuration' });
+          //       console.error('Failed to create approver configuration:', err);
+          //     }
+          //   });
+          // });
         },
         error: (error) => {
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create scenario' });
@@ -218,5 +220,61 @@ export class ConfigurationHomeComponent implements OnInit {
       this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Form is invalid' });
       console.error('Form is invalid');
     }
+  }
+
+  // onMandatoryForChange(selectedValues: string[], index: number) {
+  //   const isMandatoryControl = this.items.at(index).get('isMandatory');
+
+  //   // Scenario 1: When any normal approver is selected while "None" was previously selected
+  //   if (selectedValues.length > 1 && selectedValues.includes('None')) {
+  //     const filteredValues = selectedValues.filter(value => value !== 'None');
+  //     isMandatoryControl?.setValue(filteredValues);
+  //     return;
+  //   }
+
+  //   // Scenario 2: When "None" is selected while having other approvers
+  //   if (selectedValues.includes('None')) {
+  //     isMandatoryControl?.setValue(['None']);
+  //     return;
+  //   }
+
+  //   // Scenario 3: When deselecting all options, default to "None"
+  //   if (selectedValues.length === 0) {
+  //     isMandatoryControl?.setValue(['None']);
+  //     return;
+  //   }
+
+  //   // Scenario 4: Normal case - multiple approvers can be selected
+  //   isMandatoryControl?.setValue(selectedValues);
+  // }
+
+  onMandatoryForChange(selectedValues: string[], index: number) {
+    const isMandatoryControl = this.items.at(index).get('isMandatory');
+
+    // If 'None' is newly selected (it wasn't in previous values but is in new selection)
+    const previousValues = isMandatoryControl?.value || [];
+    const isNoneNewlySelected = !previousValues.includes('None') && selectedValues.includes('None');
+
+    if (isNoneNewlySelected) {
+      // If None is explicitly selected, clear other selections
+      isMandatoryControl?.setValue(['None']);
+      return;
+    }
+
+    // If selecting other options while None is selected, remove None
+    if (selectedValues.length > 1 && selectedValues.includes('None')) {
+      const filteredValues = selectedValues.filter(value => value !== 'None');
+      isMandatoryControl?.setValue(filteredValues);
+      return;
+    }
+
+    // When deselecting all options, default to "None"
+    if (selectedValues.length === 0) {
+      isMandatoryControl?.setValue(['None']);
+      return;
+    }
+
+    // Normal case - multiple approvers can be selected
+    isMandatoryControl?.setValue(selectedValues);
   }
 }

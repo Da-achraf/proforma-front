@@ -68,7 +68,7 @@
         @defer {
           <div class="p-2" formArrayName="items">
             @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-              <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
+              <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
                 <div class="flex items-center justify-between mb-2">
                   <span class="font-bold">Item {{ i + 1 }}</span>
                 </div>
@@ -110,21 +110,13 @@
         @placeholder (minimum 700ms) {
           <loading-dots [diameter]="25"  />
         }
-        
-        <!-- <div class="p-2"> -->
-          <!-- <button mat-icon-button color="primary" matTooltipPosition="above" matTooltip="Add another item" (click)="addItem()" type="button">
-            <mat-icon>add_circle</mat-icon>
-          </button> -->
-          <!-- <button mat-raised-button color="primary" matTooltip="" (click)="addItem()" type="button">
-            <mat-icon>add_circle</mat-icon>
-          </button> -->
-        <!-- </div> -->
       </div>
     }
-    
+
+    <!-- Actions -->
     <div mat-dialog-actions>
       <button mat-raised-button color="warn" type="button" (click)="openRejectDialog()">Reject</button>
-      <button mat-raised-button color="primary" type="button" (click)="onSubmit()" [disabled]="!requestForm.valid">Submit</button>
+      <button mat-raised-button type="button" (click)="onSubmit()" [disabled]="!requestForm.valid">Submit</button>
     </div>
   </form>
 </div>

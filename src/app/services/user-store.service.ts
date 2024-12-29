@@ -1,7 +1,7 @@
 import { inject, Injectable, signal, Signal, WritableSignal } from '@angular/core';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { UserService } from './user.service';
-import { User } from '../models/user/user.model';
+import { RoleEnum, User } from '../models/user/user.model';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from './auth.service';
 
@@ -13,9 +13,9 @@ export class UserStoreService {
   authService = inject(AuthService)
 
   private fullName = new BehaviorSubject<string>('');
-  private role = new BehaviorSubject<string>('');
+  private role = new BehaviorSubject<RoleEnum | undefined>(undefined);
 
-  public userRole = toSignal(this.role)
+  readonly userRole = toSignal<RoleEnum | undefined>(this.role)
 
   userService = inject(UserService)
 
@@ -42,11 +42,11 @@ export class UserStoreService {
     return this.fullName.asObservable();
   }
 
-  setRoleFromStore(role: string) {
+  setRoleFromStore(role: RoleEnum) {
     this.role.next(role);
   }
 
-  getRoleFromStore(): Observable<string> {
+  getRoleFromStore(): Observable<RoleEnum | undefined> {
     return this.role.asObservable();
   }
 }

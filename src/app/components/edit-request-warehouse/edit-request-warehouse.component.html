@@ -33,18 +33,6 @@
       </mat-form-field>
       }
 
-      <!-- <mat-form-field>
-        <mat-label>Currency</mat-label>
-        <input type="text" placeholder="Pick one" #currencyInput (input)="onCurrencyChange(currencyInput.value)"
-          matInput required formControlName="currency" [matAutocomplete]="auto">
-        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-          @for (option of filteredOptions | async; track option) {
-          <mat-option [value]="option">{{ option }}</mat-option>
-          }
-        </mat-autocomplete>
-      </mat-form-field> -->
-
-
       <mat-form-field>
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
@@ -53,24 +41,6 @@
           }
         </mat-select>
       </mat-form-field>
-
-
-      <!-- <mat-form-field>
-        <mat-label>Currency</mat-label>
-        <input #input
-               type="text"
-               placeholder="Pick one"
-               matInput
-               formControlName="currency"
-               required
-               [matAutocomplete]="auto"
-               (input)="filter()">
-        <mat-autocomplete requireSelection #auto="matAutocomplete">
-          @for (option of filteredOptions | async; track option) {
-            <mat-option [value]="option">{{option}}</mat-option>
-          }
-        </mat-autocomplete>
-      </mat-form-field> -->
 
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Shipped Via</mat-label>
@@ -106,34 +76,37 @@
           </span>
         </span>
       </div>
-      <div class="p-2" formArrayName="items">
-        @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-        <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded">
-          <div class="flex items-center justify-between mb-2">
-            <span class="font-bold">Item {{ i + 1 }}</span>
-            <!-- <button mat-icon-button color="warn" matTooltipPosition="above" matTooltip="Remove this item" (click)="removeItem(i)" type="button">
-                    <mat-icon>remove_circle</mat-icon>
-                  </button> -->
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            @for (field of formItems() || []; track field) {
-            <div [formGroupName]="field.nameItem">
-              <mat-form-field appearance="fill" class="w-full mb-2">
-                <mat-label>{{ field.nameItem }}</mat-label>
-                <input matInput formControlName="value" [type]="field.type" [required]="field.isMandatory"
-                  [readonly]="field.readOnly">
-              </mat-form-field>
+      @defer {
+        <div class="p-2" formArrayName="items">
+          @for (itemGroup of items.controls; track itemGroup; let i = $index) {
+          <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold">Item {{ i + 1 }}</span>
             </div>
-            }
+            <div class="flex items-center gap-2 flex-wrap">
+              @for (field of formItems() || []; track field) {
+              <div [formGroupName]="field.nameItem">
+                <mat-form-field appearance="fill" class="w-full mb-2">
+                  <mat-label>{{ field.nameItem }}</mat-label>
+                  <input matInput  formControlName="value" [type]="field.type" [required]="field.isMandatory"
+                    [readonly]="field.readOnly">
+                </mat-form-field>
+              </div>
+              }
+            </div>
           </div>
+          }
         </div>
-        }
-      </div>
+      }
+      @placeholder (minimum 700ms) {
+        <loading-dots [diameter]="25"  />
+      }
+      
     </div>
     }
 
-    <div class="form-actions">
-      <button mat-raised-button type="submit" [disabled]="!requestForm.valid" color="primary">Submit</button>
+    <div class="form-actions" mat-dialog-actions>
+      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">Submit</button>
     </div>
   </form>
 </div>

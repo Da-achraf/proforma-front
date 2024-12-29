@@ -1,11 +1,12 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Injectable, PLATFORM_ID, inject, Inject } from '@angular/core';
+import { inject, Inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Router } from '@angular/router';
 //import { JwtHelperService } from '@auth0/angular-jwt';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { Observable, of, tap } from 'rxjs';
 import { API_URL_TOKEN } from '../config/api.config';
-import { tap } from 'rxjs';
+import { RoleEnum } from '../models/user/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +15,18 @@ export class AuthService {
   baseServerUrl = inject(API_URL_TOKEN)
   private userPayload: any;
 
+  private userRoleSig = signal<RoleEnum | undefined>(undefined)
+  readonly userRole = this.userRoleSig.asReadonly()
+
   constructor(
     private http: HttpClient,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object // Inject PLATFORM_ID
   ) {
     this.userPayload = this.decodedToken();
+    if (this.userPayload) {
+      this.userRoleSig.set(this.userPayload.role)
+    }
   }
 
   SignUpUser(User: any){
@@ -92,6 +99,15 @@ export class AuthService {
       return userPayload.role;
     }
     return null; // Return null if there is no user payload
+  }
+
+  getRoleFromTokenObs(): Observable<RoleEnum | undefined> {
+    const userPayload = this.decodedToken(); // Call the method to get the most recent token payload
+    console.log('user paylooooooooooooooooooad: ', userPayload)
+    if(userPayload) {
+      return of(userPayload.role)
+    }
+    return of(undefined);
   }
 
   getUserIdFromToken() {

@@ -8,13 +8,14 @@ import { MessageService } from 'primeng/api'; // Import MessageService
 import { CURRENCY_CODES, RequestModel, StandardFieldEnum } from '../../models/request.model';
 import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, Subject, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ItemModel } from '../../models/request-item.model';
+import { ItemModel, userRoleToMandatoryForMapper } from '../../models/request-item.model';
 import { ScenarioService } from '../../services/scenario.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import _ from 'lodash'
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { notZeroValidator } from '../../shared/helpers/form-validator.helper';
 import { ParcelsComponent } from '../../shared/components/parcels/parcels.component';
+import { UserStoreService } from '../../services/user-store.service';
 
 @Component({
   selector: 'app-edit-request-warehouse',
@@ -27,6 +28,7 @@ export class EditRequestWarehouseComponent implements OnInit {
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') auto!: MatAutocomplete;
 
+  userRole = inject(UserStoreService).userRole
 
   scenarioService = inject(ScenarioService)
   currencyCodes = signal(CURRENCY_CODES)
@@ -66,17 +68,20 @@ export class EditRequestWarehouseComponent implements OnInit {
 
   formItems = computed(() => {
     const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
-    const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
+    const scenarioAttributes: { attributeName: string; mandatoryFor: string[]; }[] = this.scenarioAttributes() ?? [];
+    const userRole = this.userRole()
   
-    if (!selectedScenarioItems.length || !scenarioAttributes.length) return [];
+    if (!selectedScenarioItems.length || !scenarioAttributes.length || !userRole) return [];
+
+    const mandatoryForUser = userRoleToMandatoryForMapper(userRole)
   
     return selectedScenarioItems.map(item => {
       const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
       return {
         ...item,
-        readOnly: (item.nameItem != StandardFieldEnum.GROSS_WEIGHT && item.nameItem != StandardFieldEnum.NET_WEIGHT),
-        // isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false),
-        isMandatory: true,
+        // readOnly: (item.nameItem != StandardFieldEnum.GROSS_WEIGHT && item.nameItem != StandardFieldEnum.NET_WEIGHT),
+        readOnly: false,
+        isMandatory: matchingAttribute && mandatoryForUser ? matchingAttribute.mandatoryFor.includes(mandatoryForUser) : false
       };
     });
   });

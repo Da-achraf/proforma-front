@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit {
             this.authService.StoreToken(res);
             let tokenPayload = this.authService.decodedToken();
             this.userStore.setFullNameFromStore(tokenPayload.unique_name);
-            this.userStore.setRoleFromStore(tokenPayload.role);
+            this.userStore.setRoleFromStore(tokenPayload.role as RoleEnum);
 
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Login successful' });
             this.redirectToDashboard(tokenPayload.role as RoleEnum);

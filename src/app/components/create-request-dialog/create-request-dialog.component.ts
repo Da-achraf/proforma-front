@@ -4,7 +4,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject, filter, map, Observable, of, startWith, switchMap } from 'rxjs';
-import { ItemModel } from '../../models/request-item.model';
+import { ItemModel, userRoleToMandatoryForMapper } from '../../models/request-item.model';
 import { CreateRequest, CURRENCY_CODES, INCOTERMES, INVOICE_TYPES, ModesOfTransports, SHIPPED_VIA_OPTIONS } from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
 import { AuthService } from '../../services/auth.service';
@@ -12,6 +12,7 @@ import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
 import { ToasterService } from '../../shared/services/toaster.service';
+import { UserStoreService } from '../../services/user-store.service';
 
 @Component({
   selector: 'app-create-request-dialog',
@@ -31,6 +32,7 @@ export class CreateRequestDialogComponent implements OnInit {
   incotermOptions = signal<string[]>(INCOTERMES)
   shippedViaOptions = signal<string[]>(SHIPPED_VIA_OPTIONS)
   modesOfTransports: string[] = ModesOfTransports
+  userRole = inject(UserStoreService).userRole
 
   filteredOptions!: Observable<string[]>;
 
@@ -61,15 +63,18 @@ export class CreateRequestDialogComponent implements OnInit {
 
   formItems = computed(() => {
     const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
-    const scenarioAttributes: { attributeName: string; isMandatory: boolean; }[] = this.scenarioAttributes() ?? [];
+    const scenarioAttributes: { attributeName: string; mandatoryFor: string[]; }[] = this.scenarioAttributes() ?? [];
+    const userRole = this.userRole()
   
-    if (!selectedScenarioItems.length || !scenarioAttributes.length) return [];
+    if (!selectedScenarioItems.length || !scenarioAttributes.length || !userRole) return [];
+
+    const mandatoryForUser = userRoleToMandatoryForMapper(userRole)
   
     return selectedScenarioItems.map(item => {
       const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
       return {
         ...item,
-        isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false)
+        isMandatory: matchingAttribute && mandatoryForUser ? matchingAttribute.mandatoryFor.includes(mandatoryForUser) : false
       };
     });
   });
@@ -149,7 +154,7 @@ export class CreateRequestDialogComponent implements OnInit {
         name: item.nameItem,
         value: [fieldData ? fieldData?.value : '', (fieldData?.isMandatory || item.isMandatory) ? Validators.required : null],
         type: [fieldData ? fieldData?.type : item.type],
-        isMandatory: [fieldData?.isMandatory]
+        // isMandatory: [fieldData?.isMandatory]
       });
     });
     console.log(this.fb.group(group))
