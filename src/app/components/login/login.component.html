@@ -33,56 +33,93 @@
     </div>
 </div> -->
 
-<div class="responsive-background" fxLayout="column" fxLayoutAlign="center center">
-    <div class="wrapper">
+<div
+  class="responsive-background"
+  fxLayout="column"
+  fxLayoutAlign="center center"
+>
+  <div class="wrapper">
+    <img src="assets/pro.png" width="200" height="200" alt="" />
 
-        <img src="assets/pro.png" width="200" height="200" alt="">
-        
-        <form class="flex flex-col gap-y-8" [formGroup]="LoginForm" (ngSubmit)="loginSubmitted()">
-            <div class="flex flex-col gap-y-3">
-                <div class="form-group relative">
-                    <input type="text" id="identifier" class="form-control" formControlName="identifier"
-                           placeholder="Email or TE ID" required aria-label="Email or TE ID">
-                    <i class='bx bxs-envelope'></i>
-                    <div 
-                        *ngIf="LoginForm.get('identifier')?.errors?.['required'] && LoginForm.get('identifier')?.touched" 
-                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                    >
-                        Email or TE ID is required
-                    </div>
-                </div>
-                <div class="form-group relative">
-                    <input [type]="passwordFieldType" id="password" class="form-control" formControlName="password"
-                           placeholder="Enter your password" required aria-label="Password">
-                    <i class="pi" [ngClass]="{'pi-eye': passwordFieldType === 'password', 'pi-eye-slash': passwordFieldType === 'text'}" 
-                       (click)="togglePasswordVisibility()" aria-label="Toggle password visibility"></i>
-                    <div 
-                        *ngIf="LoginForm.get('password')?.errors?.['required'] && LoginForm.get('password')?.touched" 
-                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                    >
-                        Password is required
-                    </div>
-                    <div 
-                        *ngIf="LoginForm.get('password')?.errors?.['minlength'] && LoginForm.get('password')?.touched" 
-                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                    >
-                        Password should be at least 6 characters long
-                    </div>
-                </div>
-            </div>
-            <button 
-                type="submit" 
-                [disabled]="!LoginForm.valid"
-                class="bg-orange-400 text-gray-50 hover:bg-transparent hover:text-gray-500"
-                [ngClass]="{
-                    'cursor-not-allowed': !LoginForm.valid
-                }"
+    <form
+      class="flex flex-col gap-y-8"
+      [formGroup]="LoginForm"
+      (ngSubmit)="loginSubmitted()"
+    >
+      <div class="flex flex-col gap-y-3">
+        <div class="form-group relative">
+          <input
+            type="text"
+            id="identifier"
+            class="form-control"
+            formControlName="identifier"
+            placeholder="Email or TE ID"
+            required
+            aria-label="Email or TE ID"
+          />
+          <i class="bx bxs-envelope"></i>
+          <div
+            *ngIf="LoginForm.get('identifier')?.errors?.['required'] && LoginForm.get('identifier')?.touched"
+            class="text-red-400 text-xs font-semibold absolute top-[102%]"
+          >
+            Email or TE ID is required
+          </div>
+        </div>
+
+        <div class="relative">
+          <div
+            class="flex items-center p-3 bg-white border border-gray-300 rounded-md focus-within:border-orange-400"
+          >
+            <input
+              [type]="passwordFieldType"
+              id="password"
+              class="outline-none border-none pass pr-2 flex-1"
+              formControlName="password"
+              placeholder="Enter your password"
+              aria-label="Password"
+            />
+            <i
+              class="pi w-5"
+              [ngClass]="{
+                'pi-eye': passwordFieldType === 'password',
+                'pi-eye-slash': passwordFieldType === 'text'
+              }"
+              (click)="togglePasswordVisibility()"
+              aria-label="Toggle password visibility"
             >
-                Login
-            </button>
-            <div class="signup-route">
-                <span>Don't have an account? <a routerLink="/sign-up"><u>Sign Up</u></a></span>
-            </div>
-        </form>
-    </div>
+            </i>
+          </div>
+
+          <div
+            *ngIf="LoginForm.get('password')?.errors?.['required'] && LoginForm.get('password')?.touched"
+            class="text-red-400 text-xs font-semibold absolute top-[102%]"
+          >
+            Password is required
+          </div>
+          <div
+            *ngIf="LoginForm.get('password')?.errors?.['minlength'] && LoginForm.get('password')?.touched"
+            class="text-red-400 text-xs font-semibold absolute top-[102%]"
+          >
+            Password should be at least 6 characters long
+          </div>
+        </div>
+      </div>
+      <button
+        type="submit"
+        [disabled]="!LoginForm.valid"
+        class="bg-orange-400 text-gray-50 hover:bg-transparent hover:text-gray-500"
+        [ngClass]="{
+          'pointer-events-none opacity-50': !LoginForm.valid
+        }"
+      >
+        Login
+      </button>
+      <div class="signup-route">
+        <span
+          >Don't have an account?
+          <a routerLink="/sign-up"><u>Sign Up</u></a></span
+        >
+      </div>
+    </form>
+  </div>
 </div>

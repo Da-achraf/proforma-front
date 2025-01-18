@@ -75,7 +75,7 @@ body {
 /* Style des champs de formulaire */
 .card-body input[type="text"],
 .card-body input[type="email"],
-.card-body input[type="password"],
+/* .card-body input[type="password"], */
 .card-body select {
   width: 100%;
   padding: 10px;

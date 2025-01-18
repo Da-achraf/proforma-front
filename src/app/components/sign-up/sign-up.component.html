@@ -1,206 +1,477 @@
-<!-- <div class="responsive-background" fxLayout="column" fxLayoutAlign="center center">
+<!-- <div
+  class="responsive-background"
+  fxLayout="column"
+  fxLayoutAlign="center center"
+>
   <div class="container w-auto">
-      <div class="row justify-content-center align-items-center">
-          <div class="col-12 col-md-9 col-lg-7 col-xl-6">
-              <div class="card">
-                  <div class="card-body p-5">
-                      <h2 class="text-center mb-5">Create an account</h2>
-                      <form [formGroup]="SignUpForm" (ngSubmit)="SignUpSubmited()">
-                          <div class="row">
-                              <div class="mb-4">
-                                  <label for="TeId">TE ID</label>
-                                  <input type="text" id="TeId" formControlName="teId" class="form-control" required placeholder="Text" />
-                                  <div *ngIf="teId.errors?.['required'] && teId.touched" class="text-danger">TE ID is required</div>
-                              </div>
-                              <div class="mb-4">
-                                  <label for="username">User Name</label>
-                                  <input type="text" id="username" formControlName="username" class="form-control" required placeholder="Text" />
-                                  <div *ngIf="username.errors?.['required'] && username.touched" class="text-danger">User Name is required</div>
-                              </div>
-                          </div>
-                          <div class="row">
-                              <div class="mb-4">
-                                  <label for="email">Email</label>
-                                  <input type="email" id="email" formControlName="email" class="form-control" required placeholder="Text" />
-                                  <div *ngIf="email.errors?.['required'] && email.touched" class="text-danger">Email is required</div>
-                                  <div *ngIf="email.errors?.['email'] && email.touched" class="text-danger">Invalid email format</div>
-                              </div>
-                              <div class="mb-4">
-                                  <label for="plants">Plant:</label>
-                                  <p-multiSelect [options]="plants" formControlName="plantId" optionLabel="label" placeholder="" (onChange)="loadPlants()"></p-multiSelect>
-                                  <div *ngIf="plantId.errors?.['required'] && plantId.touched" class="text-danger">Plant is required</div>
-                              </div>
-                          </div>
-                          <div class="row">
-                              <div class="mb-4">
-                                  <label for="backup">Back UP</label>
-                                  <input type="text" id="backup" formControlName="backup" class="form-control" required placeholder="Text" />
-                                  <div *ngIf="backup.errors?.['required'] && backup.touched" class="text-danger">BackUp is required</div>
-                              </div>
-                              <div class="mb-4">
-                                  <label for="department">Department:</label>
-                                  <select id="department" formControlName="departementId" class="form-control" required>
-                                      <option *ngFor="let departement of departements" [value]="departement.id_departement">{{ departement.name }}</option>
-                                  </select>
-                                  <div *ngIf="departementId.errors?.['required'] && departementId.touched" class="text-danger">Department is required</div>
-                              </div>
-                              <div class="mb-4">
-                                  <label for="yourpassword">Your password</label>
-                                  <input type="password" id="yourpassword" formControlName="yourpassword" class="form-control" required placeholder="Text" />
-                                  <div *ngIf="yourpassword.errors?.['required'] && yourpassword.touched" class="text-danger">Password is required</div>
-                                  <div *ngIf="yourpassword.errors?.['minlength'] && yourpassword.touched" class="text-danger">Password should be at least 8 characters long</div>
-                              </div>
-                          </div>
-                          <div class="d-flex justify-content-center">
-                              <button type="submit" class="btn btn-primary">Submit</button>
-                          </div>
-                          <p style="color: black; margin-top: 10px;">Have already an account? <a href=" "><u style="color: #d67800;">Login here</u></a></p>
-                      </form>
+    <div class="row justify-content-center align-items-center">
+      <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+        <div class="card">
+          <div class="card-body p-5">
+            <h2 class="text-center mb-5 font-semibold">Create an account</h2>
+            <form [formGroup]="SignUpForm" (ngSubmit)="SignUpSubmited()">
+              <div class="row">
+                <div class="mb-4 relative">
+                  <label for="TeId">TE ID</label>
+                  <input
+                    type="text"
+                    id="TeId"
+                    formControlName="teId"
+                    class="form-control"
+                    required
+                    placeholder="TExxxxxx"
+                  />
+                  <div
+                    *ngIf="teId.errors?.['required'] && teId.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    TE ID is required
                   </div>
+                  <div
+                    *ngIf="teId.errors?.['pattern'] && teId.dirty"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Not a valid TE ID
+                  </div>
+                </div>
+                <div class="mb-4 relative">
+                  <label for="username">Full Name</label>
+                  <input
+                    type="text"
+                    id="username"
+                    formControlName="username"
+                    class="form-control"
+                    required
+                    placeholder="Full name"
+                  />
+                  <div
+                    *ngIf="username.errors?.['required'] && username.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Full name is required
+                  </div>
+                </div>
               </div>
+              <div class="row">
+                <div class="mb-4 relative">
+                  <label for="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    formControlName="email"
+                    class="form-control"
+                    required
+                    placeholder="email@te.com"
+                  />
+                  <div
+                    *ngIf="email.errors?.['required'] && email.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Email is required
+                  </div>
+                  <div
+                    *ngIf="email.errors?.['email'] && email.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Invalid email format
+                  </div>
+                </div>
+                <div class="mb-4 relative">
+                  <label for="plants">Plant(s)</label>
+                  <p-multiSelect
+                    [options]="shipPoints"
+                    formControlName="shipId"
+                    optionLabel="label"
+                    placeholder=""
+                    (onChange)="loadShipPoints()"
+                  ></p-multiSelect>
+                  <div
+                    *ngIf="shipId.errors?.['required'] && shipId.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Plant is required
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="mb-4 relative">
+                  <label for="backup">Back Email</label>
+                  <input
+                    type="text"
+                    id="backup"
+                    formControlName="backup"
+                    class="form-control"
+                    required
+                    placeholder="email@te.com"
+                  />
+                  <div
+                    *ngIf="backup.errors?.['required'] && backup.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    BackUp email is required
+                  </div>
+                </div>
+                <div class="mb-4 relative">
+                  <label for="department">Department</label>
+                  <select
+                    id="department"
+                    formControlName="departementId"
+                    class="form-control"
+                    required
+                  >
+                    <option
+                      *ngFor="let departement of departements"
+                      [value]="departement.id_departement"
+                    >
+                      {{ departement.name }}
+                    </option>
+                  </select>
+                  <div
+                    *ngIf="departementId.errors?.['required'] && departementId.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Department is required
+                  </div>
+                </div>
+
+                <div class="relative mb-4 bg-red-200">
+                  <div
+                    class="flex items-center p-3 bg-white border border-gray-300 rounded-md focus-within:border-gray-600"
+                  >
+                    <input
+                      [type]="passwordFieldType"
+                      id="password"
+                      class="outline-none border-none pass pr-2 flex-1"
+                      formControlName="password"
+                      placeholder="Enter your password"
+                      aria-label="Password"
+                    />
+                    <i
+                      class="pi w-5"
+                      [ngClass]="{
+                        'pi-eye': passwordFieldType === 'password',
+                        'pi-eye-slash': passwordFieldType === 'text'
+                      }"
+                      (click)="togglePasswordVisibility()"
+                      aria-label="Toggle password visibility"
+                    >
+                    </i>
+                  </div>
+
+                  <div
+                    *ngIf="SignUpForm.get('password')?.errors?.['required'] && SignUpForm.get('password')?.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Password is required
+                  </div>
+                  <div
+                    *ngIf="SignUpForm.get('password')?.errors?.['minlength'] && SignUpForm.get('password')?.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Password should be at least 6 characters long
+                  </div>
+                </div>
+
+                <div class="mb-4 relative">
+                  <label for="role">Role</label>
+                  <select id="role" formControlName="role" class="form-control">
+                    <option *ngFor="let role of roles" [value]="role">
+                      {{ role | userRoleForDisplay }}
+                    </option>
+                  </select>
+                  <div
+                    *ngIf="role.errors?.['required'] && role.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Role is required
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-center mt-3">
+                <button
+                  [disabled]="!SignUpForm.valid"
+                  [ngClass]="{
+                    'pointer-events-none opacity-50': !SignUpForm.valid
+                  }"
+                  type="submit"
+                  class="btn btn-primary"
+                >
+                  Submit
+                </button>
+              </div>
+              <p class="text-black mt-6">
+                Have already an account?
+                <a routerLink="/login"
+                  ><u style="color: #d67800">Login here</u>
+                </a>
+              </p>
+            </form>
           </div>
+        </div>
       </div>
+    </div>
   </div>
 </div> -->
 
+<!-- <div class="mb-4 relative">
+                  <label for="yourpassword">Your password</label>
+                  <input
+                    type="password"
+                    id="yourpassword"
+                    formControlName="yourpassword"
+                    class="form-control"
+                    required
+                    placeholder="Password"
+                  />
+                  <div
+                    *ngIf="yourpassword.errors?.['required'] && yourpassword.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Password is required
+                  </div>
+                  <div
+                    *ngIf="yourpassword.errors?.['minlength'] && yourpassword.touched"
+                    class="text-red-400 text-xs font-semibold absolute top-[102%]"
+                  >
+                    Password should be at least 8 characters long
+                  </div>
+                </div> -->
 
-
-<!-- New ui -->
-<div class="responsive-background" fxLayout="column" fxLayoutAlign="center center">
-    <div class="container w-auto">
-        <div class="row justify-content-center align-items-center">
-            <div class="col-12 col-md-9 col-lg-7 col-xl-6">
-                <div class="card">
-                    <div class="card-body p-5">
-                        <h2 class="text-center mb-5 font-semibold">Create an account</h2>
-                        <form [formGroup]="SignUpForm" (ngSubmit)="SignUpSubmited()">
-                            <div class="row">
-                                <div class="mb-4 relative">
-                                    <label for="TeId">TE ID</label>
-                                    <input type="text" id="TeId" formControlName="teId" class="form-control" required placeholder="Text" />
-                                    <div 
-                                        *ngIf="teId.errors?.['required'] && teId.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        TE ID is required
-                                    </div>
-                                </div>
-                                <div class="mb-4 relative">
-                                    <label for="username">User Name</label>
-                                    <input type="text" id="username" formControlName="username" class="form-control" required placeholder="Text" />
-                                    <div 
-                                        *ngIf="username.errors?.['required'] && username.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        User Name is required
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="mb-4 relative">
-                                    <label for="email">Email</label>
-                                    <input type="email" id="email" formControlName="email" class="form-control" required placeholder="Text" />
-                                    <div 
-                                        *ngIf="email.errors?.['required'] && email.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        Email is required
-                                    </div>
-                                    <div 
-                                        *ngIf="email.errors?.['email'] && email.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        Invalid email format
-                                    </div>
-                                </div>
-                                <!-- Old version using plants -->
-                                <!-- <div class="mb-4 relative">
-                                    <label for="plants">Plant</label>
-                                    <p-multiSelect [options]="plants" formControlName="plantId" optionLabel="label" placeholder="" (onChange)="loadPlants()"></p-multiSelect>
-                                    <div 
-                                        *ngIf="plantId.errors?.['required'] && plantId.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        Plant is required
-                                    </div>
-                                </div> -->
-
-                                <!-- New version using ship points -->
-                                <div class="mb-4 relative">
-                                    <label for="plants">Plant(s)</label>
-                                    <p-multiSelect [options]="shipPoints" formControlName="shipId" optionLabel="label" placeholder="" (onChange)="loadShipPoints()"></p-multiSelect>
-                                    <div 
-                                        *ngIf="shipId.errors?.['required'] && shipId.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        Plant is required
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="mb-4 relative relative">
-                                    <label for="backup">Back UP</label>
-                                    <input type="text" id="backup" formControlName="backup" class="form-control" required placeholder="Text" />
-                                    <div 
-                                        *ngIf="backup.errors?.['required'] && backup.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        BackUp is required
-                                    </div>
-                                </div>
-                                <div class="mb-4 relative">
-                                    <label for="department">Department</label>
-                                    <select id="department" formControlName="departementId" class="form-control" required>
-                                        <option *ngFor="let departement of departements" [value]="departement.id_departement">{{ departement.name }}</option>
-                                    </select>
-                                    <div 
-                                        *ngIf="departementId.errors?.['required'] && departementId.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        Department is required
-                                    </div>
-                                </div>
-                                <div class="mb-4 relative">
-                                    <label for="yourpassword">Your password</label>
-                                    <input type="password" id="yourpassword" formControlName="yourpassword" class="form-control" required placeholder="Text" />
-                                    <div 
-                                        *ngIf="yourpassword.errors?.['required'] && yourpassword.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        Password is required
-                                    </div>
-                                    <div 
-                                        *ngIf="yourpassword.errors?.['minlength'] && yourpassword.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        Password should be at least 8 characters long
-                                    </div>
-                                </div>
-
-                                <div class="mb-4 relative">
-                                    <label for="role">Role</label>
-                                    <select id="role" formControlName="role" class="form-control">
-                                        <option *ngFor="let role of roles" [value]="role">{{ role | userRoleForDisplay }}</option>
-                                    </select>
-                                    <div 
-                                        *ngIf="role.errors?.['required'] && role.touched" 
-                                        class="text-red-400 text-xs font-semibold absolute top-[102%]"
-                                    >
-                                        Role is required
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-center mt-3">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
-                            <p class="text-black mt-6">
-                              Have already an account? 
-                              <a routerLink="/login"><u style="color: #d67800;">Login here</u>
-                              </a></p>
-                        </form>
-                    </div>
-                </div>
-            </div>
+<div class="min-h-screen flex items-center justify-center bg-gray-100 p-4 responsive-background">
+  <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg p-8 bg-opacity-80">
+    <h2 class="text-2xl font-bold text-center mb-8">Create an Account</h2>
+    <form
+      [formGroup]="SignUpForm"
+      (ngSubmit)="SignUpSubmited()"
+      class="space-y-6"
+    >
+      <!-- Row 1: TE ID and Full Name -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="relative">
+          <label for="TeId" class="block text-sm font-medium text-gray-700"
+            >TE ID</label
+          >
+          <input
+            type="text"
+            id="TeId"
+            formControlName="teId"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            placeholder="TExxxxxx"
+            required
+          />
+          <div
+            *ngIf="teId.errors?.['required'] && teId.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            TE ID is required
+          </div>
+          <div
+            *ngIf="teId.errors?.['pattern'] && teId.dirty"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Not a valid TE ID
+          </div>
         </div>
-    </div>
+        <div class="relative">
+          <label for="username" class="block text-sm font-medium text-gray-700"
+            >Full Name</label
+          >
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            placeholder="Full name"
+            required
+          />
+          <div
+            *ngIf="username.errors?.['required'] && username.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Full name is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Email and Plant(s) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="relative">
+          <label for="email" class="block text-sm font-medium text-gray-700"
+            >Email</label
+          >
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            placeholder="email@te.com"
+            required
+          />
+          <div
+            *ngIf="email.errors?.['required'] && email.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Email is required
+          </div>
+          <div
+            *ngIf="email.errors?.['email'] && email.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Invalid email format
+          </div>
+        </div>
+        <div class="relative">
+          <label for="plants" class="block text-sm font-medium text-gray-700"
+            >Plant(s)</label
+          >
+          <p-multiSelect
+            [options]="shipPoints"
+            formControlName="shipId"
+            optionLabel="label"
+            class="mt-1 w-full"
+          ></p-multiSelect>
+          <div
+            *ngIf="shipId.errors?.['required'] && shipId.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Plant is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Backup Email and Department -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="relative">
+          <label for="backup" class="block text-sm font-medium text-gray-700"
+            >Backup Email</label
+          >
+          <input
+            type="text"
+            id="backup"
+            formControlName="backup"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            placeholder="email@te.com"
+            required
+          />
+          <div
+            *ngIf="backup.errors?.['required'] && backup.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Backup email is required
+          </div>
+        </div>
+        <div class="relative">
+          <label
+            for="department"
+            class="block text-sm font-medium text-gray-700"
+            >Department</label
+          >
+          <select
+            id="department"
+            formControlName="departementId"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            required
+          >
+            <option
+              *ngFor="let departement of departements"
+              [value]="departement.id_departement"
+            >
+              {{ departement.name }}
+            </option>
+          </select>
+          <div
+            *ngIf="departementId.errors?.['required'] && departementId.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Department is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Password and Role -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="relative ">
+          <label for="password" class="block text-sm font-medium text-gray-700"
+            >Password</label
+          >
+          <div
+            class="mt-1 flex overflow-hidden items-center bg-white border border-gray-300 rounded-md focus-within:ring-[1px] focus-within:ring-orange-400 focus-within:border-orange-400"
+          >
+            <input
+              [type]="passwordFieldType"
+              id="password"
+              formControlName="password"
+              class="w-full px-3 py-2 outline-none border-none"
+              placeholder="Enter your password"
+              required
+            />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="px-3 text-gray-500 hover:text-gray-700"
+            >
+              <i
+                class="pi"
+                [ngClass]="{
+                  'pi-eye': passwordFieldType === 'password',
+                  'pi-eye-slash': passwordFieldType === 'text'
+                }"
+              ></i>
+            </button>
+          </div>
+          <div
+            *ngIf="SignUpForm.get('password')?.errors?.['required'] && SignUpForm.get('password')?.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Password is required
+          </div>
+          <div
+            *ngIf="SignUpForm.get('password')?.errors?.['minlength'] && SignUpForm.get('password')?.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Password should be at least 6 characters long
+          </div>
+        </div>
+        <div class="relative">
+          <label for="role" class="block text-sm font-medium text-gray-700"
+            >Role</label
+          >
+          <select
+            id="role"
+            formControlName="role"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+          >
+            <option *ngFor="let role of roles" [value]="role">
+              {{ role | userRoleForDisplay }}
+            </option>
+          </select>
+          <div
+            *ngIf="role.errors?.['required'] && role.touched"
+            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+          >
+            Role is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button Row -->
+      <div class="flex justify-center mt-8 w-full">
+        <button
+          type="submit"
+          [disabled]="!SignUpForm.valid"
+          class="w-full px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          SignUp
+        </button>
+      </div>
+
+      <!-- Login Link -->
+      <p class="text-center text-gray-600 mt-6">
+        Already have an account?
+        <a routerLink="/login" class="text-orange-500 hover:underline"
+          >Login here</a
+        >
+      </p>
+    </form>
   </div>
+</div>

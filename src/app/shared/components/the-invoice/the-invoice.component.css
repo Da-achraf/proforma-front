@@ -7,8 +7,8 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     
     /* The following changes are better and are reserved fot the invoice ui enhancements */
-    /* border: none;  */
-    /* padding: 0; */
+    border: none; 
+    padding: 0;
 }
 
 .table {

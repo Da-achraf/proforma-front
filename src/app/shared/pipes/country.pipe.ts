@@ -9,7 +9,7 @@ export class CountryPipe implements PipeTransform {
 
   transform(alpha2Code: string): string {
     const foundCountry: Country = this.countries.find(c => c.alpha2Code === alpha2Code) as Country
-    return foundCountry?.alpha3Code ?? '';
+    return foundCountry?.alpha2Code ?? '';
   }
 
 }

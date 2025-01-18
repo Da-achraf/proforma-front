@@ -196,20 +196,20 @@ export class InvoiceService {
   
     try {
       // Ensure images are fully loaded before processing [Reserver for invoice ui enhancments]
-      // const images = invoiceElement.querySelectorAll('img');
-      // await Promise.all(
-      //   Array.from(images).map((img: any) => new Promise((resolve, reject) => {
-      //     if (img.complete) {
-      //       resolve(true);
-      //     } else {
-      //       img.onload = () => resolve(true);
-      //       img.onerror = () => {
-      //         console.warn('Image failed to load:', img.src);
-      //         resolve(true); // Resolve even if image fails to load
-      //       };
-      //     }
-      //   }))
-      // );
+      const images = invoiceElement.querySelectorAll('img');
+      await Promise.all(
+        Array.from(images).map((img: any) => new Promise((resolve, reject) => {
+          if (img.complete) {
+            resolve(true);
+          } else {
+            img.onload = () => resolve(true);
+            img.onerror = () => {
+              console.warn('Image failed to load:', img.src);
+              resolve(true); // Resolve even if image fails to load
+            };
+          }
+        }))
+      );
 
       // Create a temporary container with fixed width
       const tempContainer = document.createElement('div');
@@ -223,12 +223,12 @@ export class InvoiceService {
       const clonedInvoice = invoiceElement.cloneNode(true) as HTMLElement;
 
       // Additional image preparation [Reserver for invoice ui enhancments]
-      // const clonedImages = clonedInvoice.querySelectorAll('img');
-      // clonedImages.forEach(img => {
-      //   img.style.maxWidth = '100%';
-      //   img.style.height = 'auto';
-      //   img.style.objectFit = 'contain';
-      // });
+      const clonedImages = clonedInvoice.querySelectorAll('img');
+      clonedImages.forEach(img => {
+        img.style.maxWidth = '100%';
+        img.style.height = 'auto';
+        img.style.objectFit = 'contain';
+      });
       
       // Apply specific styles to prevent text cutting
       const styles = `

@@ -23,6 +23,9 @@ export class SignUpComponent implements OnInit {
   shipPoints: any[] = [];
   SignUpForm!: FormGroup;
 
+  passwordFieldType: string = 'password';
+
+
   roles = pureRoles
 
   constructor(
@@ -95,7 +98,7 @@ export class SignUpComponent implements OnInit {
 
   private initializeForm() {
     this.SignUpForm = this.fb.group({
-      teId: ['', Validators.required],
+      teId: ['', [Validators.required, Validators.pattern(/^TE\d{6}$/)]],
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       departementId: ['', Validators.required],
@@ -177,6 +180,10 @@ export class SignUpComponent implements OnInit {
         }
       });
     }
+  }
+
+  togglePasswordVisibility() {
+    this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
   }
 
   resetFormAndNavigate() {
