@@ -112,6 +112,7 @@ import { RequestStrategyFactory } from './shared/services/requests-strategies/re
 import { TruncateTextPipe } from './shared/pipes/truncate-text.pipe';
 import { DeliveryAddressListComponent } from './components/delivery-address/delivery-address-list/delivery-address-list.component';
 import { DeliveryAddressPipe } from './shared/pipes/delivery-address.pipe';
+import { InvoiceAvailabilityPipe } from './shared/pipes/invoice-availablity.pipe';
 
 @NgModule({
   declarations: [
@@ -176,7 +177,8 @@ import { DeliveryAddressPipe } from './shared/pipes/delivery-address.pipe';
     EditRequestRequesterComponent,
     DeliveryAddressCrudComponent,
     DeliveryAddressListComponent,
-    DeliveryAddressPipe
+    DeliveryAddressPipe,
+    InvoiceAvailabilityPipe
   ],
   imports: [
     BrowserModule,

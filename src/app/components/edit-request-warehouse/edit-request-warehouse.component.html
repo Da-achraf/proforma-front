@@ -52,10 +52,12 @@
         <input matInput formControlName="grossWeight" type="number" min="0">
       </mat-form-field>
       
-      <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>Tracking Number</mat-label>
-        <input matInput formControlName="trackingNumber" type="text">
-      </mat-form-field>
+      @if (requestSig()?.status != RequestStatusEnum.InShipping) {
+        <mat-form-field appearance="fill" class="small-form-field">
+          <mat-label>Tracking Number</mat-label>
+          <input matInput formControlName="trackingNumber" type="text">
+        </mat-form-field>
+      }
 
       <mat-form-field appearance="fill">
         <mat-label>Volume</mat-label>

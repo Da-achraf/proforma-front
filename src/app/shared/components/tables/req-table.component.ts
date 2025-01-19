@@ -60,6 +60,7 @@ export class RequestsTableComponent {
 
   // Enums and constants
   RoleEnum = RoleEnum;
+  RequestStatusEnum = RequestStatus 
 
   // View refs
   @ViewChild('invoiceElement') invoiceElement!: TemplateRef<any>;

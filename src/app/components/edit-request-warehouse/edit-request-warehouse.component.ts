@@ -1,26 +1,52 @@
-import { Component, computed, effect, ElementRef, inject, Inject, OnInit, signal, Signal, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  Inject,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatAutocomplete } from '@angular/material/autocomplete';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import _ from 'lodash';
+import { MessageService } from 'primeng/api'; // Import MessageService
+import {
+  BehaviorSubject,
+  filter,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
+import {
+  ItemModel,
+  userRoleToMandatoryForMapper,
+} from '../../models/request-item.model';
+import { CURRENCY_CODES, RequestModel } from '../../models/request.model';
+import { RequestStatus } from '../../models/requeststatus.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
-import { MessageService } from 'primeng/api'; // Import MessageService
-import { CURRENCY_CODES, RequestModel, StandardFieldEnum } from '../../models/request.model';
-import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, Subject, switchMap } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { ItemModel, userRoleToMandatoryForMapper } from '../../models/request-item.model';
 import { ScenarioService } from '../../services/scenario.service';
-import { mergeArrays } from '../../shared/components/tables/helpers';
-import _ from 'lodash'
-import { MatAutocomplete } from '@angular/material/autocomplete';
-import { notZeroValidator } from '../../shared/helpers/form-validator.helper';
-import { ParcelsComponent } from '../../shared/components/parcels/parcels.component';
 import { UserStoreService } from '../../services/user-store.service';
+import { mergeArrays } from '../../shared/components/tables/helpers';
+import { notZeroValidator } from '../../shared/helpers/form-validator.helper';
 
 @Component({
   selector: 'app-edit-request-warehouse',
   templateUrl: './edit-request-warehouse.component.html',
-  styleUrls: ['./edit-request-warehouse.component.css']
+  styleUrls: ['./edit-request-warehouse.component.css'],
 })
 export class EditRequestWarehouseComponent implements OnInit {
   requestForm!: FormGroup;
@@ -28,60 +54,74 @@ export class EditRequestWarehouseComponent implements OnInit {
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') auto!: MatAutocomplete;
 
-  userRole = inject(UserStoreService).userRole
+  userRole = inject(UserStoreService).userRole;
+  RequestStatusEnum = RequestStatus;
 
-  scenarioService = inject(ScenarioService)
-  currencyCodes = signal(CURRENCY_CODES)
+  scenarioService = inject(ScenarioService);
+  currencyCodes = signal(CURRENCY_CODES);
 
   modeOfTransport = computed(() => {
-    const request = this.requestSig()
-    if (!request) return
-    return request.modeOfTransport
-  })
+    const request = this.requestSig();
+    if (!request) return;
+    return request.modeOfTransport;
+  });
 
   existingItemsData = computed(() => {
-    const request = this.requestSig()
-    if (!request) return
-    return request.itemsWithValues
-  })
+    const request = this.requestSig();
+    if (!request) return;
+    return request.itemsWithValues;
+  });
 
-  
-  request$ = this.requestService.getRequestById(this.data.requestNumber).pipe(
-    shareReplay(1)
-  )
+  request$ = this.requestService
+    .getRequestById(this.data.requestNumber)
+    .pipe(shareReplay(1));
 
-  requestSig = toSignal(this.request$)
+  requestSig = toSignal(this.request$);
 
   selectedScenario = computed(() => {
-    const request = this.requestSig()
-    if (!request) return
-    this.scenearioIdSubject.next(request.scenario.id_scenario)
-    return request.scenario
-  })
+    const request = this.requestSig();
+    if (!request) return;
+    this.scenearioIdSubject.next(request.scenario.id_scenario);
+    return request.scenario;
+  });
 
-  scenearioIdSubject = new BehaviorSubject<number>(0)
+  scenearioIdSubject = new BehaviorSubject<number>(0);
   scenarioAttributes$ = this.scenearioIdSubject.pipe(
     filter((id: number) => id != 0),
     switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
-  )
-  scenarioAttributes = toSignal(this.scenarioAttributes$)
+  );
+  scenarioAttributes = toSignal(this.scenarioAttributes$);
 
   formItems = computed(() => {
-    const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
-    const scenarioAttributes: { attributeName: string; mandatoryFor: string[]; }[] = this.scenarioAttributes() ?? [];
-    const userRole = this.userRole()
-  
-    if (!selectedScenarioItems.length || !scenarioAttributes.length || !userRole) return [];
+    const selectedScenarioItems: ItemModel[] =
+      this.selectedScenario()?.items ?? [];
+    const scenarioAttributes: {
+      attributeName: string;
+      mandatoryFor: string[];
+    }[] = this.scenarioAttributes() ?? [];
+    const userRole = this.userRole();
 
-    const mandatoryForUser = userRoleToMandatoryForMapper(userRole)
-  
-    return selectedScenarioItems.map(item => {
-      const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
+    if (
+      !selectedScenarioItems.length ||
+      !scenarioAttributes.length ||
+      !userRole
+    )
+      return [];
+
+    const mandatoryForUser = userRoleToMandatoryForMapper(userRole);
+
+    return selectedScenarioItems.map((item) => {
+      const matchingAttribute = scenarioAttributes.find(
+        (attr) => attr.attributeName === item.nameItem
+      );
       return {
         ...item,
         // readOnly: (item.nameItem != StandardFieldEnum.GROSS_WEIGHT && item.nameItem != StandardFieldEnum.NET_WEIGHT),
         readOnly: false,
-        isMandatory: matchingAttribute && mandatoryForUser ? matchingAttribute.mandatoryFor.includes(mandatoryForUser) : false
+        isMandatory:
+          matchingAttribute && mandatoryForUser
+            ? matchingAttribute.mandatoryFor.includes(mandatoryForUser)
+            : false,
       };
     });
   });
@@ -98,24 +138,21 @@ export class EditRequestWarehouseComponent implements OnInit {
     private dialog: MatDialog,
     private messageService: MessageService // Inject MessageService
   ) {
-
     effect(() => {
-      const formItems = this.formItems()
-      const existingItemsData = this.existingItemsData()
+      const formItems = this.formItems();
+      const existingItemsData = this.existingItemsData();
 
+      console.log('Existing item data: ', existingItemsData);
 
-      console.log('Existing item data: ', existingItemsData)
-
-      if (existingItemsData?.length == 0) return
-      this.items?.clear()
+      if (existingItemsData?.length == 0) return;
+      this.items?.clear();
       if (existingItemsData && existingItemsData.length > 0) {
         this.patchExistingData(existingItemsData);
       } else {
         this.addItem();
       }
-    })
+    });
   }
-
 
   ngOnInit(): void {
     this.requestForm = this.fb.group({
@@ -128,15 +165,14 @@ export class EditRequestWarehouseComponent implements OnInit {
       grossWeight: ['', [Validators.required, notZeroValidator()]],
       dimension: ['', Validators.required],
       currency: [{ value: '', disabled: true }],
-      modeOfTransport: [{value: '', disabled: true}],
-      shippedVia: [{value: '', disabled: true}],
-      items: this.fb.array([]) // FormArray for items
+      modeOfTransport: [{ value: '', disabled: true }],
+      shippedVia: [{ value: '', disabled: true }],
+      items: this.fb.array([]), // FormArray for items
     });
-
 
     this.requestService.getRequestById(this.data.requestNumber).subscribe(
       (request: RequestModel) => {
-          console.log('req: ',request )
+        console.log('req: ', request);
         this.requestForm.patchValue({
           invoicesTypes: request.invoicesTypes,
           shippingPoint: request?.shipPoint.shipPoint,
@@ -150,11 +186,15 @@ export class EditRequestWarehouseComponent implements OnInit {
           boxes: request.boxes,
           pallets: request.pallets,
           shippedVia: request.shippedVia,
-          currency: request.currency
+          currency: request.currency,
         });
       },
       (error) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error fetching request data' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error fetching request data',
+        });
         console.error('Error fetching request data:', error);
       }
     );
@@ -162,38 +202,44 @@ export class EditRequestWarehouseComponent implements OnInit {
 
   patchExistingData(data: any[]) {
     this.items.clear();
-    data?.forEach(itemData => {
+    data?.forEach((itemData) => {
       this.items.push(this.createItem(itemData));
     });
   }
 
   createItem(data?: any): FormGroup {
-    const formItems = this.formItems()
+    const formItems = this.formItems();
     if (!formItems) return this.fb.group({});
     const group: { [key: string]: FormGroup } = {};
 
     formItems.forEach((item: ItemModel) => {
-      const fieldData = this.findDataOfItem(item.nameItem, data?.values) ?? undefined;
+      const fieldData =
+        this.findDataOfItem(item.nameItem, data?.values) ?? undefined;
       group[item.nameItem] = this.fb.group({
         name: item.nameItem,
-        value: [fieldData ? fieldData?.value : '', (fieldData?.isMandatory || item.isMandatory) ? Validators.required : null],
+        value: [
+          fieldData ? fieldData?.value : '',
+          fieldData?.isMandatory || item.isMandatory
+            ? Validators.required
+            : null,
+        ],
         type: [fieldData ? fieldData?.type : item.type],
-        isMandatory: [fieldData?.isMandatory]
+        isMandatory: [fieldData?.isMandatory],
       });
     });
     return this.fb.group(group);
   }
 
   findDataOfItem(itemName: string, data: any[]) {
-    let foundData:any = null
-    data?.forEach(d => {
+    let foundData: any = null;
+    data?.forEach((d) => {
       if (d['name'] === itemName) {
-        console.log('foudn data: ', d, itemName)
-        foundData = d
+        console.log('foudn data: ', d, itemName);
+        foundData = d;
       }
-    })
+    });
 
-    return foundData
+    return foundData;
   }
 
   get items(): FormArray {
@@ -206,15 +252,15 @@ export class EditRequestWarehouseComponent implements OnInit {
 
   patchValuesToFormArray(values: any[]) {
     const itemsArray = this.requestForm.get('items') as FormArray;
-  
+
     values.forEach((itemValue, itemIndex) => {
       const itemGroup = itemsArray.at(itemIndex) as FormGroup;
       const fieldsArray = itemGroup.get('fields') as FormArray;
-  
+
       itemValue.fields.forEach((fieldValue: any, fieldIndex: number) => {
         const fieldGroup = fieldsArray.at(fieldIndex) as FormGroup;
         fieldGroup?.patchValue({
-          value: fieldValue.value // Assuming fieldValue contains the `value` key
+          value: fieldValue.value, // Assuming fieldValue contains the `value` key
         });
       });
     });
@@ -227,33 +273,52 @@ export class EditRequestWarehouseComponent implements OnInit {
   onSubmit(): void {
     if (this.requestForm.valid) {
       const userId = this.authService.getUserIdFromToken();
-      const existingItemsData = this.existingItemsData() ?? []
-      const itemsCopy = _.cloneDeep(this.requestForm.value.items)
+      const existingItemsData = this.existingItemsData() ?? [];
+      const itemsCopy = _.cloneDeep(this.requestForm.value.items);
 
-      const updateData = {
-        trackingNumber: this.requestForm.get('trackingNumber')?.value,
+      const updateData: any = {
         grossWeight: this.requestForm.get('grossWeight')?.value,
         dimension: this.requestForm.get('dimension')?.value,
-        currency: this.requestForm.get('currency')?.value,
-        itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
+        itemsWithValuesJson: JSON.stringify(
+          mergeArrays(existingItemsData, itemsCopy)
+        ),
         userId: userId,
         boxes: this.requestForm.get('boxes')?.value,
         pallets: this.requestForm.get('pallets')?.value,
       };
 
-      this.requestService.updateRequestByWarehouse(this.data.requestNumber, updateData).subscribe(
-        (response) => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request updated successfully' });
-          console.log('Request updated:', response);
-          this.dialogRef.close(true);
-        },
-        (error) => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error updating request' });
-          console.error('Error updating request:', error);
-        }
-      );
+      const trackingNumber = this.requestForm.get('trackingNumber')?.value;
+      if (trackingNumber) {
+        updateData.trackingNumber = trackingNumber;
+      }
+
+      this.requestService
+        .updateRequestByWarehouse(this.data.requestNumber, updateData)
+        .subscribe(
+          (response) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Request updated successfully',
+            });
+            console.log('Request updated:', response);
+            this.dialogRef.close(true);
+          },
+          (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Error updating request',
+            });
+            console.error('Error updating request:', error);
+          }
+        );
     } else {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Form is invalid' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Form is invalid',
+      });
       console.log('Form is invalid');
     }
   }
@@ -265,7 +330,9 @@ export class EditRequestWarehouseComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.currencyCodes().filter(option => option.toLowerCase().includes(filterValue));
+    return this.currencyCodes().filter((option) =>
+      option.toLowerCase().includes(filterValue)
+    );
   }
 
   onCurrencyChange(text: string) {
@@ -281,6 +348,8 @@ export class EditRequestWarehouseComponent implements OnInit {
 
   filter(): void {
     const filterValue = this.input?.nativeElement.value.toLowerCase();
-    this.filteredOptions = of(this.currencyCodes().filter(o => o.toLowerCase().includes(filterValue)));
+    this.filteredOptions = of(
+      this.currencyCodes().filter((o) => o.toLowerCase().includes(filterValue))
+    );
   }
 }
