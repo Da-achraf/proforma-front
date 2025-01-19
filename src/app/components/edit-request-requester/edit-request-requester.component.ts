@@ -16,6 +16,9 @@ import { mergeArrays } from '../../shared/components/tables/helpers';
 import { ToasterService } from '../../shared/services/toaster.service';
 import { CreateRequestDialogComponent } from '../create-request-dialog/create-request-dialog.component';
 import { UserStoreService } from '../../services/user-store.service';
+import { DeliveryAddress } from '../../models/delivery-address.model';
+import { DeliveryAddressService } from '../../services/delivery-address.service';
+import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-address-crud/delivery-address-crud.component';
 
 @Component({
   selector: 'app-edit-request-requester',
@@ -29,7 +32,10 @@ export class EditRequestRequesterComponent {
   toastr = inject(ToasterService)
 
   requestForm!: FormGroup;
+
   shipPoints: Ship[] = [];
+  deliveryAddresses: DeliveryAddress[] = [];
+
   currencyCodes = signal<string[]>(CURRENCY_CODES)
   invoiceTypes = signal<string[]>(INVOICE_TYPES)
   incotermOptions = signal<string[]>(INCOTERMES)
@@ -99,6 +105,7 @@ export class EditRequestRequesterComponent {
     private fb: FormBuilder,
     private scenarioService: ScenarioService,
     private shippointService: ShippointService,
+    private deliveryAddressService: DeliveryAddressService,
     private requestService: RequestService,
     private authService: AuthService,
     private messageService: MessageService,
@@ -151,6 +158,7 @@ export class EditRequestRequesterComponent {
       items: this.fb.array([])
     });
     this.loadShipPoints();
+    this.loadDeliveryAddresses();
     this.onScenarioChange();
     this.onShippingOrDeliveryChange();
 
@@ -160,7 +168,7 @@ export class EditRequestRequesterComponent {
           invoicesTypes: request?.invoicesTypes,
           scenarioId: request?.scenario.id_scenario,
           shippingPoint: request?.shipPoint.id_ship,
-          deliveryAddress: request?.deliveryAddress.id_ship,
+          deliveryAddress: request?.deliveryAddress?.id,
           incoterm: request?.incoterm,
           dhlAccount: request?.dhlAccount,
           modeOfTransport: request?.modeOfTransport,
@@ -238,6 +246,22 @@ export class EditRequestRequesterComponent {
     );
   }
 
+  loadDeliveryAddresses(): void {
+    this.deliveryAddressService.getDeliveryAddresses().subscribe(
+      (addresses) => {
+        this.deliveryAddresses = addresses;
+      },
+      (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error loading delivery addresses',
+        });
+        console.error('Error loading delivery addresses:', error);
+      }
+    );
+  }
+
   onScenarioChange(): void {
     const scenarioIdControl = this.requestForm.get('scenarioId');
     this.selectedScenarioId.set(scenarioIdControl?.value ?? 0)
@@ -278,7 +302,7 @@ export class EditRequestRequesterComponent {
       const scenarioId = this.requestForm.value.scenarioId;
       if (typeof scenarioId === 'number') {
         const shippingPointId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.shippingPoint)?.id_ship ?? 0;
-        const deliveryAddressId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.deliveryAddress)?.id_ship ?? 0;
+        const deliveryAddressId = this.deliveryAddresses.find(address => address.id === this.requestForm.value.deliveryAddress)?.id ?? 0;
 
         const existingItemsData = this.existingItemsData() ?? []
         const itemsCopy = _.cloneDeep(this.requestForm.value.items)
@@ -299,10 +323,11 @@ export class EditRequestRequesterComponent {
         this.requestService.updateRequestByRequester(this.data.requestNumber, requestData).subscribe(
           (response) => {
             console.log('Request created:', response);
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request updated successfully' });
             this.dialogRef.close(true);
           },
           (error) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error creating request' });
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error editing the request' });
             console.error('Error creating request:', error);
           }
         );
@@ -336,7 +361,7 @@ export class EditRequestRequesterComponent {
 
   updateIncoterm(shippingPointId: number, deliveryAddressId: number): void {
     const shippingPoint = this.shipPoints.find(point => point.id_ship === shippingPointId);
-    const deliveryAddress = this.shipPoints.find(point => point.id_ship === deliveryAddressId);
+    const deliveryAddress = this.deliveryAddresses.find(address => address.id === deliveryAddressId);
 
     if (shippingPoint?.isTe && deliveryAddress?.isTe) {
       this.requestForm.patchValue({ incoterm: 'FCA' });
@@ -344,5 +369,22 @@ export class EditRequestRequesterComponent {
       this.requestForm.patchValue({ incoterm: '' });
     }
   }
+
+  onDeliveryAddressChange(option: string) {
+      if (option != 'other') return;
+  
+      this.dialog
+        .open(DeliveryAddressCrudComponent)
+        .afterClosed()
+        .subscribe((result) => {
+          const addressControl = this.requestForm.get('deliveryAddress');
+          if (result) {
+            this.loadDeliveryAddresses();
+            addressControl?.patchValue(result);
+          } else {
+            addressControl?.patchValue(null);
+          }
+        });
+    }
 
 }

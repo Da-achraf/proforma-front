@@ -187,7 +187,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
           scenarioId: request?.scenario.name,
           shippingPoint: request?.shipPoint.shipPoint,
           modeOfTransport: request?.modeOfTransport,
-          deliveryAddress: request?.deliveryAddress.deliveryAddress,
+          deliveryAddress: request?.deliveryAddress?.customerId,
           incoterm: request?.incoterm,
           dhlAccount: request?.dhlAccount,
           currency: request.currency
@@ -195,10 +195,10 @@ export class ModifyRequestFinanceComponent implements OnInit {
       }else{
         this.requestForm.patchValue({
           invoicesTypes: request?.invoicesTypes,
-          scenarioId: request?.scenarioId,
+          scenarioId: request?.scenario.name,
           shippingPoint: request?.shipPoint.shipPoint,
           modeOfTransport: request?.modeOfTransport,
-          deliveryAddress: request?.deliveryAddress.deliveryAddress,
+          deliveryAddress: request?.deliveryAddress?.customerId,
           incoterm: request?.incoterm,
           currency: request.currency
         });

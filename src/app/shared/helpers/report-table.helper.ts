@@ -34,7 +34,7 @@ export const adaptRequest = (request: RequestModel): Partial<TransformedRequestM
     boxes: request.boxes,
     pallets: request.pallets,
     shipPoint: request.shipPoint.shipPoint,
-    deliveryAddress: request.deliveryAddress.deliveryAddress,
+    deliveryAddress: request.deliveryAddress?.customerId,
   };
 }
 
@@ -57,7 +57,7 @@ export const transformRequest = (request: RequestModel): TransformedRequestModel
     return [];
   }
 
-  // calcukate total net weight
+  // calculate total net weight
   // const netWeight = calculatTotalNetWeight(request.itemsWithValues)
 
   const keysToChange = ['Material', 'Description', 'HTS Code', 'COO', 'Net Weight'];

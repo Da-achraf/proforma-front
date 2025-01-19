@@ -43,8 +43,9 @@
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Delivery Address</mat-label>
-        <mat-select formControlName="deliveryAddress">
-          <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
+        <mat-select formControlName="deliveryAddress" (selectionChange)="onDeliveryAddressChange($event.value)">
+          <mat-option value="other">Other</mat-option>
+          <mat-option *ngFor="let address of deliveryAddresses" [value]="address.id">{{ address.customerId }}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">

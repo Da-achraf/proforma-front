@@ -17,7 +17,6 @@ import { LoginComponent } from './components/login/login.component';
 import { SideNavComponent } from './components/side-nav/side-nav.component';
 import { tokenInterceptor } from './interceptors/token.interceptor';
 import { AuthService } from './services/auth.service';
-
 import { MatSelectCountryModule } from "@angular-material-extensions/select-country";
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -78,16 +77,15 @@ import { ListOfRequesterComponent } from './components/list-of-requester/list-of
 import { ListofdepartementsComponent } from './components/listofdepartements/listofdepartements.component';
 import { ListofplantsComponent } from './components/listofplants/listofplants.component';
 import { ListOfUsersComponent } from './components/listofusers/listofusers.component';
-import { ManagementShipPointComponent } from './components/management-ship-point/management-ship-point.component';
 import { ModifyRequestFinanceComponent } from './components/modify-request-finance/modify-request-finance.component';
 import { PlantmanagementComponent } from './components/plantmanagement/plantmanagement.component';
 import { PlantsListComponent } from './components/plants-list/plants-list.component';
 import { RejectCommentDialogComponent } from './components/reject-comment-dialog/reject-comment-dialog.component';
 import { RequesterDashboardComponent } from './components/requester-dashboard/requester-dashboard.component';
 import { RequestsReportComponent } from './components/requests-report/requests-report.component';
-import { ShipPointComponent } from './components/ship-point/ship-point.component';
-import { ShipPointsListComponent } from './components/ship-points-list/ship-points-list.component';
+import { ShipPointsListComponent } from './components/shippoints/ship-points-list/ship-points-list.component';
 import { ShippointCrudComponent } from './components/shippoints/shippoint-crud/shippoint-crud.component';
+import { DeliveryAddressCrudComponent } from './components/delivery-address/delivery-address-crud/delivery-address-crud.component';
 import { TradcomplianceDashboardComponent } from './components/tradcompliance-dashboard/tradcompliance-dashboard.component';
 import { UsermanagmentComponent } from './components/usermanagment/usermanagment.component';
 import { UsersListComponent } from './components/users-list/users-list.component';
@@ -108,10 +106,12 @@ import { NewlinePipe } from './shared/pipes/new-line.pipe';
 import { RequestStatusMapper } from './shared/pipes/request-status-mapper.pipe';
 import { TotalAmountPipe } from './shared/pipes/total-amount.pipe';
 import { TrackingColorPipe } from './shared/pipes/tracking-color.pipe';
-import { TruncateTextPipe } from './shared/pipes/truncate-text.pipe';
 import { UserRoleForDisplayPipe } from './shared/pipes/user-role-for-display.pipe';
 import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
+import { TruncateTextPipe } from './shared/pipes/truncate-text.pipe';
+import { DeliveryAddressListComponent } from './components/delivery-address/delivery-address-list/delivery-address-list.component';
+import { DeliveryAddressPipe } from './shared/pipes/delivery-address.pipe';
 
 @NgModule({
   declarations: [
@@ -138,8 +138,6 @@ import { RequestStrategyFactory } from './shared/services/requests-strategies/re
     RequesterDashboardComponent,
     ListOfRequesterComponent,
     CreateRequestDialogComponent,
-    ShipPointComponent,
-    ManagementShipPointComponent,
     FinanceDashboardComponent,
     ListOfRequestFinanceComponent,
     ModifyRequestFinanceComponent,
@@ -175,7 +173,10 @@ import { RequestStrategyFactory } from './shared/services/requests-strategies/re
     ShippointCrudComponent,
     ParcelsComponent,
     TrackingColorPipe,
-    EditRequestRequesterComponent
+    EditRequestRequesterComponent,
+    DeliveryAddressCrudComponent,
+    DeliveryAddressListComponent,
+    DeliveryAddressPipe
   ],
   imports: [
     BrowserModule,
@@ -226,23 +227,21 @@ import { RequestStrategyFactory } from './shared/services/requests-strategies/re
     MatChipsModule,
     NgOptimizedImage,
   ],
-  exports: [
-    MatDialogModule
-  ],
+  exports: [MatDialogModule],
   providers: [
     AuthService,
     RequestStrategyFactory,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: tokenInterceptor,
-      multi: true
+      multi: true,
     },
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),
     MessageService,
     DynamicDialogConfig,
-    DynamicDialogRef
+    DynamicDialogRef,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,4 +1,4 @@
-<form [formGroup]="shipPointForm" class="grid grid-cols-3 gap-4 p-4" (ngSubmit)="createShipPoint()">
+<!-- <form [formGroup]="shipPointForm" class="grid grid-cols-3 gap-4 p-4" (ngSubmit)="createShipPoint()">
     <p class="col-span-3 text-lg font-semibold">{{ formHeaderText() }}</p>
     
     <mat-form-field appearance="fill" class="col-span-1">
@@ -11,31 +11,6 @@
         <input matInput formControlName="fullAddress" name="fullAddress">
     </mat-form-field>
 
-    <mat-form-field appearance="fill" class="col-span-1">
-        <mat-label>Company name</mat-label>
-        <input matInput formControlName="companyName" name="companyName">
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="col-span-1">
-        <mat-label>Street</mat-label>
-        <input matInput formControlName="street" name="street">
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="col-span-1">
-        <mat-label>Zip code</mat-label>
-        <input matInput formControlName="zipCode" name="zipCode">
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="col-span-1">
-        <mat-label>Country</mat-label>
-        <input matInput formControlName="country" name="country">
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="col-span-1">
-        <mat-label>VAT reg no</mat-label>
-        <input matInput formControlName="vatReg" name="vatReg">
-    </mat-form-field>
-    
     <div class="col-span-1 flex items-center">
         <mat-checkbox color="primary" formControlName="isTe" name="isTe">is TE</mat-checkbox>
     </div>
@@ -49,26 +24,37 @@
             Submit
         </button>
     </div>
-</form>
+</form> -->
 
-<!-- <form [formGroup]="shipPointForm" class="flex flex-col gap-y-2 p-4" (ngSubmit)="createShipPoint()">
+
+<form [formGroup]="shipPointForm" class="flex flex-col gap-2 p-4" (ngSubmit)="createShipPoint()">
     <p class="text-lg font-semibold">{{ formHeaderText() }}</p>
+    
+    <!-- ShipPoint Field -->
     <mat-form-field appearance="fill">
         <mat-label>ShipPoint</mat-label>
         <input matInput formControlName="shipPoint" name="shipPoint">
     </mat-form-field>
+    
+    <!-- Full Address Field -->
     <mat-form-field appearance="fill">
         <mat-label>Full address</mat-label>
         <textarea matInput formControlName="fullAddress" name="fullAddress"></textarea>
     </mat-form-field>
-    <p><mat-checkbox [ariaChecked]="true" color="primary" formControlName="isTe" name="isTe">is TE</mat-checkbox></p>
+
+    <!-- isTe Checkbox -->
+    <div class="flex items-center">
+        <mat-checkbox color="primary" formControlName="isTe" name="isTe">is TE</mat-checkbox>
+    </div>
+    
+    <!-- Submit Button -->
     <div class="flex justify-end">
         <button 
-            [disabled]="!shipPointForm.valid" 
+            [disabled]="!shipPointForm.valid || isFormSubmited()" 
             mat-raised-button 
-            color="primary"
+            color="secondary"
         >
             Submit
         </button>
     </div>
-</form> -->
+</form>

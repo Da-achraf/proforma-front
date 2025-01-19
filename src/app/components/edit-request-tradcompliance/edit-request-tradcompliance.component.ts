@@ -90,7 +90,6 @@ export class EditRequestTradcomplianceComponent implements OnInit {
         ...item,
         readOnly: (item.nameItem != 'HTS Code' && item.nameItem != 'COO'),
         isMandatory: matchingAttribute && mandatoryForUser ? matchingAttribute.mandatoryFor.includes(mandatoryForUser) : false
-        // isMandatory: matchingAttribute ? matchingAttribute.isMandatory : (item.isMandatory ?? false)
       };
     });
 
@@ -173,7 +172,8 @@ export class EditRequestTradcomplianceComponent implements OnInit {
       deliveryAddress: [{ value: '', disabled: true }],
       modeOfTransport: [{ value: '', disabled: true }],
       incoterm: [{ value: '', disabled: true }],
-      currency: ['', Validators.required],
+      currency: [{ value: '', disabled: true }],
+      costCenter: [{ value: '', disabled: true }],
       dhlAccount: [{ value: '', disabled: true }],
       items: this.fb.array([]) // Ajout du FormArray pour les items
     });
@@ -183,9 +183,10 @@ export class EditRequestTradcomplianceComponent implements OnInit {
         this.requestForm.patchValue({
           invoicesTypes: request.invoicesTypes,
           shippingPoint: request.shipPoint.shipPoint,
-          deliveryAddress: request.deliveryAddress.deliveryAddress,
+          deliveryAddress: request.deliveryAddress?.customerId,
           incoterm: request.incoterm,
           currency: request.currency,
+          costCenter: request.costCenter,
           modeOfTransport: request.modeOfTransport,
           dhlAccount: request.dhlAccount,
         });
@@ -217,7 +218,6 @@ export class EditRequestTradcomplianceComponent implements OnInit {
       
       const updateData = {
         itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
-        currency: this.requestForm.value.currency,
         userId: userId
       };
 

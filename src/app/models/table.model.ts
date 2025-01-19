@@ -7,7 +7,8 @@ export enum TableNameEnum {
   USER = 'users',
   PLANT = 'plants',
   DEPARTMENT = 'departments',
-  SHIP_POINT = 'ship points'
+  SHIP_POINT = 'ship points',
+  DELIVERY_ADDRESS = 'delivery addresses'
 } 
 
 export type TableProperty = {

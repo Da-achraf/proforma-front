@@ -1,17 +1,17 @@
 import { Component, inject, model, OnInit } from '@angular/core';
-import { DepartementService } from '../../services/departement.service';
+import { DepartementService } from '../../../services/departement.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { emptyShipPoint, ShipPointModel, shipPointTableColumns, shipPointTableProperties } from '../../models/ship.model';
+import { emptyShipPoint, ShipPointModel, shipPointTableColumns, shipPointTableProperties } from '../../../models/ship.model';
 import { delay, filter, switchMap } from 'rxjs';
-import { ShippointService } from '../../services/shippoint.service';
-import { TableNameEnum } from '../../models/table.model';
+import { ShippointService } from '../../../services/shippoint.service';
+import { TableNameEnum } from '../../../models/table.model';
 import { MessageService } from 'primeng/api';
 import { MatDialog } from '@angular/material/dialog';
-import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
-import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
-import { ToasterService } from '../../shared/services/toaster.service';
-import { ShippointCrudComponent } from '../shippoints/shippoint-crud/shippoint-crud.component';
+import { DeleteConfirmationDialogComponent } from '../../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { HTTP_REQUEST_DELAY } from '../../../shared/constants/http-requests.constant';
+import { ToasterService } from '../../../shared/services/toaster.service';
+import { ShippointCrudComponent } from '../shippoint-crud/shippoint-crud.component';
 
 @Component({
   selector: 'app-ship-points-list',
@@ -58,7 +58,6 @@ export class ShipPointsListComponent implements OnInit {
   }
 
   onDelete(id: number) {
-    console.log('Opening dialog for department id: ', id)
     if (!id) return
     const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
       data: {
@@ -68,7 +67,7 @@ export class ShipPointsListComponent implements OnInit {
 
     dialogRef.afterClosed().pipe(
       filter(result => result),
-      switchMap((id: number) => this.shipPointService.deleteShipPoint(id))
+      switchMap(() => this.shipPointService.deleteShipPoint(id))
     ).subscribe({
       next: () => {
         this.showSuccessMessage('Ship Point Deleted successfully.')
@@ -113,34 +112,6 @@ export class ShipPointsListComponent implements OnInit {
     });
   }
 
-  // onCreate(): void {
-
-  //   this.createShipPointForm.reset()
-  //   this.displayCreateDialog.set(true)
-  // }
-
-  // createShipPoint() {
-  //   if (this.createShipPointForm.valid) {
-  //     const newShipPoint: ShipPointModel = {
-  //       id_ship: 0,  
-  //       shipPoint: this.createShipPointForm.value.shipPoint,
-  //       fullAddress: this.createShipPointForm.value.fullAddress,
-  //       isTe: this.createShipPointForm.value.isTe
-  //     };
-
-  //     this.shipPointService.CreateShipPoint(newShipPoint).subscribe({
-  //       next: (response) => {
-  //         this.showSuccessMessage('Ship Point successfully created!');
-  //         this.resetFormAndNavigate();
-  //       },
-  //       error: (error) => {
-  //         this.showErrorMessage('Failed to create ship point: ' + error.message);
-  //       }
-  //     });
-  //   } else {
-  //     console.log('Formulaire invalide', this.createShipPointForm);
-  //   }
-  // }
 
   updateShipPoint(): void {
     this.shipPointService.updateShipPoint(this.shipPoint.id_ship, this.shipPoint).subscribe(

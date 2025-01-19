@@ -47,6 +47,12 @@ export const allMenuItems: SidenavItem[] = [
         roles: [RoleEnum.ADMIN]
     },
     {
+        label: 'Delivery Addresses',
+        icon: 'pi pi-map-marker',
+        routerLink: '/home/delivery-addresses',
+        roles: [RoleEnum.ADMIN]
+    },
+    {
         label: 'Configuration',
         icon: 'pi pi-fw pi-cog',
         routerLink: '/home/ConfigurationSection',

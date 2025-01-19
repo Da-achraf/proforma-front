@@ -1,6 +1,7 @@
+import { DeliveryAddress } from "./delivery-address.model";
 import { FieldTypeEnum, ItemModel } from "./request-item.model";
 import { ScenarioModel } from "./scenario.model";
-import { DeliveryAddressModel, ShipPointModel } from "./ship.model";
+import { ShipPointModel } from "./ship.model";
 import { Column } from "./table.model";
 import { LoggedInUser } from "./user/user.model";
 
@@ -126,7 +127,7 @@ export interface RequestModel {
   invoicesTypes: string;
   invoicesAddress: string | null;
   shipPoint: ShipPointModel;
-  deliveryAddress: DeliveryAddressModel;
+  deliveryAddress: DeliveryAddress;
   incoterm: string;
   scenarioId: number;
   dhlAccount: string;

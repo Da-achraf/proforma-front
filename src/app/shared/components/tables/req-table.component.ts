@@ -1,175 +1,195 @@
-import { Component, computed, effect, ElementRef, inject, Renderer2, signal, TemplateRef, ViewChild } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  Renderer2,
+  signal,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { delay, filter, switchMap } from 'rxjs';
 import { CreateRequestDialogComponent } from '../../../components/create-request-dialog/create-request-dialog.component';
 import { RequestsReportComponent } from '../../../components/requests-report/requests-report.component';
-import { createdAtFormat, otherUsersRequestColumns, RequestModel, sharedRequestColumns } from '../../../models/request.model';
-import { RequestStatus, RequestStatusLabelMapping } from '../../../models/requeststatus.model';
+import {
+  createdAtFormat,
+  otherUsersRequestColumns,
+  RequestModel,
+  sharedRequestColumns,
+} from '../../../models/request.model';
+import {
+  RequestStatus,
+  RequestStatusLabelMapping,
+} from '../../../models/requeststatus.model';
 import { RoleEnum } from '../../../models/user/user.model';
 import { AuthService } from '../../../services/auth.service';
 import { RequestService } from '../../../services/request.service';
 import { UserStoreService } from '../../../services/user-store.service';
-import { createRequestSorter, sortRequestsByDate } from '../../helpers/request-sorting.helper';
+import { HTTP_REQUEST_DELAY } from '../../constants/http-requests.constant';
+import { createRequestSorter } from '../../helpers/request-sorting.helper';
 import { InvoiceService } from '../../services/invoice.service';
 import { RequestStrategyFactory } from '../../services/requests-strategies/requests-strategies-factory';
+import { SideNavService } from '../../services/side-nav.service';
 import { ToasterService } from '../../services/toaster.service';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { getRequestModificationComponent, getStatusClass } from './helpers';
-import { DatePipe } from '@angular/common';
-import { SideNavService } from '../../services/side-nav.service';
-import { HTTP_REQUEST_DELAY } from '../../constants/http-requests.constant';
 
 @Component({
   selector: 'app-reqs-table',
   templateUrl: './req-table.component.html',
   styleUrl: './req-table.component.css',
-  providers: [DatePipe]
+  providers: [DatePipe],
 })
 export class RequestsTableComponent {
-
   // Injected dependencies
-  dialog = inject(MatDialog)
-  auth = inject(AuthService)
-  userStore = inject(UserStoreService)
-  requestFactory = inject(RequestStrategyFactory)
-  requestService = inject(RequestService)
-  toasterService = inject(ToasterService)
-  renderer = inject(Renderer2)
-  elementRef = inject(ElementRef)
-  invoiceService = inject(InvoiceService)
-  datePipe = inject(DatePipe)
-  sideNavService = inject(SideNavService)
+  dialog = inject(MatDialog);
+  auth = inject(AuthService);
+  userStore = inject(UserStoreService);
+  requestFactory = inject(RequestStrategyFactory);
+  requestService = inject(RequestService);
+  toasterService = inject(ToasterService);
+  renderer = inject(Renderer2);
+  elementRef = inject(ElementRef);
+  invoiceService = inject(InvoiceService);
+  datePipe = inject(DatePipe);
+  sideNavService = inject(SideNavService);
 
   // Enums and constants
-  RoleEnum = RoleEnum
+  RoleEnum = RoleEnum;
 
   // View refs
   @ViewChild('invoiceElement') invoiceElement!: TemplateRef<any>;
 
   // Signals and computed values
-  loggedInUser = this.userStore.loggedInUser
-  invoiceRequest = this.requestService.invoiceRequest
-  searchValue = signal('')
-  requests = signal<RequestModel[] | undefined | null>(undefined)
-  rows = signal(10)
-  first = signal(0)
-  isDownloading = signal(false)
-  createdAtFormat = signal(createdAtFormat)
-  requestSortingOrder = signal<'asc' | 'desc'>('desc')
-  requestSortingIconVisible = signal(true)
+  loggedInUser = this.userStore.loggedInUser;
+  invoiceRequest = this.requestService.invoiceRequest;
+  searchValue = signal('');
+  requests = signal<RequestModel[] | undefined | null>(undefined);
+  rows = signal(10);
+  first = signal(0);
+  isDownloading = signal(false);
+  createdAtFormat = signal(createdAtFormat);
+  requestSortingOrder = signal<'asc' | 'desc'>('desc');
+  requestSortingIconVisible = signal(true);
 
   sortedRequests = computed(() => {
-    const requests = this.requests()
+    const requests = this.requests();
     const loggedInUserRole = this.loggedInUser()?.role as RoleEnum;
-    if (!requests) return
-    const order = this.requestSortingOrder()
+    if (!requests) return;
+    const order = this.requestSortingOrder();
     return createRequestSorter(requests)
       .byRoleRelevance(loggedInUserRole)
       .byDate(order)
-      .build()
-  }, undefined)
+      .build();
+  }, undefined);
 
   filteredRequests = computed(() => {
-    const requests = this.sortedRequests()
-    const searchValue = this.searchValue()
+    const requests = this.sortedRequests();
+    const searchValue = this.searchValue();
 
-    if (requests?.length === 0) return []
+    if (requests?.length === 0) return [];
     else if (requests?.length != 0) {
-      if (searchValue.length === 0) return requests
-      return this.filterRequests(searchValue.toLowerCase(), requests as RequestModel[])
+      if (searchValue.length === 0) return requests;
+      return this.filterRequests(
+        searchValue.toLowerCase(),
+        requests as RequestModel[]
+      );
     }
-    return null
-  }, undefined)
+    return null;
+  }, undefined);
 
   paginatedRequests = computed(() => {
-    const filteredRequests = this.filteredRequests()
-    return filteredRequests?.slice(this.first(), this.first() + this.rows())
-  }, undefined)
+    const filteredRequests = this.filteredRequests();
+    return filteredRequests?.slice(this.first(), this.first() + this.rows());
+  }, undefined);
 
   totalRecords = computed(() => {
-    const filteredRequests = this.filteredRequests()
-    return filteredRequests?.length
-  })
+    const filteredRequests = this.filteredRequests();
+    return filteredRequests?.length;
+  });
 
   showCreateButton = computed(() => {
-    const loggedInUser = this.loggedInUser()
-    return loggedInUser && loggedInUser.role == RoleEnum.REQUESTER
-  })
+    const loggedInUser = this.loggedInUser();
+    return loggedInUser && loggedInUser.role == RoleEnum.REQUESTER;
+  });
 
   showUpdateButton = computed(() => {
-    const loggedInUser = this.loggedInUser()
-    return loggedInUser && loggedInUser.role != RoleEnum.ADMIN
-  })
+    const loggedInUser = this.loggedInUser();
+    return loggedInUser && loggedInUser.role != RoleEnum.ADMIN;
+  });
 
   columns = computed(() => {
-    const loggedInUser = this.loggedInUser()
+    const loggedInUser = this.loggedInUser();
 
     if (loggedInUser?.role == RoleEnum.ADMIN) {
-      return sharedRequestColumns
+      return sharedRequestColumns;
     }
-    return otherUsersRequestColumns
-  })
+    return otherUsersRequestColumns;
+  });
 
   columnsLength = computed(() => {
-    const columns = this.columns()
-    return columns.length
-  })
+    const columns = this.columns();
+    return columns.length;
+  });
 
   constructor() {
     effect(() => {
-      const loggedInUser = this.loggedInUser()
+      const loggedInUser = this.loggedInUser();
       if (loggedInUser) {
-        this.requestFactory.getRequests(loggedInUser)
+        this.requestFactory
+          .getRequests(loggedInUser)
           .pipe(delay(HTTP_REQUEST_DELAY))
           .subscribe({
-            next: requests => {
-              this.requests.set(requests)
-              this.sideNavService.requests.set(requests)
-            }
-          })
+            next: (requests) => {
+              this.requests.set(requests);
+              this.sideNavService.requests.set(requests);
+            },
+          });
       }
-    })
+    });
   }
 
   ngOnInit() {
-    const userId = this.auth.getUserIdFromToken()
-    this.userStore.getLoggedInUser(userId)
+    const userId = this.auth.getUserIdFromToken();
+    this.userStore.getLoggedInUser(userId);
   }
 
   // Methods
-  getStatusClass = getStatusClass
+  getStatusClass = getStatusClass;
 
   loadRequests() {
-    const userId = this.auth.getUserIdFromToken()
-    this.userStore.getLoggedInUser(userId)
+    const userId = this.auth.getUserIdFromToken();
+    this.userStore.getLoggedInUser(userId);
   }
 
   openUpdateRequestDialog(requestNumber: number): void {
-    const role = this.auth.getRoleFromToken()
-    const component = getRequestModificationComponent(role)
-    if (!component)
-      return
+    const role = this.auth.getRoleFromToken();
+    const component = getRequestModificationComponent(role);
+    if (!component) return;
 
     const dialogRef = this.dialog.open(component, {
       width: '70vw',
       maxHeight: '90vh',
-      data: { requestNumber }
+      data: { requestNumber },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) this.loadRequests()
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) this.loadRequests();
     });
   }
 
   openCreateRequestDialog(): void {
     const dialogRef = this.dialog.open(CreateRequestDialogComponent, {
       width: '70vw',
-      maxHeight: '90vh'
+      maxHeight: '90vh',
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.toasterService.showSuccessMessage('Request created successfully')
+        this.toasterService.showSuccessMessage('Request created successfully');
         this.loadRequests();
       }
     });
@@ -180,63 +200,81 @@ export class RequestsTableComponent {
       minWidth: '800px',
       maxWidth: '85vw',
       maxHeight: '95vh',
-      data: { requests: this.requests() }
+      data: { requests: this.requests() },
     });
   }
 
-  private filterRequests(searchValue: string, requests: RequestModel[]): RequestModel[] {
+  private filterRequests(
+    searchValue: string,
+    requests: RequestModel[]
+  ): RequestModel[] {
+    const formatedDate = this.datePipe.transform('');
 
-    const formatedDate = this.datePipe.transform('')
-
-    return requests.filter(request =>
-      request.requestNumber.toString().toLowerCase().includes(searchValue) ||
-      RequestStatusLabelMapping[request.status as RequestStatus].toLowerCase().includes(searchValue) ||
-      this.datePipe.transform(request.created_at)?.toLowerCase().includes(searchValue)
+    return requests.filter(
+      (request) =>
+        request.requestNumber.toString().toLowerCase().includes(searchValue) ||
+        RequestStatusLabelMapping[request.status as RequestStatus]
+          .toLowerCase()
+          .includes(searchValue) ||
+        this.datePipe
+          .transform(request.created_at)
+          ?.toLowerCase()
+          .includes(searchValue)
     );
   }
 
   cancelRequest(reqNumber: number) {
-    if (!reqNumber) return
+    if (!reqNumber) return;
     const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
       data: {
-        label: 'request'
-      }
-    })
-
-    dialogRef.afterClosed().pipe(
-      filter(result => result),
-      switchMap(_ => this.requestService.deleteRequest(reqNumber))
-    ).subscribe({
-      next: () => {
-        this.toasterService.showSuccessMessage('Request Deleted successfully.')
-        this.loadRequests();
+        label: 'request',
       },
-      error: () => {
-        this.toasterService.showErrorMessage('Error in deleting ship point')
-      }
-    })
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter((result) => result),
+        switchMap((_) => this.requestService.deleteRequest(reqNumber))
+      )
+      .subscribe({
+        next: () => {
+          this.toasterService.showSuccessMessage(
+            'Request Deleted successfully.'
+          );
+          this.loadRequests();
+        },
+        error: () => {
+          this.toasterService.showErrorMessage('Error in deleting ship point');
+        },
+      });
   }
 
   triggerDownload() {
-    this.isDownloading.set(true)
+    this.isDownloading.set(true);
   }
 
   async download(req: any) {
-    this.invoiceRequest.set(req)
+    this.invoiceRequest.set(req);
 
-    let resolved = false
+    let resolved = false;
     try {
-        resolved = await this.invoiceService.downloadInvoice(req.requestNumber, this.invoiceElement, this.renderer, this.elementRef)
+      resolved = await this.invoiceService.downloadInvoice(
+        req.requestNumber,
+        this.invoiceElement,
+        this.renderer,
+        this.elementRef
+      );
     } catch (error) {
-      console.error('error generating pdf: ', error)
-      this.isDownloading.set(false)
+      console.error('error generating pdf: ', error);
+      this.isDownloading.set(false);
     }
 
-    while (1){
+    while (1) {
       if (resolved) {
-        this.isDownloading.set(false)
-        this.invoiceRequest.set(undefined)
-        break
+        this.isDownloading.set(false);
+        this.invoiceRequest.set(undefined);
+        break;
       }
     }
   }
@@ -248,17 +286,17 @@ export class RequestsTableComponent {
     const { pageIndex, pageSize } = event;
 
     if (typeof pageIndex === 'number' && typeof pageSize === 'number') {
-      this.first.set(pageIndex * pageSize)
-      this.rows.set(pageSize)
+      this.first.set(pageIndex * pageSize);
+      this.rows.set(pageSize);
     }
   }
 
   onToggleSortingOrder(sortingOrder: 'asc' | 'desc') {
-    this.requestSortingIconVisible.set(false)
-    const newOrder: 'asc' | 'desc' = sortingOrder === 'asc' ? 'desc' : 'asc'
+    this.requestSortingIconVisible.set(false);
+    const newOrder: 'asc' | 'desc' = sortingOrder === 'asc' ? 'desc' : 'asc';
     setTimeout(() => {
-      this.requestSortingOrder.set(newOrder)
-      this.requestSortingIconVisible.set(true)
+      this.requestSortingOrder.set(newOrder);
+      this.requestSortingIconVisible.set(true);
     }, 150);
   }
 }

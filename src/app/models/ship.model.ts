@@ -14,12 +14,12 @@ export type ShipPointModel = {
   isTe: boolean;
 }
 
-export type DeliveryAddressModel = {
-  id_ship: number;
-  deliveryAddress: string;
-  fullAddress: string;
-  isTe: boolean;
-}
+// export type DeliveryAddressModel = {
+//   id_ship: number;
+//   deliveryAddress: string;
+//   fullAddress: string;
+//   isTe: boolean;
+// }
 
 export const emptyShipPoint: ShipPointModel = {
   id_ship: 0,

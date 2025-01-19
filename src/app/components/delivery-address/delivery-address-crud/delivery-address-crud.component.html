@@ -1,0 +1,56 @@
+<form [formGroup]="form" class="grid grid-cols-3 gap-3 p-4" (ngSubmit)="createDeliveryAddress()">
+
+    <p class="col-span-3 text-lg font-semibold">{{ formHeaderText() }}</p>
+    
+    <mat-form-field appearance="fill" class="col-span-1">
+        <mat-label>Customer Id</mat-label>
+        <input matInput formControlName="customerId" name="customerId">
+    </mat-form-field>
+    
+    <mat-form-field appearance="fill" class="col-span-1">
+        <mat-label>Company name</mat-label>
+        <input matInput formControlName="companyName" name="companyName">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="col-span-1">
+        <mat-label>Street</mat-label>
+        <input matInput formControlName="street" name="street">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="col-span-1">
+        <mat-label>Zip code</mat-label>
+        <input matInput formControlName="zipCode" name="zipCode">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="col-span-1">
+        <mat-label>Country</mat-label>
+        <input matInput formControlName="country" name="country">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="col-span-1">
+        <mat-label>VAT reg no</mat-label>
+        <input matInput formControlName="vat" name="vat">
+    </mat-form-field>
+
+    <!-- Full Address as a textarea spanning the full row -->
+    <mat-form-field appearance="fill" class="col-span-3">
+        <mat-label>Full Address</mat-label>
+        <textarea matInput formControlName="fullAddress" name="fullAddress" rows="1"></textarea>
+    </mat-form-field>
+    
+    <!-- Checkbox moved to the next row -->
+    <div class="col-span-3 flex items-center">
+        <mat-checkbox color="primary" formControlName="isTe" name="isTe">is TE</mat-checkbox>
+    </div>
+    
+    <!-- Submit button -->
+    <div class="col-span-3 flex justify-end">
+        <button 
+            [disabled]="!form.valid || isFormSubmited()" 
+            mat-raised-button 
+            color="primary"
+        >
+            Submit
+        </button>
+    </div>
+</form>

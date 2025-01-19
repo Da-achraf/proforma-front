@@ -127,7 +127,7 @@ export class EditRequestWarehouseComponent implements OnInit {
       trackingNumber: ['', Validators.required],
       grossWeight: ['', [Validators.required, notZeroValidator()]],
       dimension: ['', Validators.required],
-      currency: ['', Validators.required],
+      currency: [{ value: '', disabled: true }],
       modeOfTransport: [{value: '', disabled: true}],
       shippedVia: [{value: '', disabled: true}],
       items: this.fb.array([]) // FormArray for items
@@ -141,7 +141,7 @@ export class EditRequestWarehouseComponent implements OnInit {
           invoicesTypes: request.invoicesTypes,
           shippingPoint: request?.shipPoint.shipPoint,
           modeOfTransport: request?.modeOfTransport,
-          deliveryAddress: request?.deliveryAddress.deliveryAddress,
+          deliveryAddress: request?.deliveryAddress?.customerId,
           incoterm: request.incoterm,
           dhlAccount: request.dhlAccount,
           trackingNumber: request.trackingNumber,
