@@ -374,7 +374,11 @@ export class EditRequestRequesterComponent {
       if (option != 'other') return;
   
       this.dialog
-        .open(DeliveryAddressCrudComponent)
+        .open(DeliveryAddressCrudComponent, {
+          data: {
+            makeFieldsMandatory: true
+          } 
+        })
         .afterClosed()
         .subscribe((result) => {
           const addressControl = this.requestForm.get('deliveryAddress');

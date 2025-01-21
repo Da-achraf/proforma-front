@@ -52,6 +52,8 @@ export class DeliveryAddressCrudComponent implements OnInit {
     this.patchDeliveryAddressFormValue(deliveryAddress);
   });
 
+  makeFieldsMandatory = computed(() => this.data().makeFieldsMandatory)
+
   // Component hooks
   ngOnInit(): void {
     this.initializeForm();
@@ -59,6 +61,20 @@ export class DeliveryAddressCrudComponent implements OnInit {
 
   // Component methods
   private initializeForm() {
+    if (this.makeFieldsMandatory()) {
+      this.form = this.fb.group({
+        customerId: ['', Validators.required],
+        companyName: ['', Validators.required],
+        street: ['', Validators.required],
+        zipCode: ['', Validators.required],
+        country: ['', Validators.required],
+        fullAddress: [''],
+        vat: [''],
+        isTe: [false],
+      });
+      return
+    }
+
     this.form = this.fb.group({
       customerId: ['', Validators.required],
       companyName: [''],

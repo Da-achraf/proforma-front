@@ -29,11 +29,11 @@ export const getRequestModificationComponent = (role: RoleEnum): ComponentType<a
       case RequestStatus.PendingInTradCompliance:
         return 'bg-orange-400 text-gray-50';
       case RequestStatus.InShipping:
-        return 'bg-yellow-400 text-gray-50';
+        return 'bg-purple-400 text-gray-50';
       case RequestStatus.WaitingForTrackingNo:
         return 'bg-teal-400 text-gray-50';
       case RequestStatus.Done:
-        return 'bg-green-400 text-gray-50';
+        return 'bg-green-500 text-gray-50';
       case RequestStatus.Rejected:
         return 'bg-red-400 text-gray-50';
       default:
