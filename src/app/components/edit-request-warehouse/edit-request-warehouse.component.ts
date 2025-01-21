@@ -7,10 +7,17 @@ import {
   Inject,
   OnInit,
   signal,
+  untracked,
   ViewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import {
   MAT_DIALOG_DATA,
@@ -49,7 +56,19 @@ import { notZeroValidator } from '../../shared/helpers/form-validator.helper';
   styleUrls: ['./edit-request-warehouse.component.css'],
 })
 export class EditRequestWarehouseComponent implements OnInit {
-  requestForm!: FormGroup;
+  requestForm: FormGroup = this.fb.group({
+    invoicesTypes: [{ value: '', disabled: true }],
+    shippingPoint: [{ value: '', disabled: true }],
+    deliveryAddress: [{ value: '', disabled: true }],
+    incoterm: [{ value: '', disabled: true }],
+    dhlAccount: [{ value: '', disabled: true }],
+    grossWeight: ['', [Validators.required, notZeroValidator()]],
+    dimension: ['', Validators.required],
+    currency: [{ value: '', disabled: true }],
+    modeOfTransport: [{ value: '', disabled: true }],
+    shippedVia: [{ value: '', disabled: true }],
+    items: this.fb.array([]),
+  });
 
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') auto!: MatAutocomplete;
@@ -77,6 +96,20 @@ export class EditRequestWarehouseComponent implements OnInit {
     .pipe(shareReplay(1));
 
   requestSig = toSignal(this.request$);
+
+  requestStatus = computed(() => {
+    const request = this.requestSig();
+    if (!request) return;
+    return request.status;
+  });
+
+  showTrackingNoField = signal(false);
+
+  requestStatusEffect = effect(() => {
+    const status = this.requestStatus();
+    if (!status) return;
+    untracked(() => this.addTrackingNoControl(status));
+  });
 
   selectedScenario = computed(() => {
     const request = this.requestSig();
@@ -116,7 +149,6 @@ export class EditRequestWarehouseComponent implements OnInit {
       );
       return {
         ...item,
-        // readOnly: (item.nameItem != StandardFieldEnum.GROSS_WEIGHT && item.nameItem != StandardFieldEnum.NET_WEIGHT),
         readOnly: false,
         isMandatory:
           matchingAttribute && mandatoryForUser
@@ -142,8 +174,6 @@ export class EditRequestWarehouseComponent implements OnInit {
       const formItems = this.formItems();
       const existingItemsData = this.existingItemsData();
 
-      console.log('Existing item data: ', existingItemsData);
-
       if (existingItemsData?.length == 0) return;
       this.items?.clear();
       if (existingItemsData && existingItemsData.length > 0) {
@@ -154,40 +184,36 @@ export class EditRequestWarehouseComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.requestForm = this.fb.group({
-      invoicesTypes: [{ value: '', disabled: true }],
-      shippingPoint: [{ value: '', disabled: true }],
-      deliveryAddress: [{ value: '', disabled: true }],
-      incoterm: [{ value: '', disabled: true }],
-      dhlAccount: [{ value: '', disabled: true }],
-      trackingNumber: ['', Validators.required],
-      grossWeight: ['', [Validators.required, notZeroValidator()]],
-      dimension: ['', Validators.required],
-      currency: [{ value: '', disabled: true }],
-      modeOfTransport: [{ value: '', disabled: true }],
-      shippedVia: [{ value: '', disabled: true }],
-      items: this.fb.array([]), // FormArray for items
-    });
+  private addTrackingNoControl(requestStatus: RequestStatus) {
+    if (requestStatus != RequestStatus.InShipping) {
+      const trackingNumberControl = new FormControl('', [Validators.required]);
+      this.requestForm.addControl('trackingNumber', trackingNumberControl);
+      this.showTrackingNoField.set(true);
+    }
+  }
 
+  private patchFormValue(request: RequestModel) {
+    this.requestForm.patchValue({
+      invoicesTypes: request.invoicesTypes,
+      shippingPoint: request?.shipPoint.shipPoint,
+      modeOfTransport: request?.modeOfTransport,
+      deliveryAddress: request?.deliveryAddress?.customerId,
+      incoterm: request.incoterm,
+      dhlAccount: request.dhlAccount,
+      grossWeight: request.grossWeight,
+      trackingNumber: request.trackingNumber,
+      dimension: request.dimension,
+      boxes: request.boxes,
+      pallets: request.pallets,
+      shippedVia: request.shippedVia,
+      currency: request.currency,
+    });
+  }
+
+  ngOnInit(): void {
     this.requestService.getRequestById(this.data.requestNumber).subscribe(
       (request: RequestModel) => {
-        console.log('req: ', request);
-        this.requestForm.patchValue({
-          invoicesTypes: request.invoicesTypes,
-          shippingPoint: request?.shipPoint.shipPoint,
-          modeOfTransport: request?.modeOfTransport,
-          deliveryAddress: request?.deliveryAddress?.customerId,
-          incoterm: request.incoterm,
-          dhlAccount: request.dhlAccount,
-          trackingNumber: request.trackingNumber,
-          grossWeight: request.grossWeight,
-          dimension: request.dimension,
-          boxes: request.boxes,
-          pallets: request.pallets,
-          shippedVia: request.shippedVia,
-          currency: request.currency,
-        });
+        this.patchFormValue(request);
       },
       (error) => {
         this.messageService.add({
@@ -198,6 +224,10 @@ export class EditRequestWarehouseComponent implements OnInit {
         console.error('Error fetching request data:', error);
       }
     );
+
+    this.requestForm.valueChanges.subscribe({
+      next: (value) => console.log('form value: ', value),
+    });
   }
 
   patchExistingData(data: any[]) {
@@ -291,6 +321,8 @@ export class EditRequestWarehouseComponent implements OnInit {
       if (trackingNumber) {
         updateData.trackingNumber = trackingNumber;
       }
+
+      // console.log('update data: ', updateData);
 
       this.requestService
         .updateRequestByWarehouse(this.data.requestNumber, updateData)
