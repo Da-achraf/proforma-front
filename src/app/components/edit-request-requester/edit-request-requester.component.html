@@ -1,4 +1,7 @@
-<h1 mat-dialog-title>Edit Request</h1>
+<h1 mat-dialog-title>
+  Edit Request (
+  <span class="text-cyan-600 font-semibold font-serif">{{ data.requestNumber }}</span> )
+</h1>
 <div mat-dialog-content>
   <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
     <div class="notes-container">
@@ -25,27 +28,44 @@
         <mat-select formControlName="invoicesTypes">
           <mat-option *ngFor="let type of invoiceTypes()" [value]="type">{{
             type
-            }}</mat-option>
+          }}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Scenario</mat-label>
-        <mat-select formControlName="scenarioId" (selectionChange)="onScenarioChange()">
-          <mat-option *ngFor="let scenario of scenarios()" [value]="scenario.id_scenario">{{ scenario.name }}
+        <mat-select
+          formControlName="scenarioId"
+          (selectionChange)="onScenarioChange()"
+        >
+          <mat-option
+            *ngFor="let scenario of scenarios()"
+            [value]="scenario.id_scenario"
+            >{{ scenario.name }}
           </mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Shipping Point</mat-label>
         <mat-select formControlName="shippingPoint">
-          <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
+          <mat-option
+            *ngFor="let point of shipPoints"
+            [value]="point.id_ship"
+            >{{ point.shipPoint }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Delivery Address</mat-label>
-        <mat-select formControlName="deliveryAddress" (selectionChange)="onDeliveryAddressChange($event.value)">
+        <mat-select
+          formControlName="deliveryAddress"
+          (selectionChange)="onDeliveryAddressChange($event.value)"
+        >
           <mat-option value="other">Other</mat-option>
-          <mat-option *ngFor="let address of deliveryAddresses" [value]="address.id">{{ address.customerId }}</mat-option>
+          <mat-option
+            *ngFor="let address of deliveryAddresses"
+            [value]="address.id"
+            >{{ address.customerId }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
@@ -53,7 +73,7 @@
         <mat-select formControlName="incoterm">
           <mat-option *ngFor="let term of incotermOptions()" [value]="term">{{
             term
-            }}</mat-option>
+          }}</mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -65,8 +85,11 @@
       <mat-form-field appearance="fill">
         <mat-label>Mode Of Transport</mat-label>
         <mat-select formControlName="modeOfTransport">
-          <mat-option *ngFor="let modeOfTransport of modesOfTransports" [value]="modeOfTransport">{{ modeOfTransport
-            }}</mat-option>
+          <mat-option
+            *ngFor="let modeOfTransport of modesOfTransports"
+            [value]="modeOfTransport"
+            >{{ modeOfTransport }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
 
@@ -89,7 +112,6 @@
           }
         </mat-select>
       </mat-form-field>
-
 
       <mat-form-field>
         <mat-label>Shiped Via</mat-label>
@@ -114,12 +136,24 @@
       @defer {
       <div class="p-2" formArrayName="items">
         @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-        <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
+        <div
+          [formGroupName]="i"
+          class="mb-4 p-2 border border-gray-300 rounded shadow-md"
+        >
           <div class="flex items-center justify-between mb-2">
             <span class="font-bold">Item {{ i + 1 }}</span>
-            <button mat-icon-button color="warn" matTooltipPosition="above"
-              [matTooltip]="items.length === 1 ? 'A request should have at least one item' : 'Remove this item'"
-              type="button" (click)="removeItem(i)">
+            <button
+              mat-icon-button
+              color="warn"
+              matTooltipPosition="above"
+              [matTooltip]="
+                items.length === 1
+                  ? 'A request should have at least one item'
+                  : 'Remove this item'
+              "
+              type="button"
+              (click)="removeItem(i)"
+            >
               <mat-icon>remove_circle</mat-icon>
             </button>
           </div>
@@ -128,7 +162,7 @@
             <div [formGroupName]="field.nameItem">
               <mat-form-field appearance="fill" class="w-full mb-2">
                 <mat-label>{{ field.nameItem }}</mat-label>
-                <input matInput formControlName="value" [type]="field.type">
+                <input matInput formControlName="value" [type]="field.type" />
               </mat-form-field>
             </div>
             }
@@ -137,23 +171,28 @@
         }
       </div>
       <div class="p-2">
-        <button mat-icon-button color="primary" matTooltipPosition="above" matTooltip="Add another item"
-          (click)="addItem()" type="button">
+        <button
+          mat-icon-button
+          color="primary"
+          matTooltipPosition="above"
+          matTooltip="Add another item"
+          (click)="addItem()"
+          type="button"
+        >
           <mat-icon>add_circle</mat-icon>
         </button>
       </div>
-      }
-      @placeholder (minimum 700ms) {
+      } @placeholder (minimum 700ms) {
       <loading-dots [diameter]="25" />
       }
-
     </div>
     }
 
     <div class="form-actions" mat-dialog-actions>
-      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">Submit</button>
+      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">
+        Submit
+      </button>
     </div>
-
 
     <!-- <div class="mt-2" mat-dialog-actions>
       <button mat-raised-button class="cancel-button" (click)="onNoClick()">

@@ -29,6 +29,7 @@ import _ from 'lodash';
 import { MessageService } from 'primeng/api'; // Import MessageService
 import {
   BehaviorSubject,
+  catchError,
   filter,
   map,
   Observable,
@@ -91,9 +92,13 @@ export class EditRequestWarehouseComponent implements OnInit {
     return request.itemsWithValues;
   });
 
-  request$ = this.requestService
-    .getRequestById(this.data.requestNumber)
-    .pipe(shareReplay(1));
+  request$ = this.requestService.getRequestById(this.data.requestNumber).pipe(
+    shareReplay(1),
+    catchError((err) => {
+      this.onNoClick();
+      throw err;
+    })
+  );
 
   requestSig = toSignal(this.request$);
 

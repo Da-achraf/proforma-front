@@ -52,7 +52,7 @@ export class DeliveryAddressCrudComponent implements OnInit {
     this.patchDeliveryAddressFormValue(deliveryAddress);
   });
 
-  makeFieldsMandatory = computed(() => this.data().makeFieldsMandatory)
+  makeFieldsMandatory = computed(() => this.data()?.makeFieldsMandatory)
 
   // Component hooks
   ngOnInit(): void {
@@ -92,7 +92,7 @@ export class DeliveryAddressCrudComponent implements OnInit {
   }
 
   createDeliveryAddress() {
-    if (this.form.valid) {
+    if (this.form?.valid) {
       this.isFormSubmited.set(true);
       const newDeliveryAddress: DeliveryAddressCreate = this.form.getRawValue();
 

@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { ActivatedRoute, Router } from '@angular/router';
 import { delay, filter, switchMap } from 'rxjs';
 import { CreateRequestDialogComponent } from '../../../components/create-request-dialog/create-request-dialog.component';
 import { RequestsReportComponent } from '../../../components/requests-report/requests-report.component';
@@ -38,6 +39,8 @@ import { ToasterService } from '../../services/toaster.service';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { getRequestModificationComponent, getStatusClass } from './helpers';
 
+const REQUEST_EDITING_TIMOUT = 1000;
+
 @Component({
   selector: 'app-reqs-table',
   templateUrl: './req-table.component.html',
@@ -58,9 +61,12 @@ export class RequestsTableComponent {
   datePipe = inject(DatePipe);
   sideNavService = inject(SideNavService);
 
+  router = inject(Router)
+  route = inject(ActivatedRoute)
+
   // Enums and constants
   RoleEnum = RoleEnum;
-  RequestStatusEnum = RequestStatus 
+  RequestStatusEnum = RequestStatus;
 
   // View refs
   @ViewChild('invoiceElement') invoiceElement!: TemplateRef<any>;
@@ -73,6 +79,7 @@ export class RequestsTableComponent {
   rows = signal(10);
   first = signal(0);
   isDownloading = signal(false);
+  beingEdited = signal<number | undefined>(undefined); // To apply specific styling on request opened for editing
   createdAtFormat = signal(createdAtFormat);
   requestSortingOrder = signal<'asc' | 'desc'>('desc');
   requestSortingIconVisible = signal(true);
@@ -138,6 +145,12 @@ export class RequestsTableComponent {
   });
 
   constructor() {
+    const requestNumber =
+      this.route.snapshot.queryParamMap.get('req-no');
+    if (requestNumber) {
+      this.openUpdateRequestDialog(+requestNumber);
+    }
+
     effect(() => {
       const loggedInUser = this.loggedInUser();
       if (loggedInUser) {
@@ -167,6 +180,8 @@ export class RequestsTableComponent {
     this.userStore.getLoggedInUser(userId);
   }
 
+  timeoutId!: NodeJS.Timeout;
+
   openUpdateRequestDialog(requestNumber: number): void {
     const role = this.auth.getRoleFromToken();
     const component = getRequestModificationComponent(role);
@@ -178,8 +193,28 @@ export class RequestsTableComponent {
       data: { requestNumber },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) this.loadRequests();
+    // Clear query parameters immediately after opening the dialog
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+      replaceUrl: true, // Replaces current URL in history
+    });
+
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
+
+    this.beingEdited.set(requestNumber);
+
+    dialogRef.afterClosed().subscribe({
+      next: (result) => {
+        if (result) this.loadRequests();
+      },
+      complete: () => {
+        this.timeoutId = setTimeout(() => {
+          this.beingEdited.set(undefined);
+        }, REQUEST_EDITING_TIMOUT);
+      },
     });
   }
 

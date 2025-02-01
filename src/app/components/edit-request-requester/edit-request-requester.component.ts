@@ -1,12 +1,44 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import _ from 'lodash';
 import { MessageService } from 'primeng/api';
-import { BehaviorSubject, filter, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
-import { ItemModel, userRoleToMandatoryForMapper } from '../../models/request-item.model';
-import { CURRENCY_CODES, INCOTERMES, INVOICE_TYPES, ModesOfTransports, RequestModel, SHIPPED_VIA_OPTIONS, UpdateRequestByRequester } from '../../models/request.model';
+import {
+  BehaviorSubject,
+  catchError,
+  filter,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
+import {
+  ItemModel,
+  userRoleToMandatoryForMapper,
+} from '../../models/request-item.model';
+import {
+  CURRENCY_CODES,
+  INCOTERMES,
+  INVOICE_TYPES,
+  ModesOfTransports,
+  RequestModel,
+  SHIPPED_VIA_OPTIONS,
+  UpdateRequestByRequester,
+} from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
@@ -23,83 +55,101 @@ import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-addre
 @Component({
   selector: 'app-edit-request-requester',
   templateUrl: './edit-request-requester.component.html',
-  styleUrl: './edit-request-requester.component.css'
+  styleUrl: './edit-request-requester.component.css',
 })
 export class EditRequestRequesterComponent {
-
   // Injected dependencies
-  dialog = inject(MatDialog)
-  toastr = inject(ToasterService)
+  dialog = inject(MatDialog);
+  toastr = inject(ToasterService);
 
   requestForm!: FormGroup;
 
   shipPoints: Ship[] = [];
   deliveryAddresses: DeliveryAddress[] = [];
 
-  currencyCodes = signal<string[]>(CURRENCY_CODES)
-  invoiceTypes = signal<string[]>(INVOICE_TYPES)
-  incotermOptions = signal<string[]>(INCOTERMES)
-  shippedViaOptions = signal<string[]>(SHIPPED_VIA_OPTIONS)
-  modesOfTransports: string[] = ModesOfTransports
-  userRole = inject(UserStoreService).userRole
+  currencyCodes = signal<string[]>(CURRENCY_CODES);
+  invoiceTypes = signal<string[]>(INVOICE_TYPES);
+  incotermOptions = signal<string[]>(INCOTERMES);
+  shippedViaOptions = signal<string[]>(SHIPPED_VIA_OPTIONS);
+  modesOfTransports: string[] = ModesOfTransports;
+  userRole = inject(UserStoreService).userRole;
 
   filteredOptions!: Observable<string[]>;
 
-  data: { requestNumber: number } = inject(MAT_DIALOG_DATA)
+  data: { requestNumber: number } = inject(MAT_DIALOG_DATA);
   request$ = this.requestService.getRequestById(this.data.requestNumber).pipe(
-    shareReplay(1)
-  )
-  requestSig = toSignal(this.request$)
+    shareReplay(1),
+    catchError((err) => {
+      this.onNoClick();
+      throw err;
+    })
+  );
+  requestSig = toSignal(this.request$);
 
   selectedScenario = computed(() => {
-    const request = this.requestSig()
-    if (!request) return
-    this.scenearioIdSubject.next(request.scenario.id_scenario)
-    return request.scenario
-  })
+    const request = this.requestSig();
+    if (!request) return;
+    this.scenearioIdSubject.next(request.scenario.id_scenario);
+    return request.scenario;
+  });
 
-  scenearioIdSubject = new BehaviorSubject<number>(0)
+  scenearioIdSubject = new BehaviorSubject<number>(0);
   scenarioAttributes$ = this.scenearioIdSubject.pipe(
     filter((id: number) => id != 0),
     switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
-  )
-  scenarioAttributes = toSignal(this.scenarioAttributes$)
+  );
+  scenarioAttributes = toSignal(this.scenarioAttributes$);
 
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.currencyCodes().filter(option => option.toLowerCase().includes(filterValue));
+    return this.currencyCodes().filter((option) =>
+      option.toLowerCase().includes(filterValue)
+    );
   }
 
   // Signals
-  scenarios = toSignal(this.scenarioService.getScenarios())
-  selectedScenarioId = signal(0)
-  selectedScenarioChanged = signal<number | undefined>(undefined)
-
+  scenarios = toSignal(this.scenarioService.getScenarios());
+  selectedScenarioId = signal(0);
+  selectedScenarioChanged = signal<number | undefined>(undefined);
 
   formItems = computed(() => {
-    const selectedScenarioItems: ItemModel[] = this.selectedScenario()?.items ?? [];
-    const scenarioAttributes: { attributeName: string; mandatoryFor: string[]; }[] = this.scenarioAttributes() ?? [];
-    const userRole = this.userRole()
+    const selectedScenarioItems: ItemModel[] =
+      this.selectedScenario()?.items ?? [];
+    const scenarioAttributes: {
+      attributeName: string;
+      mandatoryFor: string[];
+    }[] = this.scenarioAttributes() ?? [];
+    const userRole = this.userRole();
 
-    if (!selectedScenarioItems.length || !scenarioAttributes.length || !userRole) return [];
+    if (
+      !selectedScenarioItems.length ||
+      !scenarioAttributes.length ||
+      !userRole
+    )
+      return [];
 
-    const mandatoryForUser = userRoleToMandatoryForMapper(userRole)
+    const mandatoryForUser = userRoleToMandatoryForMapper(userRole);
 
-    return selectedScenarioItems.map(item => {
-      const matchingAttribute = scenarioAttributes.find(attr => attr.attributeName === item.nameItem);
+    return selectedScenarioItems.map((item) => {
+      const matchingAttribute = scenarioAttributes.find(
+        (attr) => attr.attributeName === item.nameItem
+      );
       return {
         ...item,
-        isMandatory: matchingAttribute && mandatoryForUser ? matchingAttribute.mandatoryFor.includes(mandatoryForUser) : false
+        isMandatory:
+          matchingAttribute && mandatoryForUser
+            ? matchingAttribute.mandatoryFor.includes(mandatoryForUser)
+            : false,
       };
     });
   });
 
   existingItemsData = computed(() => {
-    const request = this.requestSig()
-    if (!request) return
-    return request.itemsWithValues
-  })
+    const request = this.requestSig();
+    if (!request) return;
+    return request.itemsWithValues;
+  });
 
   constructor(
     private fb: FormBuilder,
@@ -111,35 +161,33 @@ export class EditRequestRequesterComponent {
     private messageService: MessageService,
     public dialogRef: MatDialogRef<CreateRequestDialogComponent>
   ) {
-
     effect(() => {
-      const changed = this.selectedScenarioChanged()
+      const changed = this.selectedScenarioChanged();
 
       if (changed) {
-        this.items?.clear()
+        this.items?.clear();
         this.addItem();
       }
-    })
+    });
 
     effect(() => {
-      const formItems = this.formItems()
-      const existingItemsData = this.existingItemsData()
+      const formItems = this.formItems();
+      const existingItemsData = this.existingItemsData();
 
-
-      if (existingItemsData?.length == 0) return
-      this.items?.clear()
+      if (existingItemsData?.length == 0) return;
+      this.items?.clear();
       if (existingItemsData && existingItemsData.length > 0) {
         this.patchExistingData(existingItemsData);
       } else {
         this.addItem();
       }
-    })
+    });
   }
 
   onChange(text: string) {
     this.filteredOptions = of(text).pipe(
       startWith(''),
-      map(value => this._filter(value || '')),
+      map((value) => this._filter(value || ''))
     );
   }
 
@@ -155,14 +203,15 @@ export class EditRequestRequesterComponent {
       shippedVia: ['', Validators.required],
       costCenter: ['', Validators.required],
       currency: ['', Validators.required],
-      items: this.fb.array([])
+      items: this.fb.array([]),
     });
+
     this.loadShipPoints();
     this.loadDeliveryAddresses();
     this.onScenarioChange();
     this.onShippingOrDeliveryChange();
 
-    this.request$.subscribe(({
+    this.request$.subscribe({
       next: (request: RequestModel) => {
         this.requestForm.patchValue({
           invoicesTypes: request?.invoicesTypes,
@@ -174,54 +223,60 @@ export class EditRequestRequesterComponent {
           modeOfTransport: request?.modeOfTransport,
           shippedVia: request?.shippedVia,
           costCenter: request?.costCenter,
-          currency: request.currency
+          currency: request.currency,
         });
-      }
-    }))
+      },
+    });
   }
 
   patchExistingData(data: any[]) {
     this.items.clear();
-    data?.forEach(itemData => {
+    data?.forEach((itemData) => {
       this.items.push(this.createItem(itemData));
     });
   }
 
   createItem(data?: any): FormGroup {
-    const formItems = this.formItems()
+    const formItems = this.formItems();
     if (!formItems) return this.fb.group({});
     const group: { [key: string]: FormGroup } = {};
 
     formItems.forEach((item: ItemModel) => {
-      const fieldData = this.findDataOfItem(item.nameItem, data?.values) ?? undefined;
+      const fieldData =
+        this.findDataOfItem(item.nameItem, data?.values) ?? undefined;
       group[item.nameItem] = this.fb.group({
         name: item.nameItem,
-        value: [fieldData ? fieldData?.value : '', (fieldData?.isMandatory || item.isMandatory) ? Validators.required : null],
+        value: [
+          fieldData ? fieldData?.value : '',
+          fieldData?.isMandatory || item.isMandatory
+            ? Validators.required
+            : null,
+        ],
         type: [fieldData ? fieldData?.type : item.type],
-        isMandatory: [fieldData?.isMandatory]
+        isMandatory: [fieldData?.isMandatory],
       });
     });
-    console.log(this.fb.group(group))
+    console.log(this.fb.group(group));
     return this.fb.group(group);
   }
 
   findDataOfItem(itemName: string, data: any[]) {
-    console.log('data: ', data)
-    let foundData: any = null
-    data?.forEach(d => {
-      if (d['name'] === itemName) foundData = d
-    })
+    console.log('data: ', data);
+    let foundData: any = null;
+    data?.forEach((d) => {
+      if (d['name'] === itemName) foundData = d;
+    });
 
-    return foundData
+    return foundData;
   }
 
   addItem() {
-    console.log('addItem called...')
+    console.log('addItem called...');
     this.items.push(this.createItem());
   }
 
   removeItem(index: number) {
-    if (this.items.length <= 1) return
+    if (this.items.length <= 1) return;
     this.items.removeAt(index);
   }
 
@@ -240,7 +295,11 @@ export class EditRequestRequesterComponent {
         this.shipPoints = shippingPoints;
       },
       (error) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error loading shipping points' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error loading shipping points',
+        });
         console.error('Error loading shipping points:', error);
       }
     );
@@ -264,14 +323,14 @@ export class EditRequestRequesterComponent {
 
   onScenarioChange(): void {
     const scenarioIdControl = this.requestForm.get('scenarioId');
-    this.selectedScenarioId.set(scenarioIdControl?.value ?? 0)
-    this.scenearioIdSubject.next(scenarioIdControl?.value ?? 0)
+    this.selectedScenarioId.set(scenarioIdControl?.value ?? 0);
+    this.scenearioIdSubject.next(scenarioIdControl?.value ?? 0);
 
-    this.selectedScenarioChanged.set(scenarioIdControl?.value ?? undefined)
+    this.selectedScenarioChanged.set(scenarioIdControl?.value ?? undefined);
   }
 
   setFormValidators(attributes: any[]): void {
-    attributes.forEach(attr => {
+    attributes.forEach((attr) => {
       const control = this.requestForm.get(attr.attributeName.toLowerCase());
       if (control) {
         if (attr.isMandatory) {
@@ -282,7 +341,7 @@ export class EditRequestRequesterComponent {
         control.updateValueAndValidity();
       }
       // Handling item form group validators
-      this.items.controls.forEach(itemGroup => {
+      this.items.controls.forEach((itemGroup) => {
         const itemControl = itemGroup.get(attr.attributeName.toLowerCase());
         if (itemControl) {
           if (attr.isMandatory) {
@@ -297,15 +356,21 @@ export class EditRequestRequesterComponent {
   }
 
   onSubmit(): void {
-    console.log('request form: ', this.requestForm.value)
+    console.log('request form: ', this.requestForm.value);
     if (this.requestForm) {
       const scenarioId = this.requestForm.value.scenarioId;
       if (typeof scenarioId === 'number') {
-        const shippingPointId = this.shipPoints.find(point => point.id_ship === this.requestForm.value.shippingPoint)?.id_ship ?? 0;
-        const deliveryAddressId = this.deliveryAddresses.find(address => address.id === this.requestForm.value.deliveryAddress)?.id ?? 0;
+        const shippingPointId =
+          this.shipPoints.find(
+            (point) => point.id_ship === this.requestForm.value.shippingPoint
+          )?.id_ship ?? 0;
+        const deliveryAddressId =
+          this.deliveryAddresses.find(
+            (address) => address.id === this.requestForm.value.deliveryAddress
+          )?.id ?? 0;
 
-        const existingItemsData = this.existingItemsData() ?? []
-        const itemsCopy = _.cloneDeep(this.requestForm.value.items)
+        const existingItemsData = this.existingItemsData() ?? [];
+        const itemsCopy = _.cloneDeep(this.requestForm.value.items);
 
         const requestData: UpdateRequestByRequester = {
           invoicesTypes: this.requestForm.value.invoicesTypes,
@@ -317,26 +382,46 @@ export class EditRequestRequesterComponent {
           shippedvia: this.requestForm.value.shippedVia,
           currency: this.requestForm.value.currency,
           modeOfTransport: this.requestForm.value.modeOfTransport,
-          itemsWithValuesJson: JSON.stringify(mergeArrays(existingItemsData, itemsCopy)),
+          itemsWithValuesJson: JSON.stringify(
+            mergeArrays(existingItemsData, itemsCopy)
+          ),
         };
 
-        this.requestService.updateRequestByRequester(this.data.requestNumber, requestData).subscribe(
-          (response) => {
-            console.log('Request created:', response);
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Request updated successfully' });
-            this.dialogRef.close(true);
-          },
-          (error) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error editing the request' });
-            console.error('Error creating request:', error);
-          }
-        );
+        this.requestService
+          .updateRequestByRequester(this.data.requestNumber, requestData)
+          .subscribe(
+            (response) => {
+              console.log('Request created:', response);
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Request updated successfully',
+              });
+              this.dialogRef.close(true);
+            },
+            (error) => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error editing the request',
+              });
+              console.error('Error creating request:', error);
+            }
+          );
       } else {
-        this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Scenario ID is not a number' });
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: 'Scenario ID is not a number',
+        });
         console.error('Scenario ID is not a number');
       }
     } else {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Form is invalid' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Form is invalid',
+      });
       console.error('Form is invalid');
     }
   }
@@ -346,8 +431,12 @@ export class EditRequestRequesterComponent {
   }
 
   onShippingOrDeliveryChange(): void {
-    this.requestForm.get('shippingPoint')?.valueChanges.subscribe(() => this.checkShippingAndDelivery());
-    this.requestForm.get('deliveryAddress')?.valueChanges.subscribe(() => this.checkShippingAndDelivery());
+    this.requestForm
+      .get('shippingPoint')
+      ?.valueChanges.subscribe(() => this.checkShippingAndDelivery());
+    this.requestForm
+      .get('deliveryAddress')
+      ?.valueChanges.subscribe(() => this.checkShippingAndDelivery());
   }
 
   checkShippingAndDelivery(): void {
@@ -360,8 +449,12 @@ export class EditRequestRequesterComponent {
   }
 
   updateIncoterm(shippingPointId: number, deliveryAddressId: number): void {
-    const shippingPoint = this.shipPoints.find(point => point.id_ship === shippingPointId);
-    const deliveryAddress = this.deliveryAddresses.find(address => address.id === deliveryAddressId);
+    const shippingPoint = this.shipPoints.find(
+      (point) => point.id_ship === shippingPointId
+    );
+    const deliveryAddress = this.deliveryAddresses.find(
+      (address) => address.id === deliveryAddressId
+    );
 
     if (shippingPoint?.isTe && deliveryAddress?.isTe) {
       this.requestForm.patchValue({ incoterm: 'FCA' });
@@ -371,24 +464,23 @@ export class EditRequestRequesterComponent {
   }
 
   onDeliveryAddressChange(option: string) {
-      if (option != 'other') return;
-  
-      this.dialog
-        .open(DeliveryAddressCrudComponent, {
-          data: {
-            makeFieldsMandatory: true
-          } 
-        })
-        .afterClosed()
-        .subscribe((result) => {
-          const addressControl = this.requestForm.get('deliveryAddress');
-          if (result) {
-            this.loadDeliveryAddresses();
-            addressControl?.patchValue(result);
-          } else {
-            addressControl?.patchValue(null);
-          }
-        });
-    }
+    if (option != 'other') return;
 
+    this.dialog
+      .open(DeliveryAddressCrudComponent, {
+        data: {
+          makeFieldsMandatory: true,
+        },
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        const addressControl = this.requestForm.get('deliveryAddress');
+        if (result) {
+          this.loadDeliveryAddresses();
+          addressControl?.patchValue(result);
+        } else {
+          addressControl?.patchValue(null);
+        }
+      });
+  }
 }

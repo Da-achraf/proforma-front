@@ -94,10 +94,15 @@
             @if (paginatedRequests(); as requests){ @for (request of requests;
             track request.requestNumber){
             <tr
-              class="py-2 transition-all duration-150 odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+              class="py-2 transition-all duration-150 border-l-4 border-transparent odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+              [ngClass]="{
+                '!border-blue-400 shadow shadow-blue-300 !bg-blue-100 transition-all duration-1000':
+                  beingEdited() === request.requestNumber
+              }"
             >
               <td
                 class="whitespace-no-wrap py-4 text-sm font-normal text-gray-600 sm:px-3 lg:table-cell"
+                [ngClass]=""
               >
                 {{ request.requestNumber }}
               </td>
@@ -199,10 +204,6 @@
       </div>
     </div>
   </div>
-  <!-- Pagination using primeng -->
-  <!-- <p-paginator [rows]="rows()" [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 20, 30]"
-    (onPageChange)="onPageChange($event)">
-  </p-paginator> -->
 
   <!-- Pagination using angular material -->
   <mat-paginator

@@ -1,46 +1,53 @@
-<h1 mat-dialog-title>Modify Request (Finance)</h1>
+<h1 mat-dialog-title>
+  Modify Request (Finance) (<span
+    class="text-cyan-600 font-semibold font-serif"
+    >{{ data.requestNumber }}</span
+  >)
+</h1>
 <div mat-dialog-content>
   <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
     <div fxLayout="row wrap" fxLayoutGap="16px">
       <!-- Normal fields -->
       <mat-form-field fxFlex="30%" appearance="fill">
         <mat-label>Invoice Type</mat-label>
-        <input matInput formControlName="invoicesTypes" readonly>
+        <input matInput formControlName="invoicesTypes" readonly />
       </mat-form-field>
-      
+
       <mat-form-field fxFlex="30%" appearance="fill">
         <mat-label>Scenario</mat-label>
-        <input matInput formControlName="scenarioId" readonly>
+        <input matInput formControlName="scenarioId" readonly />
       </mat-form-field>
-      
+
       <mat-form-field fxFlex="30%" appearance="fill">
         <mat-label>Shipping Point</mat-label>
-        <input matInput formControlName="shippingPoint" readonly>
+        <input matInput formControlName="shippingPoint" readonly />
       </mat-form-field>
-      
+
       <mat-form-field fxFlex="30%" appearance="fill">
         <mat-label>Delivery Address</mat-label>
-        <input matInput formControlName="deliveryAddress" readonly>
+        <input matInput formControlName="deliveryAddress" readonly />
       </mat-form-field>
-      
+
       <mat-form-field fxFlex="30%" appearance="fill">
         <mat-label>Mode Of Transport</mat-label>
-        <input matInput formControlName="modeOfTransport" readonly>
+        <input matInput formControlName="modeOfTransport" readonly />
       </mat-form-field>
-  
+
       <mat-form-field fxFlex="30%" appearance="fill">
         <mat-label>Incoterm</mat-label>
         <mat-select formControlName="incoterm">
-          <mat-option *ngFor="let term of incoterms" [value]="term">{{ term }}</mat-option>
+          <mat-option *ngFor="let term of incoterms" [value]="term">{{
+            term
+          }}</mat-option>
         </mat-select>
       </mat-form-field>
-  
+
       <!-- Conditional Field (DHL Account) -->
       @if ((requestModeOfTransport$ | async) == ModeOfTransportEnum.BY_AIR) {
-        <mat-form-field appearance="fill">
-          <mat-label>DHL Account</mat-label>
-          <input required matInput formControlName="dhlAccount">
-        </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>DHL Account</mat-label>
+        <input required matInput formControlName="dhlAccount" />
+      </mat-form-field>
       }
 
       <!-- <mat-form-field>
@@ -63,65 +70,74 @@
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
           @for (option of currencyCodes(); track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
+          <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
     </div>
 
     @if (items.controls.length !== 0) {
-      <div class="border border-gray-200 rounded-md overflow-hidden">
-        <div class="bg-orange-200 p-2 mb-2 text-center">
-          <span class="font-mono text-md w-fit text-orange-600">
-            Items
-            <span class="font-bold text-xs text-gray-800">
-              ({{ items.length }})
-            </span>
+    <div class="border border-gray-200 rounded-md overflow-hidden">
+      <div class="bg-orange-200 p-2 mb-2 text-center">
+        <span class="font-mono text-md w-fit text-orange-600">
+          Items
+          <span class="font-bold text-xs text-gray-800">
+            ({{ items.length }})
           </span>
-        </div>
+        </span>
+      </div>
 
-        @defer {
-          <div class="p-2" formArrayName="items">
-            @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-              <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="font-bold">Item {{ i + 1 }}</span>
-                </div>
-                <div class="flex items-center gap-2 flex-wrap">
-                  @for (field of formItems() || []; track field) {
-                    <div [formGroupName]="field.nameItem">
-                      <mat-form-field appearance="fill" class="w-full mb-2">
-                        <mat-label>{{ field.nameItem }}</mat-label>
-                        <input 
-                          matInput 
-                          formControlName="value"
-                          [type]="field.type"
-                          [readonly]="field.readOnly"
-                        >
-                      </mat-form-field>
-                    </div>
-                  }
-                </div>
-              </div>
+      @defer {
+      <div class="p-2" formArrayName="items">
+        @for (itemGroup of items.controls; track itemGroup; let i = $index) {
+        <div
+          [formGroupName]="i"
+          class="mb-4 p-2 border border-gray-300 rounded shadow-md"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold">Item {{ i + 1 }}</span>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            @for (field of formItems() || []; track field) {
+            <div [formGroupName]="field.nameItem">
+              <mat-form-field appearance="fill" class="w-full mb-2">
+                <mat-label>{{ field.nameItem }}</mat-label>
+                <input
+                  matInput
+                  formControlName="value"
+                  [type]="field.type"
+                  [readonly]="field.readOnly"
+                />
+              </mat-form-field>
+            </div>
             }
           </div>
+        </div>
         }
-        @placeholder (minimum 700ms) {
-          <loading-dots [diameter]="25"  />
-        }
-        
       </div>
+      } @placeholder (minimum 700ms) {
+      <loading-dots [diameter]="25" />
+      }
+    </div>
     }
-  
+
     <!-- Actions -->
     <div class="form-actions" mat-dialog-actions>
-      <button mat-raised-button color="warn" type="button" (click)="openRejectDialog()">Reject</button>
-      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">Submit</button>
+      <button
+        mat-raised-button
+        color="warn"
+        type="button"
+        (click)="openRejectDialog()"
+      >
+        Reject
+      </button>
+      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">
+        Submit
+      </button>
     </div>
     <!-- <div mat-dialog-actions>
       <button mat-raised-button color="warn" type="button" (click)="openRejectDialog()">Reject</button>
       <button mat-raised-button type="button" (click)="onSubmit()" [disabled]="!requestForm.valid">Submit</button>
     </div> -->
   </form>
-  
 </div>

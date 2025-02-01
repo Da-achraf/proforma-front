@@ -1,4 +1,9 @@
-<h1 mat-dialog-title>Edit Request (Trade Compliance)</h1>
+<h1 mat-dialog-title>Edit Request (Trade Compliance)
+  (<span
+    class="text-cyan-600 font-semibold font-serif"
+    >{{ data.requestNumber }}</span
+  >)
+</h1>
 <div mat-dialog-content>
   <form [formGroup]="requestForm">
     <div class="form-grid">
