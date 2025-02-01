@@ -25,113 +25,113 @@ import { TradcomplianceDashboardComponent } from './components/tradcompliance-da
 import { UsermanagmentComponent } from './components/usermanagment/usermanagment.component';
 import { UsersListComponent } from './components/users-list/users-list.component';
 import { WarehouseDashboardComponent } from './components/warehouse-dashboard/warehouse-dashboard.component';
-import { authGuardGuard } from './Guards/auth-guard.guard';
-import { LoginGuard } from './Guards/login.guard';
+import { AuthGuard } from './Guards/auth.guard';
+import { NonAuthGuard } from './Guards/non-auth.guard';
+import { RoleGuard } from './Guards/role.guard';
 import { RoleEnum } from './models/user/user.model';
-import { InvoiceComponent } from './shared/components/invoice/invoice.component';
+import { HomeRedirectResolver } from './resolvers/home-redirect.resolver';
 import { RequestsTableComponent } from './shared/components/tables/req-table.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'invoice', component: InvoiceComponent },
-  { path: 'sign-up', component: SignUpComponent },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent, canActivate: [NonAuthGuard] },
+  { path: 'sign-up', component: SignUpComponent, canActivate: [NonAuthGuard] },
   {
     path: 'admin-section',
     component: AdminSectionComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['admin'] },
   },
   {
     path: 'usermanagement',
     component: UsermanagmentComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['admin'] },
   },
 
   {
     path: 'plantmanagement',
     component: PlantmanagementComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['admin'] },
   },
 
   {
     path: 'departementmanagement',
     component: DepartementmanagementComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['admin'] },
   },
   {
     path: 'CreatePlant',
     component: CreatePlantComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['admin'] },
   },
   {
     path: 'CreateDepartement',
     component: CreateDepartementComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['admin'] },
   },
   {
     path: 'ConfigurationSection',
     component: ConfigurationSectionComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['admin'] },
   },
   {
     path: 'configurationHome',
     component: ConfigurationHomeComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['admin'] },
   },
   {
     path: 'requesterdashboard',
     component: RequesterDashboardComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['requester'] },
   },
   {
     path: 'listofrequester',
     component: ListOfRequesterComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['requester'] },
   },
   {
     path: 'financedashboard',
     component: FinanceDashboardComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['finance'] },
   },
   {
     path: 'listofrequestfinance',
     component: ListOfRequestFinanceComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['finance'] },
   },
   {
     path: 'tradcompliancedashboard',
     component: TradcomplianceDashboardComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['tradecompliance'] },
   },
   {
     path: 'listofrequesttradcompliance',
     component: ListOfRequestTradcomplianceComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['tradecompliance'] },
   },
   {
     path: 'warehousedashboard',
     component: WarehouseDashboardComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['warehouse'] },
   },
   {
     path: 'listofrequestwarehouse',
     component: ListOfRequestWarehouseComponent,
-    canActivate: [LoginGuard, authGuardGuard],
+    canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['warehouse'] },
   },
 
@@ -139,56 +139,65 @@ const routes: Routes = [
     path: 'home',
     component: Home1Component,
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: '',
+        resolve: [HomeRedirectResolver],
+        component: DashboardComponent,
+      },
       {
         path: 'dashboard',
         component: DashboardComponent,
-        canActivate: [LoginGuard, authGuardGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] },
       },
       {
         path: 'requests',
         component: RequestsTableComponent,
-        canActivate: [LoginGuard, authGuardGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ALL] },
       },
       {
         path: 'usermanagement',
         component: UsersListComponent,
-        canActivate: [LoginGuard, authGuardGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] },
       },
       {
         path: 'plantmanagement',
         component: PlantsListComponent,
-        canActivate: [LoginGuard, authGuardGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] },
       },
       {
         path: 'departementmanagement',
         component: DepartmentsListComponent,
-        canActivate: [LoginGuard, authGuardGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] },
       },
       {
         path: 'ShipPoint',
         component: ShipPointsListComponent,
-        canActivate: [LoginGuard, authGuardGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] },
       },
       {
         path: 'delivery-addresses',
         component: DeliveryAddressListComponent,
-        canActivate: [LoginGuard, authGuardGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] },
       },
       {
         path: 'ConfigurationSection',
         component: ConfigurationHomeComponent,
-        canActivate: [LoginGuard, authGuardGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] },
       },
     ],
+  },
+  {
+    path: '**',
+    redirectTo: 'home',
+    pathMatch: 'full',
   },
 ];
 

@@ -1,33 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api'; // Import MessageService
+import { ActivatedRoute, Router } from '@angular/router';
+import { map } from 'rxjs';
 import { RoleEnum } from '../../models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { UserStoreService } from '../../services/user-store.service';
+import { ToasterService } from '../../shared/services/toaster.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
   LoginForm: FormGroup;
   passwordFieldType: string = 'password';
 
+  private readonly returnUrl: Signal<string> = toSignal(
+    inject(ActivatedRoute).queryParams.pipe(
+      map((data) => data['returnUrl'] ?? '/home')
+    )
+  );
+
   constructor(
     private authService: AuthService,
     private router: Router,
     private userStore: UserStoreService,
-    private messageService: MessageService // Inject MessageService
+    private toastr: ToasterService
   ) {
     this.LoginForm = new FormGroup({
-      identifier: new FormControl("", [Validators.required]),
-      password: new FormControl("", [Validators.required, Validators.minLength(6)])
+      identifier: new FormControl('', [Validators.required]),
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(6),
+      ]),
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log('returnUrl: ', this.returnUrl());
+  }
 
   loginSubmitted() {
     if (this.LoginForm.valid) {
@@ -35,7 +48,7 @@ export class LoginComponent implements OnInit {
       this.authService.LoginUser(identifier, password).subscribe({
         next: (res: string) => {
           if (res === 'Failure') {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login unsuccessful' });
+            this.toastr.showError('Login failed');
           } else {
             localStorage.clear(); // Clear localStorage to ensure no old data remains
             this.LoginForm.reset();
@@ -44,46 +57,17 @@ export class LoginComponent implements OnInit {
             this.userStore.setFullNameFromStore(tokenPayload.unique_name);
             this.userStore.setRoleFromStore(tokenPayload.role as RoleEnum);
 
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Login successful' });
-            this.redirectToDashboard(tokenPayload.role as RoleEnum);
+            this.toastr.showSuccess('Logged in successfully');
+            this.router.navigateByUrl(this.returnUrl());
           }
         },
         error: (err) => {
-          console.error('Error during login', err);
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login failed' });
-        }
+          this.toastr.showError('Login failed');
+        },
       });
     } else {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Form is invalid' });
+      this.toastr.showWarning('Form is invalid');
     }
-  }
-
-  redirectToDashboard(role: RoleEnum) {
-    if (role == RoleEnum.ADMIN)
-      this.router.navigate(['/home']);
-    else
-      this.router.navigate(['/home/requests']);
-
-    // switch (role) {
-    //   case RoleEnum.ADMIN:
-    //     this.router.navigate(['/home']);
-    //     break;
-    //   case RoleEnum.REQUESTER:
-    //     this.router.navigate(['/requesterdashboard']);
-    //     break;
-    //   case RoleEnum.FINANCE_APPROVER:
-    //     this.router.navigate(['/financedashboard']);
-    //     break;
-    //   case RoleEnum.TRADECOMPLIANCE_APPROVER:
-    //     this.router.navigate(['/tradcompliancedashboard']);
-    //     break;
-    //   case RoleEnum.WAREHOUSE_APPROVER:
-    //     this.router.navigate(['/warehousedashboard']);
-    //     break;
-    //   default:
-    //     this.router.navigate(['/login']);
-    //     break;
-    // }
   }
 
   get identifier(): FormControl {
@@ -94,6 +78,7 @@ export class LoginComponent implements OnInit {
     return this.LoginForm.get('password') as FormControl;
   }
   togglePasswordVisibility() {
-    this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
+    this.passwordFieldType =
+      this.passwordFieldType === 'password' ? 'text' : 'password';
   }
 }
