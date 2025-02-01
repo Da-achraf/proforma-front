@@ -35,7 +35,7 @@ export class CreatePlantComponent implements OnInit {
           .pipe(
             catchError(err => {
               console.error('Error fetching managers:', err);
-              this.showErrorMessage('Error fetching managers');
+              this.showError('Error fetching managers');
               return of([]);
             })
           );
@@ -50,12 +50,12 @@ export class CreatePlantComponent implements OnInit {
         .subscribe(
           response => {
             console.log('Enregistrement du plant réussi :', response);
-            this.showErrorMessage('Successful plant registration');
+            this.showError('Successful plant registration');
 
           },
           error => {
             console.error('Erreur lors de l\'enregistrement du plant :', error);
-            this.showErrorMessage('Error when saving plant : ' + error);
+            this.showError('Error when saving plant : ' + error);
         
           }
         );
@@ -68,7 +68,7 @@ export class CreatePlantComponent implements OnInit {
     this.returnButtonClicked = true;
     this.router.navigate(["/plantmanagement"])
   }
-  showErrorMessage(message: string) {
+  showError(message: string) {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
       verticalPosition: 'top'

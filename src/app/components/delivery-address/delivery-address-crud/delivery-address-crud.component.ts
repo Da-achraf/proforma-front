@@ -101,14 +101,14 @@ export class DeliveryAddressCrudComponent implements OnInit {
         .pipe(finalize(() => this.isFormSubmited.set(false)))
         .subscribe({
           next: (address: DeliveryAddress) => {
-            this.toastr.showSuccessMessage(
+            this.toastr.showSuccess(
               'Delivery address added successfully'
             );
             this.dialogRef.close(address.id);
             this.resetForm();
           },
           error: (error) => {
-            this.toastr.showErrorMessage('Unknown error occured');
+            this.toastr.showError('Unknown error occured');
           },
         });
     }

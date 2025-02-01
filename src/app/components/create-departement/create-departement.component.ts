@@ -49,7 +49,7 @@ export class CreateDepartementComponent implements OnInit {
         return this.departementService.searchManagers(value).pipe(
           catchError(err => {
             console.error('Error fetching managers:', err);
-            this.showErrorMessage('Error fetching managers');
+            this.showError('Error fetching managers');
             return of([]);
           })
         );
@@ -70,12 +70,12 @@ export class CreateDepartementComponent implements OnInit {
       this.departementService.createDepartement(newDepartement).subscribe({
         next: (response) => {
           console.log('Département créé avec succès', response);
-          this.showSuccessMessage('Department successfully created!');
+          this.showSuccess('Department successfully created!');
           this.resetFormAndNavigate();
         },
         error: (error) => {
           console.error('Erreur lors de la création du département', error);
-          this.showErrorMessage('Failed to create department: ' + error.message);
+          this.showError('Failed to create department: ' + error.message);
         }
       });
     } else {
@@ -89,7 +89,7 @@ export class CreateDepartementComponent implements OnInit {
     this.router.navigateByUrl('/departementmanagement');
   }
 
-  private showSuccessMessage(message: string) {
+  private showSuccess(message: string) {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
       verticalPosition: 'top',
@@ -97,7 +97,7 @@ export class CreateDepartementComponent implements OnInit {
     });
   }
 
-  private showErrorMessage(message: string) {
+  private showError(message: string) {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
       verticalPosition: 'top'

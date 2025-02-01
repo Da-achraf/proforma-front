@@ -85,12 +85,12 @@ export class ShippointCrudComponent implements OnInit {
         .subscribe({
           next: (shipPoint: ShipPointModel) => {
             console.log('Ship point added successfully: ', shipPoint);
-            this.toastr.showSuccessMessage('Ship point added successfully');
+            this.toastr.showSuccess('Ship point added successfully');
             this.dialogRef.close(shipPoint.id_ship);
             this.resetShipointForm();
           },
           error: (error) => {
-            this.toastr.showErrorMessage('Unknown error occured');
+            this.toastr.showError('Unknown error occured');
           },
         });
     }

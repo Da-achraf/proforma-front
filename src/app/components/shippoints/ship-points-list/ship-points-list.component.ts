@@ -70,11 +70,11 @@ export class ShipPointsListComponent implements OnInit {
       switchMap(() => this.shipPointService.deleteShipPoint(id))
     ).subscribe({
       next: () => {
-        this.showSuccessMessage('Ship Point Deleted successfully.')
+        this.showSuccess('Ship Point Deleted successfully.')
         this.loadShipPoints();
       },
       error: () => {
-        this.showErrorMessage('Error in deleting ship point')
+        this.showError('Error in deleting ship point')
       }
     })
   }
@@ -116,7 +116,7 @@ export class ShipPointsListComponent implements OnInit {
   updateShipPoint(): void {
     this.shipPointService.updateShipPoint(this.shipPoint.id_ship, this.shipPoint).subscribe(
       () => {
-        this.showSuccessMessage('Ship Point updated successfully!');
+        this.showSuccess('Ship Point updated successfully!');
         this.displayUpdateDialog.set(false)
         this.loadShipPoints();
       },
@@ -132,11 +132,11 @@ export class ShipPointsListComponent implements OnInit {
     this.loadShipPoints();
   }
 
-  private showErrorMessage(message: string) {
+  private showError(message: string) {
     this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
   }
 
-  private showSuccessMessage(message: string) {
+  private showSuccess(message: string) {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
   }
 

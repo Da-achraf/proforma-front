@@ -74,11 +74,11 @@ export class DeliveryAddressListComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.showSuccessMessage('Delivery Address Deleted Successfully.');
+          this.showSuccess('Delivery Address Deleted Successfully.');
           this.loadDeliveryAddresses();
         },
         error: () => {
-          this.showErrorMessage('Error in deleting delivery address');
+          this.showError('Error in deleting delivery address');
         },
       });
   }
@@ -120,7 +120,7 @@ export class DeliveryAddressListComponent implements OnInit {
       .updateDeliveryAddress(this.deliveryAddress.id, this.deliveryAddress)
       .subscribe(
         () => {
-          this.showSuccessMessage('Delivery Address updated successfully!');
+          this.showSuccess('Delivery Address updated successfully!');
           this.displayUpdateDialog.set(false);
           this.loadDeliveryAddresses();
         },
@@ -130,7 +130,7 @@ export class DeliveryAddressListComponent implements OnInit {
       );
   }
 
-  private showErrorMessage(message: string) {
+  private showError(message: string) {
     this.messageService.add({
       severity: 'error',
       summary: 'Error',
@@ -138,7 +138,7 @@ export class DeliveryAddressListComponent implements OnInit {
     });
   }
 
-  private showSuccessMessage(message: string) {
+  private showSuccess(message: string) {
     this.messageService.add({
       severity: 'success',
       summary: 'Success',

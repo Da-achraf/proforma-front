@@ -182,11 +182,11 @@ export class UsersListComponent implements OnInit {
       switchMap(_ => this.userService.deleteUser(id))
     ).subscribe({
       next: () => {
-        this.toastr.showSuccessMessage('User Deleted successfully.')
+        this.toastr.showSuccess('User Deleted successfully.')
         this.loadUsers();
       },
       error: () => {
-        this.toastr.showErrorMessage('Error in deleting ship point')
+        this.toastr.showError('Error in deleting ship point')
       }
     })
   }

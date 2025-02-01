@@ -57,7 +57,7 @@ export class SignUpComponent implements OnInit {
       },
       (error) => {
         console.error('Erreur lors du chargement des plantes:', error);
-        this.showErrorMessage('Error when loading plants: ' + error);
+        this.showError('Error when loading plants: ' + error);
       }
     );
   }
@@ -73,7 +73,7 @@ export class SignUpComponent implements OnInit {
       },
       (error) => {
         console.error('Erreur lors du chargement des plantes:', error);
-        this.showErrorMessage('Error when loading plants: ' + error);
+        this.showError('Error when loading plants: ' + error);
       }
     );
   }
@@ -86,12 +86,12 @@ export class SignUpComponent implements OnInit {
       },
       (error) => {
         console.error('Erreur lors du chargement des départements:', error);
-        this.showErrorMessage('Error when loading departments: ' + error);
+        this.showError('Error when loading departments: ' + error);
       }
     );
   }
 
-  showErrorMessage(message: string) {
+  showError(message: string) {
     this.displayMsg = message;
     this.isAccountCreated = false;
   }

@@ -74,11 +74,11 @@ export class PlantsListComponent implements AfterViewInit, OnInit {
       switchMap(_ => this.plantService.deletePlant(id))
     ).subscribe({
       next: () => {
-        this.showSuccessMessage('Plant Deleted successfully.')
+        this.showSuccess('Plant Deleted successfully.')
         this.loadPlants();
       },
       error: () => {
-        this.showErrorMessage('Error in deleting plant')
+        this.showError('Error in deleting plant')
       }
     })
   }
@@ -132,11 +132,11 @@ export class PlantsListComponent implements AfterViewInit, OnInit {
     );
   }
 
-  private showErrorMessage(message: string) {
+  private showError(message: string) {
     this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
   }
 
-  private showSuccessMessage(message: string) {
+  private showSuccess(message: string) {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
   }
 }

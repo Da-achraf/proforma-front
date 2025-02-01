@@ -225,7 +225,7 @@ export class RequestsTableComponent {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.toasterService.showSuccessMessage('Request created successfully');
+        this.toasterService.showSuccess('Request created successfully');
         this.loadRequests();
       }
     });
@@ -275,13 +275,13 @@ export class RequestsTableComponent {
       )
       .subscribe({
         next: () => {
-          this.toasterService.showSuccessMessage(
+          this.toasterService.showSuccess(
             'Request Deleted successfully.'
           );
           this.loadRequests();
         },
         error: () => {
-          this.toasterService.showErrorMessage('Error in deleting ship point');
+          this.toasterService.showError('Error in deleting ship point');
         },
       });
   }

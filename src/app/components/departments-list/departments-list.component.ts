@@ -65,11 +65,11 @@ export class DepartmentsListComponent implements OnInit {
       switchMap(_ => this.departmentService.deleteDepartement(id))
     ).subscribe({
       next: () => {
-        this.showSuccessMessage('Departement Deleted successfully.')
+        this.showSuccess('Departement Deleted successfully.')
         this.loadDepartments();
       },
       error: () => {
-        this.showErrorMessage('Error in deleting departement')
+        this.showError('Error in deleting departement')
       }
     })
   }
@@ -87,12 +87,12 @@ export class DepartmentsListComponent implements OnInit {
   updateDepartement(): void {
     this.departmentService.updateDepartement(this.department.id_departement, this.department).subscribe(
       () => {
-        this.showSuccessMessage('Departement updated successfully.')
+        this.showSuccess('Departement updated successfully.')
         this.displayUpdateDialog.set(false)
         this.loadDepartments();
       },
       (error) => {
-        this.showErrorMessage('Error updating department.')
+        this.showError('Error updating department.')
         console.error('Error updating departement:', error);
       }
     );
@@ -109,11 +109,11 @@ export class DepartmentsListComponent implements OnInit {
 
       this.departmentService.createDepartement(newDepartement).subscribe({
         next: (response) => {
-          this.showSuccessMessage('Department successfully created!');
+          this.showSuccess('Department successfully created!');
           this.resetFormAndNavigate();
         },
         error: (error) => {
-          this.showErrorMessage('Error creating department.')
+          this.showError('Error creating department.')
         }
       });
     } else {
@@ -134,11 +134,11 @@ export class DepartmentsListComponent implements OnInit {
     });
   }
 
-  private showErrorMessage(message: string) {
+  private showError(message: string) {
     this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
   }
 
-  private showSuccessMessage(message: string) {
+  private showSuccess(message: string) {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
   }
 
@@ -152,7 +152,7 @@ export class DepartmentsListComponent implements OnInit {
         return this.departmentService.searchManagers(value).pipe(
           catchError(err => {
             console.error('Error fetching managers:', err);
-            this.showErrorMessage('Error fetching managers');
+            this.showError('Error fetching managers');
             return of([]);
           })
         );
