@@ -37,7 +37,7 @@ import { RequestStrategyFactory } from '../../services/requests-strategies/reque
 import { SideNavService } from '../../services/side-nav.service';
 import { ToasterService } from '../../services/toaster.service';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
-import { getRequestModificationComponent, getStatusClass } from './helpers';
+import { getRequestModificationComponent } from './helpers';
 
 const REQUEST_EDITING_TIMOUT = 1000;
 
@@ -173,8 +173,6 @@ export class RequestsTableComponent {
   }
 
   // Methods
-  getStatusClass = getStatusClass;
-
   loadRequests() {
     const userId = this.auth.getUserIdFromToken();
     this.userStore.getLoggedInUser(userId);

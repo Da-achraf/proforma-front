@@ -1,42 +1,50 @@
-<h1 mat-dialog-title>Edit Request (Trade Compliance)
-  (<span
-    class="text-cyan-600 font-semibold font-serif"
-    >{{ data.requestNumber }}</span
-  >)
-</h1>
+<div class="flex items-center justify-between p-4">
+  <span class="text-xl font-semibold">
+    Edit Request
+    <span class="text-gray-500 text-sm">(Trade & Compliance)</span> [<span
+      class="text-cyan-600 font-semibold font-serif"
+      >{{ data.requestNumber }}</span
+    >]
+  </span>
+
+  @if (requestSig()?.status; as status) {
+  <app-request-status [status]="status" />
+  }
+</div>
+
 <div mat-dialog-content>
   <form [formGroup]="requestForm">
     <div class="form-grid">
       <mat-form-field appearance="fill">
         <mat-label>Invoice Type</mat-label>
-        <input matInput formControlName="invoicesTypes" readonly>
+        <input matInput formControlName="invoicesTypes" readonly />
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Shipping Point</mat-label>
-        <input matInput formControlName="shippingPoint" readonly>
+        <input matInput formControlName="shippingPoint" readonly />
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Delivery Address</mat-label>
-        <input matInput formControlName="deliveryAddress" readonly>
+        <input matInput formControlName="deliveryAddress" readonly />
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Incoterm</mat-label>
-        <input matInput formControlName="incoterm" readonly>
+        <input matInput formControlName="incoterm" readonly />
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Mode Of Transport</mat-label>
-        <input matInput formControlName="modeOfTransport" readonly>
+        <input matInput formControlName="modeOfTransport" readonly />
       </mat-form-field>
       @if (modeOfTransport() === 'By Air') {
-        <mat-form-field appearance="fill">
-          <mat-label>DHL Account</mat-label>
-          <input matInput formControlName="dhlAccount" readonly>
-        </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>DHL Account</mat-label>
+        <input matInput formControlName="dhlAccount" readonly />
+      </mat-form-field>
       }
 
       <mat-form-field appearance="fill">
         <mat-label>Cost Center</mat-label>
-        <input matInput formControlName="costCenter" readonly>
+        <input matInput formControlName="costCenter" readonly />
       </mat-form-field>
 
       <!-- <mat-form-field>
@@ -59,74 +67,88 @@
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
           @for (option of currencyCodes(); track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
+          <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
     </div>
-    
+
     @if (items.controls.length !== 0) {
-      <div class="border border-gray-200 rounded-md overflow-hidden">
-        <div class="bg-orange-200 p-2 mb-2 text-center">
-          <span class="font-mono text-md w-fit text-orange-600">
-            Items
-            <span class="font-bold text-xs text-gray-800">
-              ({{ items.length }})
-            </span>
+    <div class="border border-gray-200 rounded-md overflow-hidden">
+      <div class="bg-orange-200 p-2 mb-2 text-center">
+        <span class="font-mono text-md w-fit text-orange-600">
+          Items
+          <span class="font-bold text-xs text-gray-800">
+            ({{ items.length }})
           </span>
-        </div>
-        @defer {
-          <div class="p-2" formArrayName="items">
-            @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-              <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="font-bold">Item {{ i + 1 }}</span>
-                </div>
-                <div class="flex items-center gap-2 flex-wrap">
-                  @for (field of formItems() || []; track field) {
-                    @if (field.nameItem === 'COO') {
-                      <div [formGroupName]="field.nameItem" class="w-full">
-                        <mat-select-country
-                          class="test"
-                          panelWidth="2"
-                          appearance="fill"
-                          label="COO"
-                          [required]="field.isMandatory ?? false"
-                          formControlName="value"
-                        >
-                        </mat-select-country>
-                      </div>
-                    }
-                    @else {
-                      <div [formGroupName]="field.nameItem">
-                        <mat-form-field appearance="fill" class="w-full mb-2">
-                          <mat-label>{{ field.nameItem }}</mat-label>
-                          <input 
-                            matInput 
-                            formControlName="value"
-                            [type]="field.type"
-                            [readonly]="field.readOnly"
-                            [required]="field.isMandatory ?? false"
-                          >
-                        </mat-form-field>
-                      </div>
-                    }
-                  }
-                </div>
-              </div>
-            }
+        </span>
+      </div>
+      @defer {
+      <div class="p-2" formArrayName="items">
+        @for (itemGroup of items.controls; track itemGroup; let i = $index) {
+        <div
+          [formGroupName]="i"
+          class="mb-4 p-2 border border-gray-300 rounded shadow-md"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold">Item {{ i + 1 }}</span>
           </div>
-        }
-        @placeholder (minimum 700ms) {
-          <loading-dots [diameter]="25"  />
+          <div class="flex items-center gap-2 flex-wrap">
+            @for (field of formItems() || []; track field) { @if (field.nameItem
+            === 'COO') {
+            <div [formGroupName]="field.nameItem" class="w-full">
+              <mat-select-country
+                class="test"
+                panelWidth="2"
+                appearance="fill"
+                label="COO"
+                [required]="field.isMandatory ?? false"
+                formControlName="value"
+              >
+              </mat-select-country>
+            </div>
+            } @else {
+            <div [formGroupName]="field.nameItem">
+              <mat-form-field appearance="fill" class="w-full mb-2">
+                <mat-label>{{ field.nameItem }}</mat-label>
+                <input
+                  matInput
+                  formControlName="value"
+                  [type]="field.type"
+                  [readonly]="field.readOnly"
+                  [required]="field.isMandatory ?? false"
+                />
+              </mat-form-field>
+            </div>
+            } }
+          </div>
+        </div>
         }
       </div>
+      } @placeholder (minimum 700ms) {
+      <loading-dots [diameter]="25" />
+      }
+    </div>
     }
 
     <!-- Actions -->
     <div mat-dialog-actions>
-      <button mat-raised-button color="warn" type="button" (click)="openRejectDialog()">Reject</button>
-      <button mat-raised-button type="button" (click)="onSubmit()" [disabled]="!requestForm.valid">Submit</button>
+      <button
+        mat-raised-button
+        color="warn"
+        type="button"
+        (click)="openRejectDialog()"
+      >
+        Reject
+      </button>
+      <button
+        mat-raised-button
+        type="button"
+        (click)="onSubmit()"
+        [disabled]="!requestForm.valid"
+      >
+        Submit
+      </button>
     </div>
   </form>
 </div>

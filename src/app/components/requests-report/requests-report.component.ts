@@ -4,7 +4,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { requestReportTableColumns } from '../../models/request-report.model';
 import { createdAtFormat, RequestModel, TransformedRequestModel } from '../../models/request.model';
 import { exportMenuOptions, ExportMenuOptionsEnum } from '../../models/table.model';
-import { getStatusClass } from '../../shared/components/tables/helpers';
 import { filterRequests, transformRequest } from '../../shared/helpers/report-table.helper';
 import { TableExportService } from '../../shared/services/table-export.service';
 import { WeightTypeEnum } from '../../shared/pipes/weight-calculator.pipe';
@@ -105,8 +104,6 @@ export class RequestsReportComponent {
 
 
   // Methods
-  getStatusClass = getStatusClass;
-  
   private async onExport() {
     this.isExporting.set(true)
     try {

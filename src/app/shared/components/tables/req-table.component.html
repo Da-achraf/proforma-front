@@ -114,22 +114,7 @@
               <td
                 class="whitespace-no-wrap py-4 text-sm font-normal text-gray-500 sm:px-3 lg:table-cell"
               >
-                <span
-                  class="whitespace-nowrap flex items-center gap-x-2 flex-nowrap rounded-md p-2 w-fit font-bold text-xs shadow-xl hover:cursor-pointer hover:shadow-2xl"
-                  [ngClass]="getStatusClass(request.status)"
-                >
-                  <i
-                    class="pi"
-                    [ngClass]="{
-                      'pi-check-circle':
-                        request.status === RequestStatusEnum.Done,
-                      'pi-spinner-dotted':
-                        request.status != RequestStatusEnum.Done,
-                    }"
-                    style="font-size: 0.8rem"
-                  ></i>
-                  {{ request.status | statusMapper }}
-                </span>
+                <app-request-status [status]="request.status" />
               </td>
               <td class="px-3">
                 @if (loggedInUser(); as loggedUser) { @if (loggedUser.role !=

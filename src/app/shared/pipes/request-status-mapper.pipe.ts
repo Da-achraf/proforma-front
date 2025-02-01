@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { RequestStatus, RequestStatusLabelMapping } from '../../models/requeststatus.model';
 
 @Pipe({
-  name: 'statusMapper',
+  name: 'mapStatus',
   pure: true
 })
 export class RequestStatusMapper implements PipeTransform {

@@ -1,7 +1,16 @@
-<h1 mat-dialog-title>
-  Edit Request (
-  <span class="text-cyan-600 font-semibold font-serif">{{ data.requestNumber }}</span> )
-</h1>
+<div class="flex items-center justify-between p-4">
+  <span class="text-xl font-semibold">
+    Edit Request
+    <span class="text-gray-500 text-sm">(Requester)</span> [<span
+      class="text-cyan-600 font-semibold font-serif"
+      >{{ data.requestNumber }}</span
+    >]
+  </span>
+
+  @if (requestSig()?.status; as status) {
+  <app-request-status [status]="status" />
+  }
+</div>
 <div mat-dialog-content>
   <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
     <div class="notes-container">

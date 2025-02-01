@@ -1,11 +1,10 @@
 import { ComponentType } from "@angular/cdk/portal"
-import { RoleEnum } from "../../../models/user/user.model"
-import { ModifyRequestFinanceComponent } from "../../../components/modify-request-finance/modify-request-finance.component"
+import { EditRequestRequesterComponent } from "../../../components/edit-request-requester/edit-request-requester.component"
 import { EditRequestTradcomplianceComponent } from "../../../components/edit-request-tradcompliance/edit-request-tradcompliance.component"
 import { EditRequestWarehouseComponent } from "../../../components/edit-request-warehouse/edit-request-warehouse.component"
-import { RequestStatus } from "../../../models/requeststatus.model"
+import { ModifyRequestFinanceComponent } from "../../../components/modify-request-finance/modify-request-finance.component"
 import { JsonItemModel } from "../../../models/request.model"
-import { EditRequestRequesterComponent } from "../../../components/edit-request-requester/edit-request-requester.component"
+import { RoleEnum } from "../../../models/user/user.model"
 
 export const getRequestModificationComponent = (role: RoleEnum): ComponentType<any> | undefined => {
     switch (role){
@@ -22,24 +21,6 @@ export const getRequestModificationComponent = (role: RoleEnum): ComponentType<a
     }
   }
 
-  export const getStatusClass = (status: number): string => {
-    switch (status) {
-      case RequestStatus.PendingInFinance:
-        return 'bg-cyan-400 text-gray-100';
-      case RequestStatus.PendingInTradCompliance:
-        return 'bg-orange-400 text-gray-50';
-      case RequestStatus.InShipping:
-        return 'bg-purple-400 text-gray-50';
-      case RequestStatus.WaitingForTrackingNo:
-        return 'bg-teal-400 text-gray-50';
-      case RequestStatus.Done:
-        return 'bg-green-500 text-gray-50';
-      case RequestStatus.Rejected:
-        return 'bg-red-400 text-gray-50';
-      default:
-        return '';
-    }
-  }
 
 // Function to convert an array of key-value pairs into an object
 const arrayToMap = (arr: JsonItemModel[]): { [key: string]: JsonItemModel } => {
@@ -77,26 +58,3 @@ export const mergeArrays = (oldArr: {values: JsonItemModel[]}[], newArr: {[key: 
       return mergedItem;
   });
 };
-
-
-
-
-
-// export const deepCopy = <T>(obj: T): T => {
-//   if (obj === null || typeof obj !== 'object') {
-//     return obj;
-//   }
-
-//   if (Array.isArray(obj)) {
-//     return obj.map(item => deepCopy(item)) as unknown as T;
-//   }
-
-//   const copy = {} as T;
-//   for (const key in obj) {
-//     if (Object.prototype.hasOwnProperty.call(obj, key)) {
-//       copy[key] = deepCopy(obj[key]);
-//     }
-//   }
-
-//   return copy;
-// }

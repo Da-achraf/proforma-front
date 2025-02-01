@@ -1,41 +1,49 @@
-<h1 mat-dialog-title>Edit Request (Warehouse)
-  (<span
-    class="text-cyan-600 font-semibold font-serif"
-    >{{ data.requestNumber }}</span
-  >)
-</h1>
+<div class="flex items-center justify-between p-4">
+  <span class="text-xl font-semibold">
+    Edit Request
+    <span class="text-gray-500 text-sm">(Warehouse)</span> [<span
+      class="text-cyan-600 font-semibold font-serif"
+      >{{ data.requestNumber }}</span
+    >]
+  </span>
+
+  @if (requestSig()?.status; as status) {
+  <app-request-status [status]="status" />
+  }
+</div>
+
 <div class="form-container">
   <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
     <div class="form-grid">
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Invoice Type</mat-label>
-        <input matInput formControlName="invoicesTypes" readonly>
+        <input matInput formControlName="invoicesTypes" readonly />
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Shipping Point</mat-label>
-        <input matInput formControlName="shippingPoint" readonly>
+        <input matInput formControlName="shippingPoint" readonly />
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Delivery Address</mat-label>
-        <input matInput formControlName="deliveryAddress" readonly>
+        <input matInput formControlName="deliveryAddress" readonly />
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Incoterm</mat-label>
-        <input matInput formControlName="incoterm" readonly>
+        <input matInput formControlName="incoterm" readonly />
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Mode Of Transport</mat-label>
-        <input matInput formControlName="modeOfTransport" type="text">
+        <input matInput formControlName="modeOfTransport" type="text" />
       </mat-form-field>
 
       @if (modeOfTransport() === 'By Air') {
       <mat-form-field appearance="fill">
         <mat-label>DHL Account</mat-label>
-        <input matInput formControlName="dhlAccount" readonly>
+        <input matInput formControlName="dhlAccount" readonly />
       </mat-form-field>
       }
 
@@ -43,26 +51,26 @@
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
           @for (option of currencyCodes(); track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
+          <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Shipped Via</mat-label>
-        <input matInput formControlName="shippedVia" type="text">
+        <input matInput formControlName="shippedVia" type="text" />
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="small-form-field">
         <mat-label>Gross Weight</mat-label>
-        <input matInput formControlName="grossWeight" type="number" min="0">
+        <input matInput formControlName="grossWeight" type="number" min="0" />
       </mat-form-field>
-      
+
       @if (showTrackingNoField()) {
-        <mat-form-field appearance="fill" class="small-form-field">
-          <mat-label>Tracking Number</mat-label>
-          <input matInput required formControlName="trackingNumber" type="text">
-        </mat-form-field>
+      <mat-form-field appearance="fill" class="small-form-field">
+        <mat-label>Tracking Number</mat-label>
+        <input matInput required formControlName="trackingNumber" type="text" />
+      </mat-form-field>
       }
 
       <mat-form-field appearance="fill">
@@ -85,36 +93,44 @@
         </span>
       </div>
       @defer {
-        <div class="p-2" formArrayName="items">
-          @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-          <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-bold">Item {{ i + 1 }}</span>
-            </div>
-            <div class="flex items-center gap-2 flex-wrap">
-              @for (field of formItems() || []; track field) {
-              <div [formGroupName]="field.nameItem">
-                <mat-form-field appearance="fill" class="w-full mb-2">
-                  <mat-label>{{ field.nameItem }}</mat-label>
-                  <input matInput  formControlName="value" [type]="field.type" [required]="field.isMandatory"
-                    [readonly]="field.readOnly">
-                </mat-form-field>
-              </div>
-              }
-            </div>
+      <div class="p-2" formArrayName="items">
+        @for (itemGroup of items.controls; track itemGroup; let i = $index) {
+        <div
+          [formGroupName]="i"
+          class="mb-4 p-2 border border-gray-300 rounded shadow-md"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold">Item {{ i + 1 }}</span>
           </div>
-          }
+          <div class="flex items-center gap-2 flex-wrap">
+            @for (field of formItems() || []; track field) {
+            <div [formGroupName]="field.nameItem">
+              <mat-form-field appearance="fill" class="w-full mb-2">
+                <mat-label>{{ field.nameItem }}</mat-label>
+                <input
+                  matInput
+                  formControlName="value"
+                  [type]="field.type"
+                  [required]="field.isMandatory"
+                  [readonly]="field.readOnly"
+                />
+              </mat-form-field>
+            </div>
+            }
+          </div>
         </div>
+        }
+      </div>
+      } @placeholder (minimum 700ms) {
+      <loading-dots [diameter]="25" />
       }
-      @placeholder (minimum 700ms) {
-        <loading-dots [diameter]="25"  />
-      }
-      
     </div>
     }
 
     <div class="form-actions" mat-dialog-actions>
-      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">Submit</button>
+      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">
+        Submit
+      </button>
     </div>
   </form>
 </div>

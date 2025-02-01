@@ -113,6 +113,8 @@ import { TruncateTextPipe } from './shared/pipes/truncate-text.pipe';
 import { DeliveryAddressListComponent } from './components/delivery-address/delivery-address-list/delivery-address-list.component';
 import { DeliveryAddressPipe } from './shared/pipes/delivery-address.pipe';
 import { InvoiceAvailabilityPipe } from './shared/pipes/invoice-availablity.pipe';
+import { StatusClassPipe } from './shared/pipes/status-class.pipe';
+import { RequestStatusComponent } from './shared/components/request-status/request-status.component';
 
 @NgModule({
   declarations: [
@@ -178,7 +180,9 @@ import { InvoiceAvailabilityPipe } from './shared/pipes/invoice-availablity.pipe
     DeliveryAddressCrudComponent,
     DeliveryAddressListComponent,
     DeliveryAddressPipe,
-    InvoiceAvailabilityPipe
+    InvoiceAvailabilityPipe,
+    StatusClassPipe,
+    RequestStatusComponent
   ],
   imports: [
     BrowserModule,
