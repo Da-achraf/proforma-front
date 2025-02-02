@@ -1,0 +1,18 @@
+<div
+  class="flex items-center border w-full transition duration-300 pr-3 gap-2 bg-white border-gray-500/30 h-[46px] rounded-[5px] overflow-hidden focus-within:shadow focus-within:shadow-blue-400"
+>
+  <input
+    type="text"
+    placeholder="Search..."
+    [(ngModel)]="searchValue"
+    (input)="onChange()"
+    class="w-full h-full pl-4 outline-none placeholder-gray-500 text-sm peer"
+  />
+  <i
+    [ngClass]="{
+      'fa-spinner animate-spin': isLoading(),
+      'fa-magnifying-glass': !isLoading()
+    }"
+    class="fa-solid text-gray-600/50 transition duration-300 peer-focus:text-gray-600/70"
+  ></i>
+</div>

@@ -10,7 +10,7 @@
         <div
           class="flex w-full flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0"
         >
-          <app-search-bar (searchTerm)="searchValue.set($event)" />
+          <ba-search-bar class="min-w-72"(search)="searchValue.set($event)" />
           @if (showCreateButton()){
           <button
             (click)="openCreateRequestDialog()"

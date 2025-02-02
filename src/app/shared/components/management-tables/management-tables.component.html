@@ -6,7 +6,7 @@
                     class="font-bold w-fit mb-5 font-mono text-orange-500 text-md border-b-2 opacity-75 border-b-blue-400">
                     {{ tableName() | titlecase }}</p>
                 <div class="flex w-full flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0">
-                    <app-search-bar class="w-1/3" (searchTerm)="searchValue.set($event)" />
+                    <ba-search-bar class="w-1/3" (search)="searchValue.set($event)" />
                     @if (showCreateButton()){
                     <button (click)="onCreateClicked()" class='create-btn' matTooltip="Create a new {{ tableName() }}"
                         matTooltipPosition="above">
