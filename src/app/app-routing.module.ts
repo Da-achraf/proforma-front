@@ -31,6 +31,7 @@ import { RoleGuard } from './Guards/role.guard';
 import { RoleEnum } from './models/user/user.model';
 import { HomeRedirectResolver } from './resolvers/home-redirect.resolver';
 import { RequestsTableComponent } from './shared/components/tables/req-table.component';
+import { ScenariosListComponent } from './feature/scenario/scenarios-list/scenarios-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -189,6 +190,12 @@ const routes: Routes = [
       {
         path: 'ConfigurationSection',
         component: ConfigurationHomeComponent,
+        canActivate: [AuthGuard, RoleGuard],
+        data: { expectedRoles: [RoleEnum.ADMIN] },
+      },
+      {
+        path: 'scenarios',
+        component: ScenariosListComponent,
         canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] },
       },

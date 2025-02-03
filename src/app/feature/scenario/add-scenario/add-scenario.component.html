@@ -1,0 +1,110 @@
+<div class="p-4 rounded-md shadow-md max-w-[1200px]">
+  <h2 class="mb-3">Create a Scenario</h2>
+
+  <form [formGroup]="scenarioForm" (ngSubmit)="onSubmit()">
+    <div class="w-full">
+      <mat-form-field class="w-full">
+        <mat-label>Scenario name</mat-label>
+        <input matInput formControlName="name" name="name" required />
+      </mat-form-field>
+    </div>
+    <div class="control-group">
+      <label for="quantity">Items:</label>
+      <span>{{ items.length }}</span>
+      <button type="button" (click)="addItem()">+</button>
+    </div>
+
+    <div formArrayName="items" class="items-container">
+      <div
+        class="item-box"
+        *ngFor="let item of items.controls; let i = index"
+        [formGroupName]="i"
+      >
+        <!-- <h6>Item {{ i + 1 }}</h6> -->
+        <mat-form-field appearance="fill">
+          <mat-label>Request item</mat-label>
+          <mat-select
+            formControlName="requestItemId"
+            (selectionChange)="onItemFieldSelected(item, i)"
+          >
+            <mat-option
+              *ngFor="let requestItem of myItems()"
+              [value]="requestItem.id_request_item"
+            >
+              {{ requestItem.nameItem }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Checkbox for marking mandatory -->
+        <!-- <mat-checkbox formControlName="isMandatory">Mandatory</mat-checkbox> -->
+        <mat-form-field appearance="fill">
+          <mat-label>Mandatory For</mat-label>
+          <mat-select
+            formControlName="isMandatory"
+            multiple
+            (selectionChange)="onMandatoryForChange($event.value, i)"
+          >
+            <mat-option
+              *ngFor="let option of mandatoryForOptions()"
+              [value]="option"
+            >
+              {{ option }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Mandatory-for functionality -->
+        <!-- <mat-form-field>
+          <mat-label>Mandatory for</mat-label>
+          <mat-select name="mandatoryFor" [formControl]="mandatoryFor" multiple>
+            <mat-select-trigger>
+              {{ (mandatoryFor.value?.[0] || '') | userRoleForDisplay }}
+              @if ((mandatoryFor.value?.length || 0) > 1) {
+                <span class="example-additional-selection">
+                  (+{{(mandatoryFor.value?.length || 0) - 1}} {{mandatoryFor.value?.length === 2 ? 'other' : 'others'}})
+                </span>
+              }
+            </mat-select-trigger>
+            @for (role of roles; track role) {
+          <mat-option [value]="role">{{role | userRoleForDisplay }}</mat-option>
+        }
+          </mat-select>
+        </mat-form-field> -->
+
+        <!-- Button to remove the item -->
+        <div class="border-l border-gray-300">
+          <button
+            mat-icon-button
+            color="warn"
+            matTooltipPosition="above"
+            matTooltip="Remove this item"
+            (click)="subtractItem(i)"
+            type="button"
+          >
+            <mat-icon>remove_circle</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3 flex items-center gap-x-3">
+      <button
+        type="submit"
+        mat-raised-button
+        class="btn btn-primary"
+        [disabled]="!scenarioForm.valid"
+      >
+        Create Scenario
+      </button>
+      <button
+        mat-raised-button
+        type="button"
+        class="btn btn-sec"
+        (click)="createItem()"
+      >
+        Create Item
+      </button>
+    </div>
+  </form>
+</div>

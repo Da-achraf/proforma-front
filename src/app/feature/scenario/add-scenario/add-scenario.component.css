@@ -1,0 +1,44 @@
+/* Styles for the items container */
+.items-container {
+    display: flex;
+    flex-wrap: wrap; /* Enables wrapping */
+    gap: 40px; /* Adds some space between items */
+}
+
+/* Styles for each item box */
+.item-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9; /* Light grey background instead of red */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* flex: 1 1 200px;  */
+    max-width: calc(50% - 20px); /* Ensures two items per row at most (adjust if needed) */
+}
+
+/* Adjust the spacing and appearance of form fields */
+.mat-form-field {
+    flex: 1;
+}
+
+.mat-checkbox {
+    flex-shrink: 0; /* Prevents checkbox from shrinking */
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.control-group button {
+    margin: 0 10px;
+}
+
+.control-group span {
+    margin: 0 10px;
+}

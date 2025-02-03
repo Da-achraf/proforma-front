@@ -52,6 +52,7 @@ export type ItemModel = {
     type: FieldTypeEnum;
     isMandatory?: boolean
     readOnly?: boolean
+    mandatoryFor?: string[]
 }
 
 export enum FieldTypeEnum {

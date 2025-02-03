@@ -1,5 +1,4 @@
 <div class="relative w-full">
-  <!-- Loading Overlay -->
   @if (loading(); as loading) {
   <div
     class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-5 z-10 backdrop-blur-sm transition-opacity duration-300"
@@ -15,7 +14,7 @@
     [globalFilterFields]="globalFilterFields()"
     (onFilter)="onFilter($event)"
   >
-    <ng-template #caption>
+    <ng-template pTemplate="caption">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-x-3">
           <ba-search-bar (search)="dt1.filterGlobal($event, 'contains')" />
@@ -24,37 +23,6 @@
               <i class="fa-solid fa-filter-circle-xmark bg-pr"></i>
             </ng-template>
           </p-button>
-          <div class="card flex justify-center additionalHeaders">
-            <button
-              [matMenuTriggerFor]="menu"
-              type="button"
-              class="relative mr-auto inline-flex cursor-pointer items-center rounded-lg border border-gray-200 bg-white px-5 py-3 text-center text-sm font-medium text-gray-800 hover:bg-gray-100 focus:shadow sm:mr-0"
-            >
-              <span
-                class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"
-              ></span>
-              <i class="fa-solid fa-filter text-primary text-sm mr-2"></i>
-              Filter
-            </button>
-            <!-- <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
-              <mat-icon>more_vert</mat-icon>
-            </button> -->
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item>
-                <mat-icon>dialpad</mat-icon>
-                <span>Redial</span>
-              </button>
-              <button mat-menu-item disabled>
-                <mat-icon>voicemail</mat-icon>
-                <span>Check voice mail</span>
-              </button>
-              <button mat-menu-item>
-                <mat-icon>notifications_off</mat-icon>
-                <span>Disable alerts</span>
-              </button>
-            </mat-menu>
-          </div>
-          <ng-content select=".additionalHeaders"></ng-content>
         </div>
         <div class="flex items-center gap-x-2">
           @if (withCreate()) {
@@ -69,7 +37,7 @@
       </div>
     </ng-template>
 
-    <ng-template #header>
+    <ng-template pTemplate="header">
       <tr>
         @for (col of columns(); track $index) {
         <th
@@ -77,25 +45,22 @@
           [pSortableColumn]="col.sortable ? col.sortField : undefined"
         >
           @if (col.filterTemplate) {
-            <ng-template
-              [ngTemplateOutlet]="getFilterTemplate(col)"
-            />
-          }
-          @else {
-            <div class="flex items-center">
-              <span>
-                {{ col.header }}
-              </span>
-              @if (col.sortable) {
-                <p-sortIcon [field]="col.sortField"></p-sortIcon>
-              } @if (col.filter; as filter) {
-                <p-columnFilter
-                  [type]="filter.type"
-                  [field]="filter.field"
-                  display="menu"
-                ></p-columnFilter>
-              }
-            </div>
+          <ng-template [ngTemplateOutlet]="getFilterTemplate(col)" />
+          } @else {
+          <div class="flex items-center">
+            <span>
+              {{ col.header }}
+            </span>
+            @if (col.sortable) {
+            <p-sortIcon [field]="col.sortField"></p-sortIcon>
+            } @if (col.filter; as filter) {
+            <p-columnFilter
+              [type]="filter.type"
+              [field]="filter.field"
+              display="menu"
+            ></p-columnFilter>
+            }
+          </div>
           }
         </th>
         }
@@ -103,23 +68,21 @@
       </tr>
     </ng-template>
 
-    <ng-template #body let-row>
+    <ng-template pTemplate="body" let-row>
       <tr>
         @for (col of columns(); track $index) {
-          <td>
-            @switch (col.type) { 
-              @case ('custom') {
-                <ng-template
-                  [ngTemplateOutlet]="getTableDataTemplate(col)"
-                  [ngTemplateOutletContext]="{ $implicit: row }"
-                />
-              } @case ('date') {
-                {{ row[col.field] | date : "MMM d, y, h:mm a" }}
-              } @case ('text') {
-                {{ row[col.field] | titlecase }}
-              }
-            }
-          </td>
+        <td>
+          @switch (col.type) { @case ('custom') {
+          <ng-template
+            [ngTemplateOutlet]="getTableDataTemplate(col)"
+            [ngTemplateOutletContext]="{ $implicit: row }"
+          />
+          } @case ('date') {
+          {{ row[col.field] | date : "MMM d, y, h:mm a" }}
+          } @case ('text') {
+          {{ row[col.field] | titlecase }}
+          } }
+        </td>
         }
         <td class="flex items-center text-gray-400">
           @if (withEdit()) {
@@ -152,16 +115,6 @@
           >
             <i class="fa-solid fa-eye"></i>
           </button>
-          } @if (withReview()) {
-          <button
-            matTooltip="Review Details"
-            matTooltipPosition="above"
-            matTooltipShowDelay="500"
-            class="hover:text-cyan-600 hover:bg-cyan-50 p-2 rounded-md transition-all duration-150"
-            (click)="review.emit(row['id'])"
-          >
-            <i class="fa-solid fa-clipboard"></i>
-          </button>
           }
         </td>
       </tr>
@@ -186,4 +139,14 @@
     [pageSizeOptions]="pageSizeOptions()"
     (pageSize)="pageSize.emit($event)"
   />
+  <!-- <mat-paginator 
+        [color]="'primary'" 
+        [length]="total()" 
+        [pageSize]="rows()" 
+        [showFirstLastButtons]="true"
+        [pageSizeOptions]="[25, 50, 100, 200]"
+        (page)="onPageChange($event)"
+        aria-label="Select page"
+    >
+    </mat-paginator> -->
 </div>

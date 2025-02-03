@@ -1,19 +1,23 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   contentChildren,
   input,
   OnInit,
   output,
-  TemplateRef
+  signal,
+  TemplateRef,
 } from '@angular/core';
 import { Table } from 'primeng/table';
 import { TableColumn } from './table-types.interface';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'ba-generic-table',
   templateUrl: './generic-table.component.html',
   styleUrl: './generic-table.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenericTableComponent implements OnInit {
   templates = contentChildren<TemplateRef<any>>(TemplateRef);
@@ -40,6 +44,9 @@ export class GenericTableComponent implements OnInit {
   readonly withViewDetail = input(false);
   readonly withReview = input(false);
 
+  rows = signal(25);
+  first = signal(0);
+
   columnsLength = computed(() => this.columns().length);
 
   private readonly size = 25;
@@ -58,7 +65,8 @@ export class GenericTableComponent implements OnInit {
 
   getFilterTemplate(column: any): TemplateRef<any> | null {
     const template = this.templates().find(
-      (t: any) => t['_declarationTContainer'].localNames[0] === column.filterTemplate
+      (t: any) =>
+        t['_declarationTContainer'].localNames[0] === column.filterTemplate
     );
     return template || null;
   }
@@ -70,4 +78,13 @@ export class GenericTableComponent implements OnInit {
   onFilter(event: any) {
     console.log('Filter: ', event);
   }
+
+  // onPageChange(event: PageEvent) {
+  //   const { pageIndex, pageSize } = event;
+
+  //   if (typeof pageIndex === 'number' && typeof pageSize === 'number') {
+  //     this.first.set(pageIndex * pageSize);
+  //     this.rows.set(pageSize);
+  //   }
+  // }
 }

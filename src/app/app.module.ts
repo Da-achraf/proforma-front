@@ -119,6 +119,10 @@ import { UserRoleForDisplayPipe } from './shared/pipes/user-role-for-display.pip
 import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
 import { BaButtonComponent } from './ui/components/button.component';
+import { ScenariosListComponent } from './feature/scenario/scenarios-list/scenarios-list.component';
+import { DeleteDialogComponent } from './pattern/dialogs/delete-dialog.component';
+import { BaseDialogComponent } from './pattern/dialogs/base-dialog.component';
+import { AddScenarioComponent } from './feature/scenario/add-scenario/add-scenario.component';
 
 
 @NgModule({
@@ -191,7 +195,11 @@ import { BaButtonComponent } from './ui/components/button.component';
     BaButtonComponent,
     GenericTableComponent,
     SearchBarComponent,
-    PaginatorComponent
+    PaginatorComponent,
+    ScenariosListComponent,
+    DeleteDialogComponent,
+    BaseDialogComponent,
+    AddScenarioComponent
   ],
   imports: [
     BrowserModule,
