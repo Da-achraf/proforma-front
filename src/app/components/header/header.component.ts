@@ -1,6 +1,13 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  OnInit,
+  output,
+  viewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import { AuthService } from '../../services/auth.service';
 import { UserStoreService } from '../../services/user-store.service';
 import { UserService } from '../../services/user.service';
@@ -8,51 +15,48 @@ import { UserService } from '../../services/user.service';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrl: './header.component.scss',
 })
-export class HeaderComponent implements OnInit{
-  @Output() toggleSidebarForMe: EventEmitter<any> = new EventEmitter();
+export class HeaderComponent implements OnInit {
+  protected readonly userStore = inject(UserStoreService);
+  protected readonly router = inject(Router);
+  protected readonly api = inject(UserService);
+  protected readonly authservice = inject(AuthService);
 
-  userStore = inject(UserStoreService)
+  private readonly trigger = viewChild('overlayPanelTrigger', { read: ElementRef });
+  private readonly overlayPanel = viewChild(OverlayPanel);
 
-  public fullName: string = " ";
-  public users: any = [];
-  public role!: string;
-  public items: MenuItem[] = [];
+  toggleSidebarForMe = output();
 
-  constructor(private router: Router,
-              private api: UserService,
-              private authservice: AuthService) { }
+  protected triggerWidth!: number;
+  protected fullName: string = ' ';
+  protected users: any = [];
+  protected role!: string;
 
   ngOnInit() {
-    this.api.getUsers()
-      .subscribe(resp => {
-        this.users = resp;
-      });
+    this.api.getUsers().subscribe((resp) => {
+      this.users = resp;
+    });
 
-    this.userStore.getFullNameFromStore()
-      .subscribe(val => {
-        const fullNameFromToken = this.authservice.getFullNameFromToken();
-        this.fullName = val || fullNameFromToken;
-      });
+    this.userStore.getFullNameFromStore().subscribe((val) => {
+      const fullNameFromToken = this.authservice.getFullNameFromToken();
+      this.fullName = val || fullNameFromToken;
+    });
 
-    this.userStore.getRoleFromStore()
-      .subscribe(val => {
-        const roleFromToken = this.authservice.getRoleFromToken();
-        this.role = val || roleFromToken;
-      });
-
-    this.items = [
-      {
-        label: 'Logout',
-        icon: 'pi pi-sign-out',
-        command: () => this.logout()
-      }
-    ];
+    this.userStore.getRoleFromStore().subscribe((val) => {
+      const roleFromToken = this.authservice.getRoleFromToken();
+      this.role = val || roleFromToken;
+    });
   }
 
   toggleSidebar() {
     this.toggleSidebarForMe.emit();
+  }
+
+  // Update width before showing panel
+  toggleOverlay(event: Event) {
+    this.triggerWidth = this.trigger()?.nativeElement.offsetWidth;
+    this.overlayPanel()?.toggle(event);
   }
 
   logout() {

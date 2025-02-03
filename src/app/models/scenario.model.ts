@@ -20,6 +20,7 @@ export type ScenarioModel = {
   id_scenario: number;
   name: string;
   requestCount: number;
+  itemsCount: number;
   items: ItemModel[];
 };
 
@@ -28,5 +29,6 @@ export const emptyScenario: ScenarioModel = {
   id_scenario: 0,
   name: '',
   requestCount: 0,
+  itemsCount: 0,
   items: []
 }

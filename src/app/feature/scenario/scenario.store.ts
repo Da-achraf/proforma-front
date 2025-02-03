@@ -47,8 +47,7 @@ export const ScenarioStore = signalStore(
   })),
 
   withComputed(({ entities }) => ({
-    total: computed(() => entities().length),
-    fieldsCount: computed(() => entities().map((e) => e.items).length),
+    total: computed(() => entities().length)
   })),
 
   withMethods(

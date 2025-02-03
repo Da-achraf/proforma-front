@@ -8,12 +8,12 @@
     (delete)="store.openDeleteScenarioDialog($event)"
     (create)="store.openCreateScenarioDialog()"
   >
-    <ng-template #fieldsCountTemplate>
+    <ng-template #fieldsCountTemplate let-scenario>
       <div
         class="flex items-center gap-x-2 rounded-md font-semibold bg-white border border-blue-100 w-fit p-2 shadow-md"
       >
         <p class="text-blue-500 m-0">
-          {{ store.fieldsCount() }}
+          {{ scenario.itemsCount }}
         </p>
         <p class="text-sm font-bold text-blue-500 m-0">Fields</p>
       </div>

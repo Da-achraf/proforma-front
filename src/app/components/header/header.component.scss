@@ -5,75 +5,81 @@ p-toolbar {
   z-index: 100;
 }
 
-ul {
-  li {
-    list-style: none;
-  }
-}
-
-button {
-  outline: none;
-  border: 0;
-  background: transparent;
-}
-
-.user {
-  font-size: 14px;
-}
-
-.user-image {
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  
-  &-icon {
-    height: 18px;
-    font-size: 16px;
-  }
-}
-
-.black-button {
-  color: black; /* Change la couleur du texte en noir */
-}
-
 ::ng-deep {
-  .p-menubar {
-    width: auto;
-  }
-
-  .p-menubar-root-list {
-    display: flex;
-    align-items: center;
-  }
-
-  .p-menuitem-text {
-    margin-right: 0.5rem;
+  .p-toolbar	{
+    padding: .9rem;
   }
 }
 
-.overlay-panel {
-  padding: 1rem;
+// ul {
+//   li {
+//     list-style: none;
+//   }
+// }
 
-  .overlay-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+// button {
+//   outline: none;
+//   border: 0;
+//   background: transparent;
+// }
 
-  .logout-button {
-    color: black;
-    font-weight: bold;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-  }
+// .user {
+//   font-size: 14px;
+// }
 
-  .logout-button .pi {
-    margin-right: 0.5rem;
-  }
-}
+// .user-image {
+//   border-radius: 50%;
+//   width: 50px;
+//   height: 50px;
+  
+//   &-icon {
+//     height: 18px;
+//     font-size: 16px;
+//   }
+// }
+
+// .black-button {
+//   color: black; /* Change la couleur du texte en noir */
+// }
+
+// ::ng-deep {
+//   .p-menubar {
+//     width: auto;
+//   }
+
+//   .p-menubar-root-list {
+//     display: flex;
+//     align-items: center;
+//   }
+
+//   .p-menuitem-text {
+//     margin-right: 0.5rem;
+//   }
+// }
+
+// .overlay-panel {
+//   padding: .5rem;
+
+//   .overlay-content {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//   }
+
+//   .logout-button {
+//     color: black;
+//     font-weight: bold;
+//     background-color: white;
+//     border: 1px solid #ccc;
+//     border-radius: 5px;
+//     text-decoration: none;
+//     display: flex;
+//     align-items: center;
+//     padding: 0.5rem 1rem;
+//     cursor: pointer;
+//   }
+
+//   .logout-button .pi {
+//     margin-right: 0.5rem;
+//   }
+// }

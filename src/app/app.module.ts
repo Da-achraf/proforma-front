@@ -25,12 +25,10 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgToastModule } from 'ng-angular-popup';
 import { MessageService } from 'primeng/api';
 import { Button, ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -43,7 +41,6 @@ import { InputTextModule } from "primeng/inputtext";
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PaginatorModule } from 'primeng/paginator';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { TableModule } from 'primeng/table';
@@ -123,7 +120,8 @@ import { ScenariosListComponent } from './feature/scenario/scenarios-list/scenar
 import { DeleteDialogComponent } from './pattern/dialogs/delete-dialog.component';
 import { BaseDialogComponent } from './pattern/dialogs/base-dialog.component';
 import { AddScenarioComponent } from './feature/scenario/add-scenario/add-scenario.component';
-
+import {MatToolbarModule} from '@angular/material/toolbar';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 @NgModule({
   declarations: [
@@ -206,7 +204,6 @@ import { AddScenarioComponent } from './feature/scenario/add-scenario/add-scenar
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    NgToastModule,
     ChartModule,
     PanelMenuModule,
     BrowserAnimationsModule,

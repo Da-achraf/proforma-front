@@ -52,10 +52,16 @@ export const allMenuItems: SidenavItem[] = [
         routerLink: '/home/delivery-addresses',
         roles: [RoleEnum.ADMIN]
     },
+    // {
+    //     label: 'Configuration',
+    //     icon: 'pi pi-fw pi-cog',
+    //     routerLink: '/home/ConfigurationSection',
+    //     roles: [RoleEnum.ADMIN]
+    // },
     {
-        label: 'Configuration',
+        label: 'Scenarios',
         icon: 'pi pi-fw pi-cog',
-        routerLink: '/home/ConfigurationSection',
+        routerLink: '/home/scenarios',
         roles: [RoleEnum.ADMIN]
     }
 ];
