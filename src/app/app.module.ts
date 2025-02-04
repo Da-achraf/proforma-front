@@ -122,6 +122,8 @@ import { BaseDialogComponent } from './pattern/dialogs/base-dialog.component';
 import { AddScenarioComponent } from './feature/scenario/add-scenario/add-scenario.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ToastComponent } from './pattern/toast/toast.component';
+import { ToastClassPipe } from './pattern/toast/toast-class.pipe';
 
 @NgModule({
   declarations: [
@@ -197,7 +199,9 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
     ScenariosListComponent,
     DeleteDialogComponent,
     BaseDialogComponent,
-    AddScenarioComponent
+    AddScenarioComponent,
+    ToastComponent,
+    ToastClassPipe
   ],
   imports: [
     BrowserModule,

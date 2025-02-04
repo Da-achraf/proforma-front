@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { MessageService } from 'primeng/api';
 
+const Toast_Life = 3000;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -17,7 +19,7 @@ export class ToasterService {
   showInfo(
     detail: string,
     summary: string = 'Info',
-    life: number = 3000
+    life: number = Toast_Life
   ): void {
     this.messageService.add({ severity: 'info', summary, detail, life });
   }
@@ -31,7 +33,7 @@ export class ToasterService {
   showSuccess(
     detail: string,
     summary: string = 'Success',
-    life: number = 3000
+    life: number = Toast_Life
   ): void {
     this.messageService.add({ severity: 'success', summary, detail, life });
   }
@@ -45,7 +47,7 @@ export class ToasterService {
   showWarning(
     detail: string,
     summary: string = 'Warning',
-    life: number = 3000
+    life: number = Toast_Life
   ): void {
     this.messageService.add({ severity: 'warn', summary, detail, life });
   }
@@ -59,7 +61,7 @@ export class ToasterService {
   showError(
     detail: string,
     summary: string = 'Error',
-    life: number = 3000
+    life: number = Toast_Life
   ): void {
     this.messageService.add({ severity: 'error', summary, detail, life });
   }
