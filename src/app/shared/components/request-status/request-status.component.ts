@@ -4,22 +4,20 @@ import { RequestStatus } from '../../../models/requeststatus.model';
 @Component({
   selector: 'app-request-status',
   template: `
-    @if(status(); as status){
+    @if(status() != null; as _){
     <span
-      class="whitespace-nowrap flex items-center gap-x-2 flex-nowrap rounded-md p-2 w-fit font-bold text-xs shadow-xl hover:cursor-pointer hover:shadow-2xl"
-      [ngClass]="status | statusClass"
+      class="whitespace-nowrap inline-flex items-center gap-x-1.5 rounded-lg px-3 py-1.5 cursor-pointer transition-all hover:scale-[1.02]"
+      [ngClass]="status() | statusClass"
     >
       <i
         class="pi"
         [ngClass]="{
-            'pi-check-circle':
-            status === RequestStatusEnum.Done,
-            'pi-spinner-dotted':
-            status != RequestStatusEnum.Done,
+            'pi-check-circle': status() === RequestStatusEnum.Done,
+            'pi-spinner-dotted': status() !== RequestStatusEnum.Done,
         }"
         style="font-size: 0.8rem"
       ></i>
-      {{ status | mapStatus }}
+      {{ status() | mapStatus }}
     </span>
     }
   `,
