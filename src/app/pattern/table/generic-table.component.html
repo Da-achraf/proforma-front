@@ -101,7 +101,7 @@
             matTooltipPosition="above"
             matTooltipShowDelay="500"
             class="hover:text-red-400 hover:bg-red-50 p-2 rounded-md transition-all duration-150"
-            (click)="delete.emit(row['id'])"
+            (click)="delete.emit(row[key()])"
           >
             <i class="fa-solid fa-trash"></i>
           </button>

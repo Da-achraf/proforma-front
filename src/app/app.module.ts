@@ -125,6 +125,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ToastComponent } from './pattern/toast/toast.component';
 import { ToastClassPipe } from './pattern/toast/toast-class.pipe';
 import { NoDataFoundComponent } from './ui/components/no-data-found/no-data-found.component';
+import { EditScenarioComponent } from './feature/scenario/edit-scenario/edit-scenario.component';
 
 @NgModule({
   declarations: [
@@ -201,6 +202,7 @@ import { NoDataFoundComponent } from './ui/components/no-data-found/no-data-foun
     DeleteDialogComponent,
     BaseDialogComponent,
     AddScenarioComponent,
+    EditScenarioComponent,
     ToastComponent,
     ToastClassPipe,
     NoDataFoundComponent

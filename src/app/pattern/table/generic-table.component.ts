@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   contentChildren,
+  effect,
   input,
   OnInit,
   output,
@@ -29,6 +30,12 @@ export class GenericTableComponent implements OnInit {
   view = output<number>();
   delete = output<number>();
   review = output<number>();
+
+  /**
+   * the table model primary key. It's id for most of the time.
+   * We provided this input to make it customizable
+   */
+  readonly key = input('id');
 
   readonly data = input<any[]>([]);
   readonly total = input.required<number>();
@@ -77,6 +84,12 @@ export class GenericTableComponent implements OnInit {
   onFilter(event: any) {
     console.log('Filter: ', event);
   }
+
+  dataEffect = effect(() => {
+    const data = this.data()
+
+    console.log('data: ', data)
+  })
 
   // onPageChange(event: PageEvent) {
   //   const { pageIndex, pageSize } = event;

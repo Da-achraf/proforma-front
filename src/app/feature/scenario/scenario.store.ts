@@ -5,6 +5,7 @@ import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStore,
+  type,
   withComputed,
   withHooks,
   withMethods,
@@ -13,8 +14,8 @@ import {
 } from '@ngrx/signals';
 import {
   addEntity,
+  entityConfig,
   removeEntity,
-  SelectEntityId,
   setAllEntities,
   withEntities,
 } from '@ngrx/signals/entities';
@@ -24,6 +25,7 @@ import { ScenarioModel } from '../../models/scenario.model';
 import { DeleteDialogComponent } from '../../pattern/dialogs/delete-dialog.component';
 import { ScenarioService } from '../../services/scenario.service';
 import { AddScenarioComponent } from './add-scenario/add-scenario.component';
+import { EditScenarioComponent } from './edit-scenario/edit-scenario.component';
 
 type ScenariosState = {
   loading: boolean;
@@ -32,13 +34,19 @@ const initialState: ScenariosState = {
   loading: false,
 };
 
-const selectId: SelectEntityId<ScenarioModel> = (scenario) =>
-  scenario.id_scenario;
+/**
+ * Normally, the withEntities api from ngrx signal store expects that
+ * the entity identifier is named 'id', but it can overriden in selectId
+ */
+const scenarioConfig = entityConfig({
+  entity: type<ScenarioModel>(),
+  selectId: (scenario) => scenario.id_scenario,
+});
 
 export const ScenarioStore = signalStore(
   { providedIn: 'root' },
   withState<ScenariosState>(initialState),
-  withEntities<ScenarioModel>(),
+  withEntities(scenarioConfig),
 
   withProps(() => ({
     scenarioService: inject(ScenarioService),
@@ -47,97 +55,123 @@ export const ScenarioStore = signalStore(
   })),
 
   withComputed(({ entities }) => ({
-    total: computed(() => entities().length)
+    total: computed(() => entities().length),
+  })),
+
+  withMethods(({ scenarioService, ...store }) => ({
+    // Add a new scenario
+    addScenario: (scenario: ScenarioModel) => {
+      patchState(store, addEntity(scenario, scenarioConfig));
+    },
+
+    // Update an existing scenario
+    updateScenario: rxMethod<ScenarioModel>(
+      pipe()
+      // switchMap((scenario) =>
+      //   scenarioService.(scenario.id_scenario, scenario).pipe(
+      //     tapResponse({
+      //       next: (updatedScenario) =>
+      //         patchState(store, updateEntity(updatedScenario, { selectId })),
+      //       error: console.log,
+      //     })
+      //   )
+      // )
+    ),
+
+    // Delete a scenario
+    deleteScenario: rxMethod<number>(
+      pipe(
+        tap(() => patchState(store, { loading: true })),
+        switchMap((id) =>
+          scenarioService.deleteScenarios(id).pipe(
+            tapResponse({
+              next: () => patchState(store, removeEntity(id)),
+              error: console.log,
+              finalize: () => patchState(store, { loading: false }),
+            })
+          )
+        )
+      )
+    ),
   })),
 
   withMethods(
-    ({ scenarioService, entities, loading, dialog, destroyRef, ...store }) => {
-      // Add a new scenario
-      const addScenario = (scenario: ScenarioModel) => {
-        patchState(store, addEntity(scenario, { selectId }));
-      };
-
-      // Delete a scenario
-      const deleteScenario = rxMethod<number>(
+    ({
+      scenarioService,
+      addScenario,
+      deleteScenario,
+      entities,
+      entityMap,
+      loading,
+      dialog,
+      destroyRef,
+      ...store
+    }) => ({
+      // Load all scenarios
+      loadScenarios: rxMethod<void>(
         pipe(
           tap(() => patchState(store, { loading: true })),
-          switchMap((id) =>
-            scenarioService.deleteScenarios(id).pipe(
+          switchMap(() =>
+            scenarioService.getScenarios().pipe(
+              filter((data) => data.length != 0),
               tapResponse({
-                next: () => patchState(store, removeEntity(id)),
+                next: (scenarios) =>
+                  patchState(store, setAllEntities(scenarios, scenarioConfig)),
                 error: console.log,
                 finalize: () => patchState(store, { loading: false }),
               })
             )
           )
         )
-      );
+      ),
 
-      return {
-        // Load all scenarios
-        loadScenarios: rxMethod<void>(
-          pipe(
-            tap(() => patchState(store, { loading: true })),
-            switchMap(() =>
-              scenarioService.getScenarios().pipe(
-                filter((data) => data.length != 0),
-                tapResponse({
-                  next: (scenarios) =>
-                    patchState(store, setAllEntities(scenarios, { selectId })),
-                  error: console.log,
-                  finalize: () => patchState(store, { loading: false }),
-                })
-              )
-            )
-          )
-        ),
+      openCreateScenarioDialog: () => {
+        dialog
+          .open(AddScenarioComponent, {
+            maxHeight: '80vh',
+          })
+          .afterClosed()
+          .pipe(takeUntilDestroyed(destroyRef))
+          .subscribe({
+            next: (res) => {
+              if (res && res?.scenario) addScenario(res.scenario);
+            },
+          });
+      },
 
-        // Update an existing scenario
-        // updateScenario: rxMethod<ScenarioModel>(
-        //   pipe(
-        //     switchMap((scenario) =>
-        //       scenarioService.updateScenarios(scenario.id_scenario, scenario).pipe(
-        //         tapResponse({
-        //           next: (updatedScenario) =>
-        //             patchState(store, updateEntity(updatedScenario, { selectId })),
-        //           error: console.log,
-        //         })
-        //       )
-        //     )
-        //   )
-        // ),
+      openUpdateScenarioDialog: (id: number) => {
+        dialog
+          .open(EditScenarioComponent, {
+            maxHeight: '80vh',
+            data: {
+              scenario: entityMap()[id],
+            },
+          })
+          .afterClosed()
+          .pipe(takeUntilDestroyed(destroyRef))
+          .subscribe({
+            next: (res) => {
+              if (res && res?.scenario) addScenario(res.scenario);
+            },
+          });
+      },
 
-        openCreateScenarioDialog: () => {
-          dialog
-            .open(AddScenarioComponent, {
-              maxHeight: '80vh',
-            })
-            .afterClosed()
-            .pipe(takeUntilDestroyed(destroyRef))
-            .subscribe({
-              next: (res) => {
-                if (res && res?.scenario) addScenario(res.scenario);
-              },
-            });
-        },
-
-        openDeleteScenarioDialog: (id: number) => {
-          dialog
-            .open(DeleteDialogComponent, {
-              data: { label: 'scenario' },
-              minWidth: '40vw',
-              maxHeight: '95vh',
-            })
-            .afterClosed()
-            .pipe(takeUntilDestroyed(destroyRef))
-            .subscribe({
-              next: (res) => {
-                if (res && res?.type === 'delete') deleteScenario(id);
-              },
-            });
-        },
-      };
-    }
+      openDeleteScenarioDialog: (id: number) => {
+        dialog
+          .open(DeleteDialogComponent, {
+            data: { label: 'scenario' },
+            minWidth: '40vw',
+            maxHeight: '95vh',
+          })
+          .afterClosed()
+          .pipe(takeUntilDestroyed(destroyRef))
+          .subscribe({
+            next: (res) => {
+              if (res && res?.type === 'delete') deleteScenario(id);
+            },
+          });
+      },
+    })
   ),
   withHooks(({ loadScenarios }) => ({
     onInit: () => loadScenarios(),

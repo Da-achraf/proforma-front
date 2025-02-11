@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
 import { API_URL_TOKEN } from '../config/api.config';
-import { Scenario, ScenarioModel } from '../models/scenario.model';
+import { Scenario, ScenarioModel, ScenarioUpdate } from '../models/scenario.model';
 
 @Injectable({
   providedIn: 'root',
@@ -51,7 +51,7 @@ export class ScenarioService {
     return this.http.delete(`${this.baseUrl}/${id_scenario}`);
   }
 
-  updateScenarios(id_scenario: number, scenario: Scenario): Observable<any> {
+  updateScenarios(id_scenario: number, scenario: ScenarioUpdate): Observable<any> {
     return this.http.put(`${this.baseUrl}/${id_scenario}`, scenario);
   }
 

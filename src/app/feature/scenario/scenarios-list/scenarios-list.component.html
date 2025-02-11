@@ -10,8 +10,9 @@
     [columns]="columns()"
     [globalFilterFields]="globalFilterFields()"
     [loading]="store.loading()"
-    (delete)="store.openDeleteScenarioDialog($event)"
     (create)="store.openCreateScenarioDialog()"
+    (edit)="store.openUpdateScenarioDialog($event)"
+    (delete)="store.openDeleteScenarioDialog($event)"
   >
     <ng-template #fieldsCountTemplate let-scenario>
       <div

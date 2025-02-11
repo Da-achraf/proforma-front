@@ -1,0 +1,100 @@
+@defer {
+<div class="p-4 rounded-md shadow-md max-w-[1200px]">
+  <h2 class="mb-3">Edit Scenario</h2>
+
+  <form [formGroup]="scenarioForm" (ngSubmit)="onSubmit()">
+    <div class="w-full">
+      <mat-form-field class="w-full">
+        <mat-label>Scenario name</mat-label>
+        <input matInput formControlName="name" name="name" required />
+      </mat-form-field>
+    </div>
+
+    <div formArrayName="items" class="items-container">
+      <div
+        class="item-box"
+        *ngFor="let item of items.controls; let i = index"
+        [formGroupName]="i"
+      >
+        <mat-form-field appearance="fill">
+          <mat-label>Request item</mat-label>
+          <mat-select
+            formControlName="requestItemId"
+            (selectionChange)="onItemFieldSelected(item, i)"
+          >
+            <mat-option
+              *ngFor="let requestItem of myItems()"
+              [value]="requestItem.id_request_item"
+            >
+              {{ requestItem.nameItem }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Mandatory For</mat-label>
+          <mat-select
+            formControlName="isMandatory"
+            multiple
+            (selectionChange)="onMandatoryForChange($event.value, i)"
+          >
+            <mat-option
+              *ngFor="let option of mandatoryForOptions()"
+              [value]="option"
+            >
+              {{ option }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="border-l border-gray-300">
+          <button
+            mat-icon-button
+            color="warn"
+            matTooltipPosition="above"
+            matTooltip="Remove this item"
+            (click)="subtractItem(i)"
+            type="button"
+          >
+            <mat-icon>remove_circle</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group mt-4">
+      <button
+        type="button"
+        mat-raised-button
+        color="primary"
+        (click)="addItem()"
+      >
+        Add Item
+      </button>
+    </div>
+
+    <div class="mt-3 flex items-center gap-x-3">
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        [disabled]="!scenarioForm.valid"
+      >
+        Update Scenario
+      </button>
+      <button
+        mat-raised-button
+        color="warn"
+        type="button"
+        (click)="dialogRef.close()"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
+} @placeholder(minimum 500ms) {
+<div class="flex items-center justify-center w-full h-full">
+  <loading-dots [diameter]="25" />
+</div>
+}
