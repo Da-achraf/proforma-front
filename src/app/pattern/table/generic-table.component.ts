@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import { Table } from 'primeng/table';
 import { TableColumn } from './table-types.interface';
-import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'ba-generic-table',

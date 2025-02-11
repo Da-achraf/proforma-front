@@ -110,7 +110,7 @@ export const ScenarioStore = signalStore(
         openCreateScenarioDialog: () => {
           dialog
             .open(AddScenarioComponent, {
-              maxHeight: '95vh',
+              maxHeight: '80vh',
             })
             .afterClosed()
             .pipe(takeUntilDestroyed(destroyRef))

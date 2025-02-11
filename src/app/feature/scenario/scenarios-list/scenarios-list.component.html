@@ -1,4 +1,9 @@
-<div class="w-full max-w-[95vw] p-10">
+<div class="w-full max-w-screen-2xl px-2 py-10">
+  <p
+    class="font-bold w-fit mb-5 font-mono text-orange-500 text-md border-b-2 opacity-75 border-b-blue-400"
+  >
+    {{ 'Scenarios list' | titlecase }}
+  </p>
   <ba-generic-table
     [data]="store.entities()"
     [total]="store.total()"
@@ -32,7 +37,7 @@
         </div>
         <span
           class="m-0 font-semibold bg-teal-100 text-teal-600 border-t border-r border-b border-teal-300 rounded-tr-md rounded-br-md px-1 py-2 shadow-md"
-          >{{scenario.requestCount}}</span
+          >{{ scenario.requestCount }}</span
         >
       </div>
       } @else {

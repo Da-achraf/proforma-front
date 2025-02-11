@@ -1,3 +1,4 @@
+@defer {
 <div class="p-4 rounded-md shadow-md max-w-[1200px]">
   <h2 class="mb-3">Create a Scenario</h2>
 
@@ -56,21 +57,21 @@
 
         <!-- Mandatory-for functionality -->
         <!-- <mat-form-field>
-          <mat-label>Mandatory for</mat-label>
-          <mat-select name="mandatoryFor" [formControl]="mandatoryFor" multiple>
-            <mat-select-trigger>
-              {{ (mandatoryFor.value?.[0] || '') | userRoleForDisplay }}
-              @if ((mandatoryFor.value?.length || 0) > 1) {
-                <span class="example-additional-selection">
-                  (+{{(mandatoryFor.value?.length || 0) - 1}} {{mandatoryFor.value?.length === 2 ? 'other' : 'others'}})
-                </span>
-              }
-            </mat-select-trigger>
-            @for (role of roles; track role) {
-          <mat-option [value]="role">{{role | userRoleForDisplay }}</mat-option>
-        }
-          </mat-select>
-        </mat-form-field> -->
+            <mat-label>Mandatory for</mat-label>
+            <mat-select name="mandatoryFor" [formControl]="mandatoryFor" multiple>
+              <mat-select-trigger>
+                {{ (mandatoryFor.value?.[0] || '') | userRoleForDisplay }}
+                @if ((mandatoryFor.value?.length || 0) > 1) {
+                  <span class="example-additional-selection">
+                    (+{{(mandatoryFor.value?.length || 0) - 1}} {{mandatoryFor.value?.length === 2 ? 'other' : 'others'}})
+                  </span>
+                }
+              </mat-select-trigger>
+              @for (role of roles; track role) {
+            <mat-option [value]="role">{{role | userRoleForDisplay }}</mat-option>
+          }
+            </mat-select>
+          </mat-form-field> -->
 
         <!-- Button to remove the item -->
         <div class="border-l border-gray-300">
@@ -108,3 +109,9 @@
     </div>
   </form>
 </div>
+
+} @placeholder(minimum 500ms) {
+<div class="flex items-center justify-center w-full h-full">
+  <loading-dots [diameter]="25" />
+</div>
+}

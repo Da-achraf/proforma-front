@@ -10,7 +10,7 @@
         <div
           class="flex w-full flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0"
         >
-          <ba-search-bar class="min-w-72"(search)="searchValue.set($event)" />
+          <ba-search-bar class="min-w-72" (search)="searchValue.set($event)" />
           @if (showCreateButton()){
           <button
             (click)="openCreateRequestDialog()"
@@ -164,23 +164,28 @@
             } @empty {
             <tr>
               <td [attr.colspan]="columnsLength()" class="text-center p-4">
-                <span class="font-semibold text-lg text-red-500 p-4"
-                  >No requests found.</span
-                >
+                <app-no-data-found />
               </td>
             </tr>
             } } @if (paginatedRequests() === null) {
-            <tr>
+            <!-- <tr>
               <td [attr.colspan]="columnsLength()" class="text-center p-4">
                 <span class="font-semibold text-lg text-red-500 p-3"
                   >No requests found.</span
                 >
               </td>
-            </tr>
+            </tr> -->
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td [attr.colspan]="4">
+                  <app-no-data-found />
+                </td>
+              </tr>
+            </ng-template>
             } @if (paginatedRequests() === undefined) {
             <tr>
               <td [attr.colspan]="columnsLength()" class="p-0">
-                <loading-dots></loading-dots>
+                <loading-dots />
               </td>
             </tr>
             }

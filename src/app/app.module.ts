@@ -124,6 +124,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ToastComponent } from './pattern/toast/toast.component';
 import { ToastClassPipe } from './pattern/toast/toast-class.pipe';
+import { NoDataFoundComponent } from './ui/components/no-data-found/no-data-found.component';
 
 @NgModule({
   declarations: [
@@ -201,7 +202,8 @@ import { ToastClassPipe } from './pattern/toast/toast-class.pipe';
     BaseDialogComponent,
     AddScenarioComponent,
     ToastComponent,
-    ToastClassPipe
+    ToastClassPipe,
+    NoDataFoundComponent
   ],
   imports: [
     BrowserModule,

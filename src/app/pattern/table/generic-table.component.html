@@ -120,17 +120,13 @@
       </tr>
     </ng-template>
 
-    <ng-template #emptymessage>
+    <ng-template pTemplate="emptymessage">
       <tr>
-        <td [attr.colspan]="columnsLength()">
-          @if (!loading() && !data()) {
-          <ng-container *ngTemplateOutlet="defaultEmptyMessage" />
-          }
+        <td [attr.colspan]="columnsLength() + 1">
+          <app-no-data-found />
         </td>
       </tr>
     </ng-template>
-
-    <ng-template #defaultEmptyMessage> No records found. </ng-template>
   </p-table>
 
   <ba-paginator
@@ -139,14 +135,4 @@
     [pageSizeOptions]="pageSizeOptions()"
     (pageSize)="pageSize.emit($event)"
   />
-  <!-- <mat-paginator 
-        [color]="'primary'" 
-        [length]="total()" 
-        [pageSize]="rows()" 
-        [showFirstLastButtons]="true"
-        [pageSizeOptions]="[25, 50, 100, 200]"
-        (page)="onPageChange($event)"
-        aria-label="Select page"
-    >
-    </mat-paginator> -->
 </div>
