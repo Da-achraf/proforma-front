@@ -10,15 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
-import {
-  BehaviorSubject,
-  filter,
-  map,
-  Observable,
-  of,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import { map, Observable, of, startWith } from 'rxjs';
 import { DeliveryAddress } from '../../models/delivery-address.model';
 import {
   ItemModel,
@@ -73,57 +65,42 @@ export class CreateRequestDialogComponent implements OnInit {
   }
 
   // Signals
-  scenarios = toSignal(this.scenarioService.getScenarios());
-  selectedScenarioId = signal(0);
-  selectedScenario = computed(() => {
-    const allSceanrios = this.scenarios();
-    const selectedScenarioId = this.selectedScenarioId();
-
-    if (!allSceanrios || selectedScenarioId === 0) return;
-
-    return allSceanrios.find((s) => s.id_scenario === selectedScenarioId);
+  scenarios = toSignal(this.scenarioService.getScenarios(), {
+    initialValue: [],
   });
-
-  scenearioIdSubject = new BehaviorSubject<number>(0);
-  scenarioAttributes$ = this.scenearioIdSubject.pipe(
-    filter((id: number) => id != 0),
-    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
+  selectedScenarioId = signal(0);
+  selectedScenario = computed(() =>
+    this.scenarios().find((s) => s.id_scenario === this.selectedScenarioId())
   );
-  scenarioAttributes = toSignal(this.scenarioAttributes$);
 
   formItems = computed(() => {
     const selectedScenarioItems: ItemModel[] =
       this.selectedScenario()?.items ?? [];
-    const scenarioAttributes: {
-      attributeName: string;
-      mandatoryFor: string[];
-    }[] = this.scenarioAttributes() ?? [];
+
     const userRole = this.userRole();
 
-    if (
-      !selectedScenarioItems.length ||
-      !scenarioAttributes.length ||
-      !userRole
-    )
-      return [];
+    if (!selectedScenarioItems.length || !userRole) return [];
 
     const mandatoryForUser = userRoleToMandatoryForMapper(userRole);
 
     return selectedScenarioItems.map((item) => {
-      const matchingAttribute = scenarioAttributes.find(
-        (attr) => attr.attributeName === item.nameItem
-      );
       return {
         ...item,
         isMandatory:
-          matchingAttribute && mandatoryForUser
-            ? matchingAttribute.mandatoryFor.includes(mandatoryForUser)
+          item && mandatoryForUser
+            ? item.mandatoryFor?.includes(mandatoryForUser) ?? false
             : false,
       };
     });
   });
 
-  existingItemsData = [];
+  selectedScenarioEffect = effect(() => {
+    const selectedScenario = this.selectedScenario();
+    if (!selectedScenario) return;
+
+    this.addItem();
+    // untracked(() => this.addItem());
+  });
 
   constructor(
     private fb: FormBuilder,
@@ -134,19 +111,7 @@ export class CreateRequestDialogComponent implements OnInit {
     private authService: AuthService,
     private messageService: MessageService,
     public dialogRef: MatDialogRef<CreateRequestDialogComponent>
-  ) {
-    effect(() => {
-      const selectedScenario = this.selectedScenario();
-
-      if (!selectedScenario) return;
-      this.items?.clear();
-      if (this.existingItemsData.length > 0) {
-        this.patchExistingData();
-      } else {
-        this.addItem();
-      }
-    });
-  }
+  ) {}
 
   onChange(text: string) {
     this.filteredOptions = of(text).pipe(
@@ -173,19 +138,6 @@ export class CreateRequestDialogComponent implements OnInit {
     this.loadDeliveryAddresses();
     this.onScenarioChange();
     this.onShippingOrDeliveryChange();
-
-    if (this.existingItemsData.length > 0) {
-      this.patchExistingData();
-    } else {
-      // this.addItem();
-    }
-  }
-
-  patchExistingData() {
-    this.items.clear();
-    this.existingItemsData.forEach((itemData) => {
-      this.items.push(this.createItem(itemData));
-    });
   }
 
   createItem(data?: any): FormGroup {
@@ -223,7 +175,7 @@ export class CreateRequestDialogComponent implements OnInit {
   }
 
   addItem() {
-    console.log('addItem called...');
+    this.items.clear();
     this.items.push(this.createItem());
   }
 
@@ -232,7 +184,6 @@ export class CreateRequestDialogComponent implements OnInit {
     this.items.removeAt(index);
   }
 
-  /******************methodes items*****************/
   get items(): FormArray {
     return this.requestForm.get('items') as FormArray;
   }
@@ -276,7 +227,7 @@ export class CreateRequestDialogComponent implements OnInit {
   onScenarioChange(): void {
     const scenarioIdControl = this.requestForm.get('scenarioId');
     this.selectedScenarioId.set(scenarioIdControl?.value ?? 0);
-    this.scenearioIdSubject.next(scenarioIdControl?.value ?? 0);
+    // this.scenearioIdSubject.next(scenarioIdControl?.value ?? 0);
   }
 
   setFormValidators(attributes: any[]): void {

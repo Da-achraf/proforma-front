@@ -16,11 +16,12 @@ import { ScenarioItemConfigurationService } from '../../../services/scenario-ite
 import { ScenarioService } from '../../../services/scenario.service';
 import { ToasterService } from '../../../shared/services/toaster.service';
 import { ScenarioStore } from '../scenario.store';
+import { CreateItemDialogComponent } from '../../../components/create-item-dialog/create-item-dialog.component';
 
 @Component({
   selector: 'app-edit-scenario',
   templateUrl: 'edit-scenario.component.html',
-  styleUrl: 'edit-scenario.component.css'
+  styleUrl: 'edit-scenario.component.css',
 })
 export class EditScenarioComponent implements OnInit {
   protected readonly dialogRef = inject(MatDialogRef<EditScenarioComponent>);
@@ -61,8 +62,7 @@ export class EditScenarioComponent implements OnInit {
   private initializeForm(): void {
     const scenario = this.data.scenario;
 
-
-    console.log('sceanario: ', scenario)
+    console.log('sceanario: ', scenario);
 
     // Set the basic scenario info
     this.scenarioForm.patchValue({
@@ -90,6 +90,24 @@ export class EditScenarioComponent implements OnInit {
         this.myItems.set(items);
       },
       error: (_) => this.toastr.showError('Error loading items'),
+    });
+  }
+
+  createItem(): void {
+    const dialogRef = this.dialog.open(CreateItemDialogComponent, {
+      width: '800px',
+    });
+
+    dialogRef.afterClosed().subscribe((itemToSave: RequestItemModel) => {
+      if (itemToSave) {
+        this.requestItemService.saveRequestItem(itemToSave).subscribe({
+          next: (response) => {
+            this.myItems.update((items) => [...items, { ...response }]);
+            this.toastr.showSuccess('Item created successfully');
+          },
+          error: () => this.toastr.showError('Error creating item'),
+        });
+      }
     });
   }
 

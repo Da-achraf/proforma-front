@@ -127,9 +127,22 @@
     </div>
     }
 
-    <div class="form-actions" mat-dialog-actions>
-      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">
-        Submit
+    <div class="mt-4 flex items-center gap-x-3 justify-end">
+      <button
+        mat-raised-button
+        color="warn"
+        type="button"
+        (click)="dialogRef.close()"
+      >
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        [disabled]="!requestForm.valid"
+        type="submit"
+        class="submit-button"
+      >
+        Save Changes
       </button>
     </div>
   </form>

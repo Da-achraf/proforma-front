@@ -88,7 +88,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
   requestSig = toSignal(this.request$);
   selectedScenario = computed(() => {
     const request = this.requestSig();
-    if (!request) return;
+    if (!request || !request?.scenario) return;
     this.scenearioIdSubject.next(request.scenario.id_scenario);
     return request.scenario;
   });
@@ -239,7 +239,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
         if (modeOfTransport == ModeOfTransportEnum.BY_AIR) {
           this.requestForm.patchValue({
             invoicesTypes: request?.invoicesTypes,
-            scenarioId: request?.scenario.name,
+            scenarioId: request?.scenario?.name,
             shippingPoint: request?.shipPoint.shipPoint,
             modeOfTransport: request?.modeOfTransport,
             deliveryAddress: request?.deliveryAddress?.customerId,

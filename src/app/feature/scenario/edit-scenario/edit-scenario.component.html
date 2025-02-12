@@ -62,34 +62,44 @@
       </div>
     </div>
 
-    <div class="control-group mt-4">
-      <button
-        type="button"
-        mat-raised-button
-        color="primary"
-        (click)="addItem()"
-      >
-        Add Item
-      </button>
-    </div>
-
-    <div class="mt-3 flex items-center gap-x-3">
-      <button
-        type="submit"
-        mat-raised-button
-        color="primary"
-        [disabled]="!scenarioForm.valid"
-      >
-        Update Scenario
-      </button>
-      <button
-        mat-raised-button
-        color="warn"
-        type="button"
-        (click)="dialogRef.close()"
-      >
-        Cancel
-      </button>
+    <div class="mt-3 flex items-center justify-between gap-x-3">
+      <div class="flex items-center gap-x-3">
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-sec"
+          (click)="createItem()"
+        >
+          Create New Item
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          matTooltipPosition="above"
+          matTooltip="Add item"
+          (click)="addItem()"
+          type="button"
+        >
+          <mat-icon>add_circle</mat-icon>
+        </button>
+      </div>
+      <div class="flex items-center gap-x-3">
+        <button
+          type="submit"
+          mat-raised-button
+          [disabled]="!scenarioForm.valid"
+        >
+          Save Changes
+        </button>
+        <button
+          mat-raised-button
+          color="warn"
+          type="button"
+          (click)="dialogRef.close()"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   </form>
 </div>

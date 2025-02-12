@@ -25,27 +25,44 @@
         <mat-select formControlName="invoicesTypes">
           <mat-option *ngFor="let type of invoiceTypes()" [value]="type">{{
             type
-            }}</mat-option>
+          }}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Scenario</mat-label>
-        <mat-select formControlName="scenarioId" (selectionChange)="onScenarioChange()">
-          <mat-option *ngFor="let scenario of scenarios()" [value]="scenario.id_scenario">{{ scenario.name }}
+        <mat-select
+          formControlName="scenarioId"
+          (selectionChange)="onScenarioChange()"
+        >
+          <mat-option
+            *ngFor="let scenario of scenarios()"
+            [value]="scenario.id_scenario"
+            >{{ scenario.name }}
           </mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Shipping Point</mat-label>
         <mat-select formControlName="shippingPoint">
-          <mat-option *ngFor="let point of shipPoints" [value]="point.id_ship">{{ point.shipPoint }}</mat-option>
+          <mat-option
+            *ngFor="let point of shipPoints"
+            [value]="point.id_ship"
+            >{{ point.shipPoint }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Delivery Address</mat-label>
-        <mat-select formControlName="deliveryAddress" (selectionChange)="onDeliveryAddressChange($event.value)">
+        <mat-select
+          formControlName="deliveryAddress"
+          (selectionChange)="onDeliveryAddressChange($event.value)"
+        >
           <mat-option value="other">Other</mat-option>
-          <mat-option *ngFor="let address of deliveryAddresses" [value]="address.id">{{ address.customerId }}</mat-option>
+          <mat-option
+            *ngFor="let address of deliveryAddresses"
+            [value]="address.id"
+            >{{ address.customerId }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
@@ -53,20 +70,23 @@
         <mat-select formControlName="incoterm">
           <mat-option *ngFor="let term of incotermOptions()" [value]="term">{{
             term
-            }}</mat-option>
+          }}</mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="fill">
-        <mat-label>Cost Center</mat-label>  
+        <mat-label>Cost Center</mat-label>
         <input matInput formControlName="costCenter" />
       </mat-form-field>
 
       <mat-form-field appearance="fill">
         <mat-label>Mode Of Transport</mat-label>
         <mat-select formControlName="modeOfTransport">
-          <mat-option *ngFor="let modeOfTransport of modesOfTransports" [value]="modeOfTransport">{{ modeOfTransport
-            }}</mat-option>
+          <mat-option
+            *ngFor="let modeOfTransport of modesOfTransports"
+            [value]="modeOfTransport"
+            >{{ modeOfTransport }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
 
@@ -85,17 +105,16 @@
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
           @for (option of currencyCodes(); track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
+          <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
-
 
       <mat-form-field>
         <mat-label>Shiped Via</mat-label>
         <mat-select formControlName="shippedVia" name="shippedVia">
           @for (option of shippedViaOptions(); track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
+          <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -113,12 +132,24 @@
       </div>
       <div class="p-2" formArrayName="items">
         @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-        <div [formGroupName]="i" class="mb-4 p-2 border border-gray-300 rounded shadow-md">
+        <div
+          [formGroupName]="i"
+          class="mb-4 p-2 border border-gray-300 rounded shadow-md"
+        >
           <div class="flex items-center justify-between mb-2">
             <span class="font-bold">Item {{ i + 1 }}</span>
-            <button mat-icon-button color="warn" matTooltipPosition="above"
-              [matTooltip]="items.length === 1 ? 'A request should have at least one item' : 'Remove this item'"
-              type="button" (click)="removeItem(i)">
+            <button
+              mat-icon-button
+              color="warn"
+              matTooltipPosition="above"
+              [matTooltip]="
+                items.length === 1
+                  ? 'A request should have at least one item'
+                  : 'Remove this item'
+              "
+              type="button"
+              (click)="removeItem(i)"
+            >
               <mat-icon>remove_circle</mat-icon>
             </button>
           </div>
@@ -127,7 +158,12 @@
             <div [formGroupName]="field.nameItem">
               <mat-form-field appearance="fill" class="w-full mb-2">
                 <mat-label>{{ field.nameItem }}</mat-label>
-                <input matInput formControlName="value" [type]="field.type" [required]="field.isMandatory">
+                <input
+                  matInput
+                  formControlName="value"
+                  [type]="field.type"
+                  [required]="field.isMandatory"
+                />
               </mat-form-field>
             </div>
             }
@@ -136,22 +172,38 @@
         }
       </div>
       <div class="p-2">
-        <button mat-icon-button color="primary" matTooltipPosition="above" matTooltip="Add another item"
-          (click)="addItem()" type="button">
+        <button
+          mat-icon-button
+          color="primary"
+          matTooltipPosition="above"
+          matTooltip="Add another item"
+          (click)="addItem()"
+          type="button"
+        >
           <mat-icon>add_circle</mat-icon>
         </button>
       </div>
     </div>
     }
 
+    <mat-divider class="my-3" />
 
-
-    <div class="mt-2" mat-dialog-actions>
-      <button mat-raised-button class="cancel-button" (click)="onNoClick()">
+    <div class="mt-2 flex items-center gap-x-3 justify-end">
+      <button
+        mat-raised-button
+        color="warn"
+        type="button"
+        (click)="dialogRef.close()"
+      >
         Cancel
       </button>
-      <button mat-raised-button [disabled]="!requestForm.valid" class="submit-button" (click)="onSubmit()">
-        Submit
+      <button
+        mat-raised-button
+        [disabled]="!requestForm.valid"
+        class="submit-button"
+        (click)="onSubmit()"
+      >
+        Create Request
       </button>
     </div>
   </form>

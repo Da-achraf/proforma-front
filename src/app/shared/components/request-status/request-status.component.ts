@@ -14,6 +14,7 @@ import { RequestStatus } from '../../../models/requeststatus.model';
         [ngClass]="{
             'pi-check-circle': status() === RequestStatusEnum.Done,
             'pi-spinner-dotted': status() !== RequestStatusEnum.Done,
+            'pi-times-circle': status() === RequestStatusEnum.Rejected
         }"
         style="font-size: 0.8rem"
       ></i>

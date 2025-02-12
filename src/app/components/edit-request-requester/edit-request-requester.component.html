@@ -197,19 +197,23 @@
     </div>
     }
 
-    <div class="form-actions" mat-dialog-actions>
-      <button mat-raised-button type="submit" [disabled]="!requestForm.valid">
-        Submit
-      </button>
-    </div>
-
-    <!-- <div class="mt-2" mat-dialog-actions>
-      <button mat-raised-button class="cancel-button" (click)="onNoClick()">
+    <div class="mt-4 flex items-center gap-x-3 justify-end">
+      <button
+        mat-raised-button
+        color="warn"
+        type="button"
+        (click)="dialogRef.close()"
+      >
         Cancel
       </button>
-      <button mat-raised-button [disabled]="!requestForm.valid" class="submit-button" (click)="onSubmit()">
-        Submit
+      <button
+        mat-raised-button
+        [disabled]="!requestForm.valid"
+        class="submit-button"
+        type="submit"
+      >
+        Save Changes
       </button>
-    </div> -->
+    </div>
   </form>
 </div>

@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-  untracked,
-} from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
@@ -15,17 +8,8 @@ import {
 } from '@angular/material/dialog';
 import _ from 'lodash';
 import { MessageService } from 'primeng/api';
-import {
-  BehaviorSubject,
-  catchError,
-  filter,
-  map,
-  Observable,
-  of,
-  shareReplay,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import { catchError, map, Observable, of, shareReplay, startWith } from 'rxjs';
+import { DeliveryAddress } from '../../models/delivery-address.model';
 import {
   ItemModel,
   userRoleToMandatoryForMapper,
@@ -40,16 +24,14 @@ import {
   UpdateRequestByRequester,
 } from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
-import { AuthService } from '../../services/auth.service';
+import { DeliveryAddressService } from '../../services/delivery-address.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
+import { UserStoreService } from '../../services/user-store.service';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import { ToasterService } from '../../shared/services/toaster.service';
 import { CreateRequestDialogComponent } from '../create-request-dialog/create-request-dialog.component';
-import { UserStoreService } from '../../services/user-store.service';
-import { DeliveryAddress } from '../../models/delivery-address.model';
-import { DeliveryAddressService } from '../../services/delivery-address.service';
 import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-address-crud/delivery-address-crud.component';
 
 @Component({
@@ -86,20 +68,6 @@ export class EditRequestRequesterComponent {
   );
   requestSig = toSignal(this.request$);
 
-  selectedScenario = computed(() => {
-    const request = this.requestSig();
-    if (!request) return;
-    this.scenearioIdSubject.next(request.scenario.id_scenario);
-    return request.scenario;
-  });
-
-  scenearioIdSubject = new BehaviorSubject<number>(0);
-  scenarioAttributes$ = this.scenearioIdSubject.pipe(
-    filter((id: number) => id != 0),
-    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
-  );
-  scenarioAttributes = toSignal(this.scenarioAttributes$);
-
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
@@ -108,38 +76,39 @@ export class EditRequestRequesterComponent {
     );
   }
 
-  // Signals
+  // Signals and computed values
   scenarios = toSignal(this.scenarioService.getScenarios());
   selectedScenarioId = signal(0);
   selectedScenarioChanged = signal<number | undefined>(undefined);
 
+  patchedScenario = computed(() => this.requestSig()?.scenario);
+
+  selectedScenario = computed(() =>
+    this.scenarios()?.find((s) => s.id_scenario === this.selectedScenarioId())
+  );
+
   formItems = computed(() => {
-    const selectedScenarioItems: ItemModel[] =
-      this.selectedScenario()?.items ?? [];
-    const scenarioAttributes: {
-      attributeName: string;
-      mandatoryFor: string[];
-    }[] = this.scenarioAttributes() ?? [];
+    const patchedScenario = this.patchedScenario();
+    const selectedScenario = this.selectedScenario();
+
+    const scenarioItems: ItemModel[] = selectedScenario
+      ? selectedScenario.items
+      : patchedScenario
+      ? patchedScenario.items
+      : [];
+
     const userRole = this.userRole();
 
-    if (
-      !selectedScenarioItems.length ||
-      !scenarioAttributes.length ||
-      !userRole
-    )
-      return [];
+    if (!scenarioItems.length || !userRole) return [];
 
     const mandatoryForUser = userRoleToMandatoryForMapper(userRole);
 
-    return selectedScenarioItems.map((item) => {
-      const matchingAttribute = scenarioAttributes.find(
-        (attr) => attr.attributeName === item.nameItem
-      );
+    return scenarioItems.map((item) => {
       return {
         ...item,
         isMandatory:
-          matchingAttribute && mandatoryForUser
-            ? matchingAttribute.mandatoryFor.includes(mandatoryForUser)
+          item && mandatoryForUser
+            ? item.mandatoryFor?.includes(mandatoryForUser) ?? false
             : false,
       };
     });
@@ -147,7 +116,7 @@ export class EditRequestRequesterComponent {
 
   existingItemsData = computed(() => {
     const request = this.requestSig();
-    if (!request) return;
+    if (!request || !request.scenario) return;
     return request.itemsWithValues;
   });
 
@@ -157,7 +126,6 @@ export class EditRequestRequesterComponent {
     private shippointService: ShippointService,
     private deliveryAddressService: DeliveryAddressService,
     private requestService: RequestService,
-    private authService: AuthService,
     private messageService: MessageService,
     public dialogRef: MatDialogRef<CreateRequestDialogComponent>
   ) {
@@ -215,7 +183,7 @@ export class EditRequestRequesterComponent {
       next: (request: RequestModel) => {
         this.requestForm.patchValue({
           invoicesTypes: request?.invoicesTypes,
-          scenarioId: request?.scenario.id_scenario,
+          scenarioId: request?.scenario?.id_scenario,
           shippingPoint: request?.shipPoint.id_ship,
           deliveryAddress: request?.deliveryAddress?.id,
           incoterm: request?.incoterm,
@@ -256,7 +224,6 @@ export class EditRequestRequesterComponent {
         isMandatory: [fieldData?.isMandatory],
       });
     });
-    console.log(this.fb.group(group));
     return this.fb.group(group);
   }
 
@@ -280,7 +247,6 @@ export class EditRequestRequesterComponent {
     this.items.removeAt(index);
   }
 
-  /******************methodes items*****************/
   get items(): FormArray {
     return this.requestForm.get('items') as FormArray;
   }
@@ -324,8 +290,6 @@ export class EditRequestRequesterComponent {
   onScenarioChange(): void {
     const scenarioIdControl = this.requestForm.get('scenarioId');
     this.selectedScenarioId.set(scenarioIdControl?.value ?? 0);
-    this.scenearioIdSubject.next(scenarioIdControl?.value ?? 0);
-
     this.selectedScenarioChanged.set(scenarioIdControl?.value ?? undefined);
   }
 

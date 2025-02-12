@@ -118,7 +118,7 @@ export class EditRequestWarehouseComponent implements OnInit {
 
   selectedScenario = computed(() => {
     const request = this.requestSig();
-    if (!request) return;
+    if (!request || !request?.scenario) return;
     this.scenearioIdSubject.next(request.scenario.id_scenario);
     return request.scenario;
   });
