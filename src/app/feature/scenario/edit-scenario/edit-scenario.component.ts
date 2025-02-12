@@ -167,47 +167,43 @@ export class EditScenarioComponent implements OnInit {
         name: formValue.name,
       };
 
-      id_scenario: this.scenarioId,
-        // Update the scenario
-        this.scenarioService
-          .updateScenarios(this.scenarioId, scenarioUpdate)
-          .pipe(
-            switchMap((updatedScenario) => {
-              // Create observables for updating item configurations
-              const itemConfigUpdates = formValue.items.map((item: any) => {
-                const itemConfig = {
-                  id_scenario: this.scenarioId,
-                  id_request_item: item.requestItemId,
-                  isMandatory: false,
-                  mandatoryFor: item.isMandatory.join(','),
-                };
+      // Update the scenario
+      this.scenarioService
+        .updateScenarios(this.scenarioId, scenarioUpdate)
+        .pipe(
+          switchMap((updatedScenario) => {
+            // Create observables for updating item configurations
+            const itemConfigUpdates = formValue.items.map((item: any) => {
+              const itemConfig = {
+                id_scenario: this.scenarioId,
+                id_request_item: item.requestItemId,
+                isMandatory: false,
+                mandatoryFor: item.isMandatory.join(','),
+              };
 
-                return this.scenarioItemConfigurationService.updateScenarioItemsConfiguration(
-                  // this.scenarioId,
-                  // item.requestItemId,
-                  itemConfig
-                );
-              });
-
-              // Wait for all item configurations to be updated
-              return forkJoin(itemConfigUpdates).pipe(
-                switchMap(() => {
-                  // Fetch the updated scenario
-                  return this.scenarioService.getScenarioById(this.scenarioId);
-                })
+              return this.scenarioItemConfigurationService.CreatescenarioItemsConfiguration(
+                itemConfig
               );
-            })
-          )
-          .subscribe({
-            next: (updatedScenario) => {
-              this.store.updateScenario(updatedScenario);
-              this.dialogRef.close({ scenario: updatedScenario });
-              this.toastr.showSuccess('Scenario updated successfully');
-            },
-            error: (error) => {
-              this.toastr.showError('Failed to update scenario');
-            },
-          });
+            });
+
+            // Wait for all item configurations to be created
+            return forkJoin(itemConfigUpdates).pipe(
+              switchMap(() => {
+                // Fetch the updated scenario
+                return this.scenarioService.getScenarioById(this.scenarioId);
+              })
+            );
+          })
+        )
+        .subscribe({
+          next: (updatedScenario) => {
+            this.store.updateScenario(updatedScenario);
+            this.dialogRef.close({ scenario: updatedScenario });
+          },
+          error: (error) => {
+            this.toastr.showError('Failed to update scenario');
+          },
+        });
     } else {
       this.toastr.showWarning('Form is invalid');
     }

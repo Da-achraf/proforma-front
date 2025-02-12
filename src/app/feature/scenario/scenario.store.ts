@@ -17,6 +17,8 @@ import {
   entityConfig,
   removeEntity,
   setAllEntities,
+  setEntity,
+  updateEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -26,6 +28,7 @@ import { DeleteDialogComponent } from '../../pattern/dialogs/delete-dialog.compo
 import { ScenarioService } from '../../services/scenario.service';
 import { AddScenarioComponent } from './add-scenario/add-scenario.component';
 import { EditScenarioComponent } from './edit-scenario/edit-scenario.component';
+import { ToasterService } from '../../shared/services/toaster.service';
 
 type ScenariosState = {
   loading: boolean;
@@ -50,6 +53,7 @@ export const ScenarioStore = signalStore(
 
   withProps(() => ({
     scenarioService: inject(ScenarioService),
+    toastr: inject(ToasterService),
     dialog: inject(MatDialog),
     destroyRef: inject(DestroyRef),
   })),
@@ -58,25 +62,18 @@ export const ScenarioStore = signalStore(
     total: computed(() => entities().length),
   })),
 
-  withMethods(({ scenarioService, ...store }) => ({
+  withMethods(({ scenarioService, toastr, ...store }) => ({
     // Add a new scenario
     addScenario: (scenario: ScenarioModel) => {
       patchState(store, addEntity(scenario, scenarioConfig));
+      toastr.showSuccess('Scenario Created successfully');
     },
 
     // Update an existing scenario
-    updateScenario: rxMethod<ScenarioModel>(
-      pipe()
-      // switchMap((scenario) =>
-      //   scenarioService.(scenario.id_scenario, scenario).pipe(
-      //     tapResponse({
-      //       next: (updatedScenario) =>
-      //         patchState(store, updateEntity(updatedScenario, { selectId })),
-      //       error: console.log,
-      //     })
-      //   )
-      // )
-    ),
+    updateScenario: (updatedScenario: ScenarioModel) => {
+      patchState(store, setEntity(updatedScenario, scenarioConfig));
+      toastr.showSuccess('Scenario Updated successfully');
+    },
 
     // Delete a scenario
     deleteScenario: rxMethod<number>(
@@ -99,6 +96,7 @@ export const ScenarioStore = signalStore(
     ({
       scenarioService,
       addScenario,
+      updateScenario,
       deleteScenario,
       entities,
       entityMap,
@@ -151,7 +149,7 @@ export const ScenarioStore = signalStore(
           .pipe(takeUntilDestroyed(destroyRef))
           .subscribe({
             next: (res) => {
-              if (res && res?.scenario) addScenario(res.scenario);
+              if (res && res?.scenario) updateScenario(res.scenario);
             },
           });
       },

@@ -173,49 +173,6 @@ export class AddScenarioComponent implements OnInit {
 
   onSubmit(): void {
     if (this.scenarioForm.valid) {
-      // const formValue = this.scenarioForm.value;
-
-      // this.scenarioService
-      //   .CreateScenarios({
-      //     name: formValue.name,
-      //     approvers: formValue.approvers.map((approver: any) => ({
-      //       role: approver.role,
-      //       class: approver.class,
-      //     })),
-      //     items: formValue.items.map((item: any) => ({
-      //       requestItemId: item.requestItemId,
-      //       isMandatory: item.isMandatory,
-      //     })),
-      //   })
-      //   .subscribe({
-      //     next: (response) => {
-      //       const scenarioId = response.id_scenario;
-
-      //       formValue.items.forEach((item: any) => {
-      //         const itemConfig = {
-      //           id_scenario: scenarioId,
-      //           id_request_item: item.requestItemId,
-      //           isMandatory: false,
-      //           mandatoryFor: item.isMandatory.join(','),
-      //         };
-      //         this.scenarioItemConfigurationService
-      //           .CreatescenarioItemsConfiguration(itemConfig)
-      //           .subscribe({
-      //             error: () => {
-      //               this.toastr.showError(
-      //                 `Failed to create item configuration with name ${item.nameItem}`
-      //               );
-      //             },
-      //           });
-      //       });
-
-      //       this.toastr.showSuccess('Scenario created successfully');
-      //     },
-      //     error: () => {
-      //       this.toastr.showError('Failed to create scenario');
-      //     },
-      //   });
-
       const formValue = this.scenarioForm.value;
 
       this.scenarioService
@@ -259,7 +216,6 @@ export class AddScenarioComponent implements OnInit {
         .subscribe({
           next: (scenario) => {
             this.dialogRef.close({ scenario });
-            this.toastr.showSuccess('Scenario created successfully');
           },
           error: (error) => {
             this.toastr.showError(
@@ -271,32 +227,6 @@ export class AddScenarioComponent implements OnInit {
       this.toastr.showWarning('Form is invalid');
     }
   }
-
-  // onMandatoryForChange(selectedValues: string[], index: number) {
-  //   const isMandatoryControl = this.items.at(index).get('isMandatory');
-
-  //   // Scenario 1: When any normal approver is selected while "None" was previously selected
-  //   if (selectedValues.length > 1 && selectedValues.includes('None')) {
-  //     const filteredValues = selectedValues.filter(value => value !== 'None');
-  //     isMandatoryControl?.setValue(filteredValues);
-  //     return;
-  //   }
-
-  //   // Scenario 2: When "None" is selected while having other approvers
-  //   if (selectedValues.includes('None')) {
-  //     isMandatoryControl?.setValue(['None']);
-  //     return;
-  //   }
-
-  //   // Scenario 3: When deselecting all options, default to "None"
-  //   if (selectedValues.length === 0) {
-  //     isMandatoryControl?.setValue(['None']);
-  //     return;
-  //   }
-
-  //   // Scenario 4: Normal case - multiple approvers can be selected
-  //   isMandatoryControl?.setValue(selectedValues);
-  // }
 
   onMandatoryForChange(selectedValues: string[], index: number) {
     const isMandatoryControl = this.items.at(index).get('isMandatory');

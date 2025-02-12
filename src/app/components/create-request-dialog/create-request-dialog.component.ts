@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   signal,
+  untracked,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -98,8 +99,10 @@ export class CreateRequestDialogComponent implements OnInit {
     const selectedScenario = this.selectedScenario();
     if (!selectedScenario) return;
 
-    this.addItem();
-    // untracked(() => this.addItem());
+    untracked(() => {
+      this.items.clear();
+      this.addItem();
+    });
   });
 
   constructor(
@@ -151,13 +154,12 @@ export class CreateRequestDialogComponent implements OnInit {
       group[item.nameItem] = this.fb.group({
         name: item.nameItem,
         value: [
-          fieldData ? fieldData?.value : '',
+          '',
           fieldData?.isMandatory || item.isMandatory
             ? Validators.required
             : null,
         ],
         type: [fieldData ? fieldData?.type : item.type],
-        // isMandatory: [fieldData?.isMandatory]
       });
     });
     console.log(this.fb.group(group));
@@ -175,7 +177,6 @@ export class CreateRequestDialogComponent implements OnInit {
   }
 
   addItem() {
-    this.items.clear();
     this.items.push(this.createItem());
   }
 
