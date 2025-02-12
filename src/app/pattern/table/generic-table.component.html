@@ -13,7 +13,7 @@
     [value]="data()"
     [globalFilterFields]="globalFilterFields()"
     (onFilter)="onFilter($event)"
-  >
+    >
     <ng-template pTemplate="caption">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-x-3">
@@ -121,11 +121,13 @@
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
-      <tr>
-        <td [attr.colspan]="columnsLength() + 1">
-          <app-no-data-found />
-        </td>
-      </tr>
+      @if (!loading() && data().length === 0) {
+        <tr>
+          <td [attr.colspan]="columnsLength() + 1">
+            <app-no-data-found />
+          </td>
+        </tr>  
+      }
     </ng-template>
   </p-table>
 

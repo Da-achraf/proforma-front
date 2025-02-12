@@ -18,7 +18,6 @@ import {
   removeEntity,
   setAllEntities,
   setEntity,
-  updateEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -26,9 +25,9 @@ import { filter, pipe, switchMap, tap } from 'rxjs';
 import { ScenarioModel } from '../../models/scenario.model';
 import { DeleteDialogComponent } from '../../pattern/dialogs/delete-dialog.component';
 import { ScenarioService } from '../../services/scenario.service';
+import { ToasterService } from '../../shared/services/toaster.service';
 import { AddScenarioComponent } from './add-scenario/add-scenario.component';
 import { EditScenarioComponent } from './edit-scenario/edit-scenario.component';
-import { ToasterService } from '../../shared/services/toaster.service';
 
 type ScenariosState = {
   loading: boolean;
@@ -66,13 +65,13 @@ export const ScenarioStore = signalStore(
     // Add a new scenario
     addScenario: (scenario: ScenarioModel) => {
       patchState(store, addEntity(scenario, scenarioConfig));
-      toastr.showSuccess('Scenario Created successfully');
+      toastr.showSuccess('Scenario Created Successfully');
     },
 
     // Update an existing scenario
     updateScenario: (updatedScenario: ScenarioModel) => {
       patchState(store, setEntity(updatedScenario, scenarioConfig));
-      toastr.showSuccess('Scenario Updated successfully');
+      toastr.showSuccess('Scenario Updated Successfully');
     },
 
     // Delete a scenario

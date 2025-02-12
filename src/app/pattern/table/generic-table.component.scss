@@ -35,3 +35,18 @@
 //     font-size: 2rem;
 //   }
 // }
+
+/* Alternating row colors */
+.p-datatable .p-datatable-tbody > tr.p-datatable-even {
+    background-color: #f9f9f9; /* Light gray for even rows */
+  }
+  
+  .p-datatable .p-datatable-tbody > tr.p-datatable-odd {
+    background-color: #ffffff; /* White for odd rows */
+  }
+  
+  /* Hover effect */
+  .p-datatable .p-datatable-tbody > tr:hover {
+    background-color: #e0e0e0; /* Light gray on hover */
+    cursor: pointer; /* Optional: Change cursor to pointer */
+  }

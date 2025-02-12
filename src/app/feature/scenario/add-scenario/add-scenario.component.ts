@@ -29,6 +29,7 @@ import { ScenarioService } from '../../../services/scenario.service';
 import { ToasterService } from '../../../shared/services/toaster.service';
 import { ScenarioStore } from '../scenario.store';
 import { forkJoin, switchMap } from 'rxjs';
+import { ScenarioUtilService } from '../scenario-util.service';
 
 @Component({
   selector: 'app-add-scenario',
@@ -48,6 +49,7 @@ export class AddScenarioComponent implements OnInit {
   protected readonly scenarioItemConfigurationService = inject(
     ScenarioItemConfigurationService
   );
+  protected readonly scenarioUtilService = inject(ScenarioUtilService);
 
   scenarioForm: FormGroup;
   itemsAvailable: any[] = [];
@@ -229,33 +231,51 @@ export class AddScenarioComponent implements OnInit {
   }
 
   onMandatoryForChange(selectedValues: string[], index: number) {
-    const isMandatoryControl = this.items.at(index).get('isMandatory');
+    const isMandatoryControl = this.items
+      .at(index)
+      .get('isMandatory') as FormControl;
 
-    // If 'None' is newly selected (it wasn't in previous values but is in new selection)
-    const previousValues = isMandatoryControl?.value || [];
-    const isNoneNewlySelected =
-      !previousValues.includes('None') && selectedValues.includes('None');
-
-    if (isNoneNewlySelected) {
-      // If None is explicitly selected, clear other selections
-      isMandatoryControl?.setValue(['None']);
-      return;
-    }
-
-    // If selecting other options while None is selected, remove None
-    if (selectedValues.length > 1 && selectedValues.includes('None')) {
-      const filteredValues = selectedValues.filter((value) => value !== 'None');
-      isMandatoryControl?.setValue(filteredValues);
-      return;
-    }
-
-    // When deselecting all options, default to "None"
-    if (selectedValues.length === 0) {
-      isMandatoryControl?.setValue(['None']);
-      return;
-    }
-
-    // Normal case - multiple approvers can be selected
-    isMandatoryControl?.setValue(selectedValues);
+    this.scenarioUtilService.onMandatoryForChange(
+      selectedValues,
+      index,
+      isMandatoryControl
+    );
   }
+
+  // previousValuesMap: { [index: number]: string[] } = {};
+  // onMandatoryForChange(selectedValues: string[], index: number) {
+  //   const None = MandatoryForEnum.None
+
+  //   const previousValues = this.previousValuesMap[index] || [];
+  //   const isMandatoryControl = this.items.at(index).get('isMandatory');
+
+  //   // Check if 'None' is newly selected
+  //   const isNoneNewlySelected =
+  //     !previousValues.includes(None) && selectedValues.includes(None);
+
+  //   if (isNoneNewlySelected) {
+  //     isMandatoryControl?.setValue([None], { emitEvent: false });
+  //     this.previousValuesMap[index] = [None];
+  //     return;
+  //   }
+
+  //   // If other options are selected with 'None', remove 'None'
+  //   if (selectedValues.length > 1 && selectedValues.includes(None)) {
+  //     const filteredValues = selectedValues.filter((value) => value !== None);
+  //     isMandatoryControl?.setValue(filteredValues, { emitEvent: false });
+  //     this.previousValuesMap[index] = filteredValues;
+  //     return;
+  //   }
+
+  //   // Default to 'None' if nothing is selected
+  //   if (selectedValues.length === 0) {
+  //     isMandatoryControl?.setValue([None], { emitEvent: false });
+  //     this.previousValuesMap[index] = [None];
+  //     return;
+  //   }
+
+  //   // Update with the selected values
+  //   isMandatoryControl?.setValue(selectedValues, { emitEvent: false });
+  //   this.previousValuesMap[index] = selectedValues;
+  // }
 }

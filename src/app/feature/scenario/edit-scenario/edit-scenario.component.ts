@@ -1,11 +1,18 @@
 import { Component, effect, inject, OnInit, signal } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
 import { forkJoin, switchMap } from 'rxjs';
+import { CreateItemDialogComponent } from '../../../components/create-item-dialog/create-item-dialog.component';
 import {
   MANDATORY_FOR_OPTIONS,
   MandatoryForEnum,
@@ -15,8 +22,7 @@ import { RequestItemService } from '../../../services/request-item.service';
 import { ScenarioItemConfigurationService } from '../../../services/scenario-item-configuration.service';
 import { ScenarioService } from '../../../services/scenario.service';
 import { ToasterService } from '../../../shared/services/toaster.service';
-import { ScenarioStore } from '../scenario.store';
-import { CreateItemDialogComponent } from '../../../components/create-item-dialog/create-item-dialog.component';
+import { ScenarioUtilService } from '../scenario-util.service';
 
 @Component({
   selector: 'app-edit-scenario',
@@ -26,7 +32,6 @@ import { CreateItemDialogComponent } from '../../../components/create-item-dialo
 export class EditScenarioComponent implements OnInit {
   protected readonly dialogRef = inject(MatDialogRef<EditScenarioComponent>);
   protected readonly data = inject(MAT_DIALOG_DATA);
-  protected readonly store = inject(ScenarioStore);
   protected readonly fb = inject(FormBuilder);
   protected readonly dialog = inject(MatDialog);
   protected readonly toastr = inject(ToasterService);
@@ -35,6 +40,7 @@ export class EditScenarioComponent implements OnInit {
   protected readonly scenarioItemConfigurationService = inject(
     ScenarioItemConfigurationService
   );
+  protected readonly scenarioUtilService = inject(ScenarioUtilService);
 
   scenarioForm: FormGroup;
   scenarioId!: number;
@@ -61,8 +67,6 @@ export class EditScenarioComponent implements OnInit {
 
   private initializeForm(): void {
     const scenario = this.data.scenario;
-
-    console.log('sceanario: ', scenario);
 
     // Set the basic scenario info
     this.scenarioForm.patchValue({
@@ -136,26 +140,15 @@ export class EditScenarioComponent implements OnInit {
   }
 
   onMandatoryForChange(selectedValues: string[], index: number) {
-    const isMandatoryControl = this.items.at(index).get('isMandatory');
+    const isMandatoryControl = this.items
+      .at(index)
+      .get('isMandatory') as FormControl;
 
-    if (selectedValues.length === 0) {
-      isMandatoryControl?.setValue(['None']);
-      return;
-    }
-
-    const isNoneNewlySelected = selectedValues.includes('None');
-    if (isNoneNewlySelected) {
-      isMandatoryControl?.setValue(['None']);
-      return;
-    }
-
-    if (selectedValues.length > 1 && selectedValues.includes('None')) {
-      const filteredValues = selectedValues.filter((value) => value !== 'None');
-      isMandatoryControl?.setValue(filteredValues);
-      return;
-    }
-
-    isMandatoryControl?.setValue(selectedValues);
+    this.scenarioUtilService.onMandatoryForChange(
+      selectedValues,
+      index,
+      isMandatoryControl
+    );
   }
 
   onSubmit(): void {
@@ -197,7 +190,6 @@ export class EditScenarioComponent implements OnInit {
         )
         .subscribe({
           next: (updatedScenario) => {
-            this.store.updateScenario(updatedScenario);
             this.dialogRef.close({ scenario: updatedScenario });
           },
           error: (error) => {
