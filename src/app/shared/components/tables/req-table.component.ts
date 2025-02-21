@@ -37,7 +37,7 @@ import { RequestStrategyFactory } from '../../services/requests-strategies/reque
 import { SideNavService } from '../../services/side-nav.service';
 import { ToasterService } from '../../services/toaster.service';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
-import { getRequestModificationComponent } from './helpers';
+import { FilterOptions, getRequestModificationComponent } from './helpers';
 
 const REQUEST_EDITING_TIMOUT = 1000;
 
@@ -61,12 +61,13 @@ export class RequestsTableComponent {
   datePipe = inject(DatePipe);
   sideNavService = inject(SideNavService);
 
-  router = inject(Router)
-  route = inject(ActivatedRoute)
+  router = inject(Router);
+  route = inject(ActivatedRoute);
 
   // Enums and constants
   RoleEnum = RoleEnum;
   RequestStatusEnum = RequestStatus;
+  FilterOptions = FilterOptions
 
   // View refs
   @ViewChild('invoiceElement') invoiceElement!: TemplateRef<any>;
@@ -83,6 +84,12 @@ export class RequestsTableComponent {
   createdAtFormat = signal(createdAtFormat);
   requestSortingOrder = signal<'asc' | 'desc'>('desc');
   requestSortingIconVisible = signal(true);
+
+  canViewReport = computed(() =>
+    [RoleEnum.ADMIN, RoleEnum.WAREHOUSE_APPROVER].some(
+      (r) => r === this.loggedInUser()?.role
+    )
+  );
 
   sortedRequests = computed(() => {
     const requests = this.requests();
@@ -145,8 +152,7 @@ export class RequestsTableComponent {
   });
 
   constructor() {
-    const requestNumber =
-      this.route.snapshot.queryParamMap.get('req-no');
+    const requestNumber = this.route.snapshot.queryParamMap.get('req-no');
     if (requestNumber) {
       this.openUpdateRequestDialog(+requestNumber);
     }
@@ -273,9 +279,7 @@ export class RequestsTableComponent {
       )
       .subscribe({
         next: () => {
-          this.toasterService.showSuccess(
-            'Request Deleted successfully.'
-          );
+          this.toasterService.showSuccess('Request Deleted successfully.');
           this.loadRequests();
         },
         error: () => {

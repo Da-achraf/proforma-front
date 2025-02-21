@@ -5,9 +5,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 
-import { MatSelectCountryModule } from "@angular-material-extensions/select-country";
+import { MatSelectCountryModule } from '@angular-material-extensions/select-country';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  HttpClientModule,
+  provideHttpClient,
+  withFetch,
+} from '@angular/common/http';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -25,6 +30,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -37,10 +43,11 @@ import { ChartModule } from 'primeng/chart';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { InputTextModule } from "primeng/inputtext";
+import { InputTextModule } from 'primeng/inputtext';
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PaginatorModule } from 'primeng/paginator';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { TableModule } from 'primeng/table';
@@ -87,10 +94,17 @@ import { TradcomplianceDashboardComponent } from './components/tradcompliance-da
 import { UsermanagmentComponent } from './components/usermanagment/usermanagment.component';
 import { UsersListComponent } from './components/users-list/users-list.component';
 import { WarehouseDashboardComponent } from './components/warehouse-dashboard/warehouse-dashboard.component';
+import { AddScenarioComponent } from './feature/scenario/add-scenario/add-scenario.component';
+import { EditScenarioComponent } from './feature/scenario/edit-scenario/edit-scenario.component';
+import { ScenariosListComponent } from './feature/scenario/scenarios-list/scenarios-list.component';
 import { tokenInterceptor } from './interceptors/token.interceptor';
+import { BaseDialogComponent } from './pattern/dialogs/base-dialog.component';
+import { DeleteDialogComponent } from './pattern/dialogs/delete-dialog.component';
 import { PaginatorComponent } from './pattern/paginator/paginator.component';
 import { SearchBarComponent } from './pattern/search/search-bar.component';
 import { GenericTableComponent } from './pattern/table/generic-table.component';
+import { ToastClassPipe } from './pattern/toast/toast-class.pipe';
+import { ToastComponent } from './pattern/toast/toast.component';
 import { AuthService } from './services/auth.service';
 import { DeleteConfirmationDialogComponent } from './shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { InvoiceComponent } from './shared/components/invoice/invoice.component';
@@ -115,17 +129,8 @@ import { TruncateTextPipe } from './shared/pipes/truncate-text.pipe';
 import { UserRoleForDisplayPipe } from './shared/pipes/user-role-for-display.pipe';
 import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
-import { BaButtonComponent } from './ui/components/button.component';
-import { ScenariosListComponent } from './feature/scenario/scenarios-list/scenarios-list.component';
-import { DeleteDialogComponent } from './pattern/dialogs/delete-dialog.component';
-import { BaseDialogComponent } from './pattern/dialogs/base-dialog.component';
-import { AddScenarioComponent } from './feature/scenario/add-scenario/add-scenario.component';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
-import { ToastComponent } from './pattern/toast/toast.component';
-import { ToastClassPipe } from './pattern/toast/toast-class.pipe';
-import { NoDataFoundComponent } from './ui/components/no-data-found/no-data-found.component';
-import { EditScenarioComponent } from './feature/scenario/edit-scenario/edit-scenario.component';
+import { UiModule } from './ui/ui.module';
+import { RadioFilterComponent } from './pattern/radio-filter/radio.filter.component';
 
 @NgModule({
   declarations: [
@@ -193,8 +198,7 @@ import { EditScenarioComponent } from './feature/scenario/edit-scenario/edit-sce
     InvoiceAvailabilityPipe,
     StatusClassPipe,
     RequestStatusComponent,
-    
-    BaButtonComponent,
+
     GenericTableComponent,
     SearchBarComponent,
     PaginatorComponent,
@@ -205,7 +209,7 @@ import { EditScenarioComponent } from './feature/scenario/edit-scenario/edit-sce
     EditScenarioComponent,
     ToastComponent,
     ToastClassPipe,
-    NoDataFoundComponent
+    RadioFilterComponent,
   ],
   imports: [
     BrowserModule,
@@ -256,7 +260,8 @@ import { EditScenarioComponent } from './feature/scenario/edit-scenario/edit-sce
     NgOptimizedImage,
     InputTextModule,
     Button,
-    FormsModule
+    FormsModule,
+    UiModule,
   ],
   exports: [MatDialogModule],
   providers: [

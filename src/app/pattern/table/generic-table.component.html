@@ -26,12 +26,7 @@
         </div>
         <div class="flex items-center gap-x-2">
           @if (withCreate()) {
-          <ba-button
-            label="Create"
-            icon="fa-plus"
-            buttonClass="text-gray-50 bg-primary-200 border border-primary-200 rounded-xl hover:bg-primary hover:text-neutral-50"
-            (onClick)="create.emit()"
-          />
+            <app-create-button title="scenario" />
           }
         </div>
       </div>
