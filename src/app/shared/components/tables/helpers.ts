@@ -4,8 +4,9 @@ import { EditRequestTradcomplianceComponent } from '../../../components/edit-req
 import { EditRequestWarehouseComponent } from '../../../components/edit-request-warehouse/edit-request-warehouse.component';
 import { ModifyRequestFinanceComponent } from '../../../components/modify-request-finance/modify-request-finance.component';
 import { JsonItemModel } from '../../../models/request.model';
+import { RequestStatus } from '../../../models/requeststatus.model';
 import { RoleEnum } from '../../../models/user/user.model';
-import { FilterOption } from '../../../pattern/radio-filter/types';
+import { FilterOption } from '../../../ui/components/radio-filter/types';
 
 export const getRequestModificationComponent = (
   role: RoleEnum
@@ -64,9 +65,27 @@ export const mergeArrays = (
   });
 };
 
-export const FilterOptions: FilterOption[] = [
-  { label: 'All', title: 'All requests', value: 'all' },
-  { label: 'Test', title: 'Test requests', value: 'test_requests', count: 1 },
-  { label: 'Test2', title: 'Test requests2', value: 'test_requests2', count: 10 },
-  { label: 'Test3', title: 'Test requests3', value: 'test_requests3', count: 125 },
-];
+export const queryParamsByRole = (
+  role: RoleEnum,
+  loggedInUser: any
+): { [key: string]: any } => {
+  switch (role) {
+    case RoleEnum.ADMIN:
+      return {};
+
+    case RoleEnum.REQUESTER:
+      return {
+        UserId: loggedInUser.userId,
+      };
+
+    case RoleEnum.FINANCE_APPROVER:
+    case RoleEnum.TRADECOMPLIANCE_APPROVER:
+    case RoleEnum.WAREHOUSE_APPROVER:
+      return {
+        ShipPointIds: loggedInUser.userShipPoints?.map((s: any) => s.id_ship),
+      };
+
+    default:
+      return {};
+  }
+};

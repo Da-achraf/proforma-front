@@ -37,9 +37,11 @@ import { RequestStrategyFactory } from '../../services/requests-strategies/reque
 import { SideNavService } from '../../services/side-nav.service';
 import { ToasterService } from '../../services/toaster.service';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
-import { FilterOptions, getRequestModificationComponent } from './helpers';
+import { PAGE_SIZE_OPTIONS } from './data';
+import { getRequestModificationComponent } from './helpers';
+import { RequestStore } from './request.store';
 
-const REQUEST_EDITING_TIMOUT = 1000;
+const REQUEST_EDITING_TIMOUT = 1500;
 
 @Component({
   selector: 'app-reqs-table',
@@ -60,14 +62,23 @@ export class RequestsTableComponent {
   invoiceService = inject(InvoiceService);
   datePipe = inject(DatePipe);
   sideNavService = inject(SideNavService);
+  requestStore = inject(RequestStore);
 
   router = inject(Router);
   route = inject(ActivatedRoute);
 
+  // Server side pagination
+  _requests = this.requestStore.requests;
+  _loading = this.requestStore.loading;
+  _totalRecords = this.requestStore.totalItems;
+  _rows = this.requestStore.pageSize;
+  pageSizeOptions = signal(inject(PAGE_SIZE_OPTIONS));
+
+  timeoutId!: NodeJS.Timeout;
+
   // Enums and constants
   RoleEnum = RoleEnum;
   RequestStatusEnum = RequestStatus;
-  FilterOptions = FilterOptions
 
   // View refs
   @ViewChild('invoiceElement') invoiceElement!: TemplateRef<any>;
@@ -76,12 +87,12 @@ export class RequestsTableComponent {
   loggedInUser = this.userStore.loggedInUser;
   invoiceRequest = this.requestService.invoiceRequest;
   searchValue = signal('');
-  requests = signal<RequestModel[] | undefined | null>(undefined);
-  rows = signal(10);
-  first = signal(0);
+
   isDownloading = signal(false);
   beingEdited = signal<number | undefined>(undefined); // To apply specific styling on request opened for editing
+
   createdAtFormat = signal(createdAtFormat);
+
   requestSortingOrder = signal<'asc' | 'desc'>('desc');
   requestSortingIconVisible = signal(true);
 
@@ -91,41 +102,9 @@ export class RequestsTableComponent {
     )
   );
 
-  sortedRequests = computed(() => {
-    const requests = this.requests();
-    const loggedInUserRole = this.loggedInUser()?.role as RoleEnum;
-    if (!requests) return;
-    const order = this.requestSortingOrder();
-    return createRequestSorter(requests)
-      .byRoleRelevance(loggedInUserRole)
-      .byDate(order)
-      .build();
-  }, undefined);
-
-  filteredRequests = computed(() => {
-    const requests = this.sortedRequests();
-    const searchValue = this.searchValue();
-
-    if (requests?.length === 0) return [];
-    else if (requests?.length != 0) {
-      if (searchValue.length === 0) return requests;
-      return this.filterRequests(
-        searchValue.toLowerCase(),
-        requests as RequestModel[]
-      );
-    }
-    return null;
-  }, undefined);
-
-  paginatedRequests = computed(() => {
-    const filteredRequests = this.filteredRequests();
-    return filteredRequests?.slice(this.first(), this.first() + this.rows());
-  }, undefined);
-
-  totalRecords = computed(() => {
-    const filteredRequests = this.filteredRequests();
-    return filteredRequests?.length;
-  });
+  onStatusChange(status: RequestStatus | undefined) {
+    this.requestStore.setQueryParams({ status });
+  }
 
   showCreateButton = computed(() => {
     const loggedInUser = this.loggedInUser();
@@ -153,24 +132,7 @@ export class RequestsTableComponent {
 
   constructor() {
     const requestNumber = this.route.snapshot.queryParamMap.get('req-no');
-    if (requestNumber) {
-      this.openUpdateRequestDialog(+requestNumber);
-    }
-
-    effect(() => {
-      const loggedInUser = this.loggedInUser();
-      if (loggedInUser) {
-        this.requestFactory
-          .getRequests(loggedInUser)
-          .pipe(delay(HTTP_REQUEST_DELAY))
-          .subscribe({
-            next: (requests) => {
-              this.requests.set(requests);
-              this.sideNavService.requests.set(requests);
-            },
-          });
-      }
-    });
+    if (requestNumber) this.openUpdateRequestDialog(+requestNumber);
   }
 
   ngOnInit() {
@@ -179,12 +141,6 @@ export class RequestsTableComponent {
   }
 
   // Methods
-  loadRequests() {
-    const userId = this.auth.getUserIdFromToken();
-    this.userStore.getLoggedInUser(userId);
-  }
-
-  timeoutId!: NodeJS.Timeout;
 
   openUpdateRequestDialog(requestNumber: number): void {
     const role = this.auth.getRoleFromToken();
@@ -212,7 +168,7 @@ export class RequestsTableComponent {
 
     dialogRef.afterClosed().subscribe({
       next: (result) => {
-        if (result) this.loadRequests();
+        if (result) this.requestStore.triggerReloading();
       },
       complete: () => {
         this.timeoutId = setTimeout(() => {
@@ -230,7 +186,7 @@ export class RequestsTableComponent {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.toasterService.showSuccess('Request created successfully');
-        this.loadRequests();
+        this.requestStore.triggerReloading();
       }
     });
   }
@@ -240,27 +196,8 @@ export class RequestsTableComponent {
       minWidth: '800px',
       maxWidth: '85vw',
       maxHeight: '95vh',
-      data: { requests: this.requests() },
+      data: { requests: [] },
     });
-  }
-
-  private filterRequests(
-    searchValue: string,
-    requests: RequestModel[]
-  ): RequestModel[] {
-    const formatedDate = this.datePipe.transform('');
-
-    return requests.filter(
-      (request) =>
-        request.requestNumber.toString().toLowerCase().includes(searchValue) ||
-        RequestStatusLabelMapping[request.status as RequestStatus]
-          .toLowerCase()
-          .includes(searchValue) ||
-        this.datePipe
-          .transform(request.created_at)
-          ?.toLowerCase()
-          .includes(searchValue)
-    );
   }
 
   cancelRequest(reqNumber: number) {
@@ -280,7 +217,7 @@ export class RequestsTableComponent {
       .subscribe({
         next: () => {
           this.toasterService.showSuccess('Request Deleted successfully.');
-          this.loadRequests();
+          this.requestStore.triggerReloading();
         },
         error: () => {
           this.toasterService.showError('Error in deleting ship point');
@@ -324,8 +261,7 @@ export class RequestsTableComponent {
     const { pageIndex, pageSize } = event;
 
     if (typeof pageIndex === 'number' && typeof pageSize === 'number') {
-      this.first.set(pageIndex * pageSize);
-      this.rows.set(pageSize);
+      this.requestStore.setPagination(pageIndex + 1, pageSize);
     }
   }
 

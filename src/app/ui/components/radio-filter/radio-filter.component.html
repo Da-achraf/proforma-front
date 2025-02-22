@@ -1,0 +1,49 @@
+<div
+  class="flex items-center select-none box-border overflow-hidden border border-gray-300 rounded-md"
+>
+  @for (option of options(); track $index; let isLast = $last) {
+    <button
+      class="flex-1 border-r border-gray-300 text-sm font-semibold transition-colors duration-150 ease-in-out group"
+      [ngClass]="{
+        'border-none': isLast,
+        'bg-gray-100/90': option.value === selectedOption()
+      }"
+      [attr.aria-selected]="selectedOption() === option.value"
+      [attr.aria-label]="option.label"
+      (click)="onOptionChange(option.value)"
+    >
+      <label
+        [title]="option.title || ''"
+        class="flex flex-grow items-center justify-center cursor-pointer p-2"
+      >
+        <input
+          type="radio"
+          [name]="uniqueName"
+          [value]="option.value"
+          [checked]="selectedOption() === option.value"
+          class="sr-only peer"
+        />
+        <span
+          class="flex items-center gap-x-2 text-gray-500 transition-colors duration-150 px-1 py-1 ease-in-out group-hover:text-gray-700"
+          [ngClass]="{
+            'text-gray-800': option.value === selectedOption()
+          }"
+        >
+          {{ option.label }}
+
+          @if (option.count != undefined) {
+            <span
+              class="inline-flex items-center justify-center min-w-[24px] transition-all duration-75"
+              [ngClass]="{
+                'scale-110 text-orange-500': option.value === selectedOption(),
+                'text-gray-400': option.value !== selectedOption()
+              }"
+            >
+              {{ option.count }}
+            </span>
+          }
+        </span>
+      </label>
+    </button>
+  }
+</div>

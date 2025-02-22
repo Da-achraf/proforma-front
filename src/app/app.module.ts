@@ -112,6 +112,7 @@ import { LoadingDotsComponent } from './shared/components/loading-dots/loading-d
 import { ManagementTablesComponent } from './shared/components/management-tables/management-tables.component';
 import { ParcelsComponent } from './shared/components/parcels/parcels.component';
 import { RequestStatusComponent } from './shared/components/request-status/request-status.component';
+import { PAGE_SIZE_OPTIONS, TABLE_PAGE_SIZE } from './shared/components/tables/data';
 import { RequestsTableComponent } from './shared/components/tables/req-table.component';
 import { TheInvoiceComponent } from './shared/components/the-invoice/the-invoice.component';
 import { CountryPipe } from './shared/pipes/country.pipe';
@@ -130,7 +131,7 @@ import { UserRoleForDisplayPipe } from './shared/pipes/user-role-for-display.pip
 import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
 import { UiModule } from './ui/ui.module';
-import { RadioFilterComponent } from './pattern/radio-filter/radio.filter.component';
+import { RequestStatusTabFilterComponent } from './pattern/request-tab-filter/request-status-tab-filter.component';
 
 @NgModule({
   declarations: [
@@ -209,7 +210,7 @@ import { RadioFilterComponent } from './pattern/radio-filter/radio.filter.compon
     EditScenarioComponent,
     ToastComponent,
     ToastClassPipe,
-    RadioFilterComponent,
+    RequestStatusTabFilterComponent
   ],
   imports: [
     BrowserModule,
@@ -271,6 +272,14 @@ import { RadioFilterComponent } from './pattern/radio-filter/radio.filter.compon
       provide: HTTP_INTERCEPTORS,
       useClass: tokenInterceptor,
       multi: true,
+    },
+    {
+      provide: TABLE_PAGE_SIZE,
+      useValue: 2,
+    },
+    {
+      provide: PAGE_SIZE_OPTIONS,
+      useValue: [2, 4, 5, 10]
     },
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),

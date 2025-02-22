@@ -1,8 +1,8 @@
-import { inject, Injectable } from "@angular/core";
-import { RequestModel } from "../../../models/request.model";
-import { LoggedInUser, User } from "../../../models/user/user.model";
-import { RequestService } from "../../../services/request.service";
+import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { RequestModel } from "../../../models/request.model";
+import { User } from "../../../models/user/user.model";
+import { RequestService } from "../../../services/request.service";
 import { IRequestStrategy } from "./requests-strategies";
 
 @Injectable({

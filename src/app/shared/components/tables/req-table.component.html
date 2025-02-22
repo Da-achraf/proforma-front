@@ -10,41 +10,39 @@
         <div
           class="flex w-full flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0"
         >
-          <div class="flex items-center gap-x-5">
-            <app-radio-filter
-              [options]="FilterOptions"
-              [initialSelected]="'all'"
-            />
+          <div
+            class="flex flex-col gap-y-2 lg:flex-row lg:items-center lg:gap-x-3"
+          >
+            <app-request-status-tab-filter (statusFilterChange)="onStatusChange($event)" />
+            
             <ba-search-bar
               class="min-w-72"
               (search)="searchValue.set($event)"
             />
           </div>
           @if (showCreateButton()){
-            <app-create-button />
+          <app-create-button />
           }
 
           <!-- View report button -->
           @if (canViewReport()) {
-            <i
-              (click)="onOpenReportDialog()"
-              matTooltip="View report"
-              matTooltipPosition="above"
-              class="pi pi-window-maximize cursor-pointer text-gray-500 hover:text-gray-700"
-            ></i>
+          <i
+            (click)="onOpenReportDialog()"
+            matTooltip="View report"
+            matTooltipPosition="above"
+            class="pi pi-window-maximize cursor-pointer text-gray-500 hover:text-gray-700"
+          ></i>
           }
         </div>
       </div>
 
-      <div class="mt-6 rounded-xl py-3 bg-white px-6 shadow-md lg:px-4">
-        <table
-          class="min-w-full border-collapse border-spacing-y-2 border-spacing-x-2"
-        >
-          <thead class="p-1 lg:table-header-group">
-            <tr>
+      <div class="mt-10 rounded-xl bg-white shadow-md">
+        <table class="min-w-full border-spacing-y-2 border-spacing-x-2">
+          <thead class="rounded-t-lg overflow-hidden p-2">
+            <tr class="bg-gray-100 rounded-md">
               @for (col of columns(); track col.label){
-              <td
-                class="whitespace-normal py-2 font-medium text-gray-500 sm:px-3"
+              <th
+                class="whitespace-normal py-3 font-medium text-gray-500 sm:px-3 relative first:rounded-l-md last:rounded-r-md"
               >
                 <span>
                   {{ col.label }}
@@ -60,18 +58,19 @@
                     [style.opacity]="requestSortingIconVisible() ? '1' : '0.5'"
                     (click)="onToggleSortingOrder(order)"
                     (transitionend)="requestSortingIconVisible.set(true)"
-                  >
-                  </i>
+                  ></i>
                   } }
                 </span>
-              </td>
+              </th>
               }
             </tr>
           </thead>
 
-          <tbody class="bg-white lg:border-gray-300">
-            @if (paginatedRequests(); as requests){ @for (request of requests;
-            track request.requestNumber){
+          <tbody
+            class="bg-white lg:border-gray-300"
+            [ngClass]="{ 'blur-sm': _loading() && _requests().length != 0 }"
+          >
+            @for (request of _requests(); track request.requestNumber){
             <tr
               class="py-2 transition-all duration-150 border-l-4 border-transparent odd:bg-white even:bg-gray-50 hover:bg-gray-100"
               [ngClass]="{
@@ -95,6 +94,8 @@
               >
                 <app-request-status [status]="request.status" />
               </td>
+
+              @if (loggedInUser()?.role != RoleEnum.ADMIN) {
               <td class="px-3">
                 @if (loggedInUser(); as loggedUser) { @if (loggedUser.role !=
                 RoleEnum.ADMIN) {
@@ -131,43 +132,29 @@
                     (click)="triggerDownload()"
                     class="pi text-gray-500 hover:text-gray-700"
                     [ngClass]="{
-                              'pi-spinner-dotted animate-spin': isDownloading() && invoiceRequest()?.requestNumber === request?.requestNumber,
-                              'pi-cloud-download': !isDownloading() || invoiceRequest()?.requestNumber !== request?.requestNumber,
-                              'text-red-600 cursor-not-allowed': !(request.status | invoiceavailablity),
-                            }"
+                                'pi-spinner-dotted animate-spin': isDownloading() && invoiceRequest()?.requestNumber === request?.requestNumber,
+                                'pi-cloud-download': !isDownloading() || invoiceRequest()?.requestNumber !== request?.requestNumber,
+                                'text-red-600 cursor-not-allowed': !(request.status | invoiceavailablity),
+                              }"
                   ></i>
                 </button>
                 } }
               </td>
+              }
             </tr>
-            } @empty {
-            <tr>
-              <td [attr.colspan]="columnsLength()" class="text-center p-4">
-                <app-no-data-found />
-              </td>
-            </tr>
-            } } @if (paginatedRequests() === null) {
-            <!-- <tr>
-              <td [attr.colspan]="columnsLength()" class="text-center p-4">
-                <span class="font-semibold text-lg text-red-500 p-3"
-                  >No requests found.</span
-                >
-              </td>
-            </tr> -->
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td [attr.colspan]="4">
-                  <app-no-data-found />
-                </td>
-              </tr>
-            </ng-template>
-            } @if (paginatedRequests() === undefined) {
+            } @if (_requests().length === 0) { @if (_loading()) {
             <tr>
               <td [attr.colspan]="columnsLength()" class="p-0">
                 <loading-dots />
               </td>
             </tr>
-            }
+            } @else {
+            <tr>
+              <td [attr.colspan]="columnsLength()" class="text-center p-4">
+                <app-no-data-found />
+              </td>
+            </tr>
+            } }
           </tbody>
         </table>
       </div>
@@ -177,11 +164,11 @@
   <!-- Pagination using angular material -->
   <mat-paginator
     [color]="'primary'"
-    [length]="totalRecords()"
-    [pageSize]="rows()"
+    [length]="_totalRecords()"
+    [pageSize]="_rows()"
     [showFirstLastButtons]="true"
     (page)="onPageChange($event)"
-    [pageSizeOptions]="[10, 25, 50, 100]"
+    [pageSizeOptions]="pageSizeOptions()"
     aria-label="Select page"
   >
   </mat-paginator>
