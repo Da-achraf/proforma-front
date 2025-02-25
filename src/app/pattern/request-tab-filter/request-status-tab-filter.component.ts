@@ -11,12 +11,14 @@ import { RequestStatus } from '../../models/requeststatus.model';
     <app-radio-filter
       [options]="options()"
       (optionSelected)="onStatusFilter($event)"
+      [initialSelected]="initialSelected()"
     />
     }
   `,
 })
 export class RequestStatusTabFilterComponent {
   protected readonly options = inject(RequestStatusTabFilterService).options;
+  protected readonly initialSelected = inject(RequestStatusTabFilterService).initialSelected;
   protected readonly loading = inject(RequestStatusTabFilterService).loading;
 
   statusFilterChange = output<RequestStatus | undefined>();

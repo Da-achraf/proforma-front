@@ -17,7 +17,7 @@
             
             <ba-search-bar
               class="min-w-72"
-              (search)="searchValue.set($event)"
+              (search)="onSearch($event)"
             />
           </div>
           @if (showCreateButton()){

@@ -1,7 +1,10 @@
-import { Injectable, signal } from '@angular/core';
-import { delay, of, tap } from 'rxjs';
-import { StatusFilterOptions } from './data';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { delay, of, tap } from 'rxjs';
+import { RequestStatus } from '../../models/requeststatus.model';
+import { RoleEnum } from '../../models/user/user.model';
+import { AuthService } from '../../services/auth.service';
+import { StatusFilterOptions } from './data';
 
 @Injectable({ providedIn: 'root' })
 export class RequestStatusTabFilterService {
@@ -18,8 +21,25 @@ export class RequestStatusTabFilterService {
   private options$ = of(StatusFilterOptions).pipe(
     tap(() => this._loading.set(true)),
     delay(900),
-    tap(() => this._loading.set(false)),
+    tap(() => this._loading.set(false))
   );
-
   options = toSignal(this.options$, { initialValue: [] });
+
+  private readonly userRole = inject(AuthService).getRoleFromToken();
+  initialSelected = computed(() => {
+    this.options();
+
+    switch (this.userRole) {
+      case RoleEnum.FINANCE_APPROVER:
+        return RequestStatus.PendingInFinance.toString();
+
+      case RoleEnum.TRADECOMPLIANCE_APPROVER:
+        return RequestStatus.PendingInTradCompliance.toString();
+
+      case RoleEnum.WAREHOUSE_APPROVER:
+        return RequestStatus.InShipping.toString();
+      default:
+        return 'all';
+    }
+  });
 }

@@ -142,8 +142,6 @@ export const RequestStore = signalStore(
         const userId = authService.getUserIdFromToken();
         const loggedInUser = await authService.getUserById(userId);
 
-        console.log('loggedInUser: ', loggedInUser);
-
         const queryParams = queryParamsByRole(
           loggedInUser.role as RoleEnum,
           loggedInUser

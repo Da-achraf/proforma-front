@@ -101,6 +101,7 @@ import { tokenInterceptor } from './interceptors/token.interceptor';
 import { BaseDialogComponent } from './pattern/dialogs/base-dialog.component';
 import { DeleteDialogComponent } from './pattern/dialogs/delete-dialog.component';
 import { PaginatorComponent } from './pattern/paginator/paginator.component';
+import { RequestStatusTabFilterComponent } from './pattern/request-tab-filter/request-status-tab-filter.component';
 import { SearchBarComponent } from './pattern/search/search-bar.component';
 import { GenericTableComponent } from './pattern/table/generic-table.component';
 import { ToastClassPipe } from './pattern/toast/toast-class.pipe';
@@ -131,7 +132,6 @@ import { UserRoleForDisplayPipe } from './shared/pipes/user-role-for-display.pip
 import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
 import { UiModule } from './ui/ui.module';
-import { RequestStatusTabFilterComponent } from './pattern/request-tab-filter/request-status-tab-filter.component';
 
 @NgModule({
   declarations: [
@@ -210,7 +210,7 @@ import { RequestStatusTabFilterComponent } from './pattern/request-tab-filter/re
     EditScenarioComponent,
     ToastComponent,
     ToastClassPipe,
-    RequestStatusTabFilterComponent
+    RequestStatusTabFilterComponent,
   ],
   imports: [
     BrowserModule,
@@ -275,11 +275,11 @@ import { RequestStatusTabFilterComponent } from './pattern/request-tab-filter/re
     },
     {
       provide: TABLE_PAGE_SIZE,
-      useValue: 2,
+      useValue: 10,
     },
     {
       provide: PAGE_SIZE_OPTIONS,
-      useValue: [2, 4, 5, 10]
+      useValue: [10, 20, 50, 100]
     },
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),

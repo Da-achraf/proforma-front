@@ -67,7 +67,7 @@ export class RequestsTableComponent {
   router = inject(Router);
   route = inject(ActivatedRoute);
 
-  // Server side pagination
+  // Server side pagination for requests
   _requests = this.requestStore.requests;
   _loading = this.requestStore.loading;
   _totalRecords = this.requestStore.totalItems;
@@ -86,7 +86,6 @@ export class RequestsTableComponent {
   // Signals and computed values
   loggedInUser = this.userStore.loggedInUser;
   invoiceRequest = this.requestService.invoiceRequest;
-  searchValue = signal('');
 
   isDownloading = signal(false);
   beingEdited = signal<number | undefined>(undefined); // To apply specific styling on request opened for editing
@@ -104,6 +103,10 @@ export class RequestsTableComponent {
 
   onStatusChange(status: RequestStatus | undefined) {
     this.requestStore.setQueryParams({ status });
+  }
+
+  onSearch(search: string) {
+    this.requestStore.setQueryParams({ search });
   }
 
   showCreateButton = computed(() => {
