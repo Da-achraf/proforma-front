@@ -2,36 +2,31 @@ import { DatePipe } from '@angular/common';
 import {
   Component,
   computed,
-  effect,
   ElementRef,
   inject,
   Renderer2,
   signal,
   TemplateRef,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
-import { delay, filter, switchMap } from 'rxjs';
+import { filter, switchMap } from 'rxjs';
 import { CreateRequestDialogComponent } from '../../../components/create-request-dialog/create-request-dialog.component';
 import { RequestsReportComponent } from '../../../components/requests-report/requests-report.component';
 import {
   createdAtFormat,
   otherUsersRequestColumns,
-  RequestModel,
-  sharedRequestColumns,
+  sharedRequestColumns
 } from '../../../models/request.model';
 import {
-  RequestStatus,
-  RequestStatusLabelMapping,
+  RequestStatus
 } from '../../../models/requeststatus.model';
 import { RoleEnum } from '../../../models/user/user.model';
 import { AuthService } from '../../../services/auth.service';
 import { RequestService } from '../../../services/request.service';
 import { UserStoreService } from '../../../services/user-store.service';
-import { HTTP_REQUEST_DELAY } from '../../constants/http-requests.constant';
-import { createRequestSorter } from '../../helpers/request-sorting.helper';
 import { InvoiceService } from '../../services/invoice.service';
 import { RequestStrategyFactory } from '../../services/requests-strategies/requests-strategies-factory';
 import { SideNavService } from '../../services/side-nav.service';
@@ -199,7 +194,7 @@ export class RequestsTableComponent {
       minWidth: '800px',
       maxWidth: '85vw',
       maxHeight: '95vh',
-      data: { requests: [] },
+      data: { requests: this.requestStore.requests() },
     });
   }
 

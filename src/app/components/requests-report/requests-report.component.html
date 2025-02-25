@@ -79,7 +79,7 @@
 
 <!--
     Ng template of report table used to export the report to an excel sheet
-    depending on the requestsToExport() array of requests which is set dynamically.
+    depending on the requestsToExport() signal of requests which is set dynamically.
 -->
 <ng-template #exportTable>
     <table id="reportTable" class="min-w-full border-collapse border-spacing-y-2 border-spacing-x-2">
@@ -110,7 +110,7 @@
 
 <!--
     Ng template of report table body for reusing purposes:
-    - Used in table that is shown in the view
+    - Used in the table that is shown in the view
     - Used in table that is used for export to excel sheet
 -->
 <ng-template #reportTableBody let-request="request" let-index="index">

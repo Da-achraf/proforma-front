@@ -57,9 +57,6 @@ export const transformRequest = (request: RequestModel): TransformedRequestModel
     return [];
   }
 
-  // calculate total net weight
-  // const netWeight = calculatTotalNetWeight(request.itemsWithValues)
-
   const keysToChange = ['Material', 'Description', 'HTS Code', 'COO', 'Net Weight'];
 
   // Extract duplicated values and changes for each item
@@ -75,9 +72,6 @@ export const transformRequest = (request: RequestModel): TransformedRequestModel
         transformedRequest[camelCaseKey] = valueObj.value;
       }
     });
-
-    // Set total calculated net weight (for all the request's items)
-    // transformedRequest.netWeight = netWeight
 
     // Calculate total amount for each item (price * quantity)
     transformedRequest.totalAmount = calculateAmount(item.values)
