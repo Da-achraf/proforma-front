@@ -26,7 +26,7 @@
         </div>
         <div class="flex items-center gap-x-2">
           @if (withCreate()) {
-            <app-create-button title="scenario" />
+            <app-create-button (create)="create.emit()" title="scenario" />
           }
         </div>
       </div>

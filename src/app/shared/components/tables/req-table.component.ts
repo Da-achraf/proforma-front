@@ -7,7 +7,7 @@ import {
   Renderer2,
   signal,
   TemplateRef,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -18,11 +18,9 @@ import { RequestsReportComponent } from '../../../components/requests-report/req
 import {
   createdAtFormat,
   otherUsersRequestColumns,
-  sharedRequestColumns
+  sharedRequestColumns,
 } from '../../../models/request.model';
-import {
-  RequestStatus
-} from '../../../models/requeststatus.model';
+import { RequestStatus } from '../../../models/requeststatus.model';
 import { RoleEnum } from '../../../models/user/user.model';
 import { AuthService } from '../../../services/auth.service';
 import { RequestService } from '../../../services/request.service';
@@ -85,7 +83,7 @@ export class RequestsTableComponent {
   isDownloading = signal(false);
   beingEdited = signal<number | undefined>(undefined); // To apply specific styling on request opened for editing
 
-  createdAtFormat = signal(createdAtFormat);
+  protected readonly createdAtFormat = signal(createdAtFormat);
 
   requestSortingOrder = signal<'asc' | 'desc'>('desc');
   requestSortingIconVisible = signal(true);
@@ -199,7 +197,7 @@ export class RequestsTableComponent {
   }
 
   async exportData() {
-    await this.requestStore.exportData()
+    await this.requestStore.exportData();
   }
 
   cancelRequest(reqNumber: number) {
@@ -271,6 +269,7 @@ export class RequestsTableComponent {
     this.requestSortingIconVisible.set(false);
     const newOrder: 'asc' | 'desc' = sortingOrder === 'asc' ? 'desc' : 'asc';
     setTimeout(() => {
+      this.requestStore.setQueryParams({ sortOrder: newOrder });
       this.requestSortingOrder.set(newOrder);
       this.requestSortingIconVisible.set(true);
     }, 150);
