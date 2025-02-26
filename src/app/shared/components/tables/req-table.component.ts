@@ -198,6 +198,10 @@ export class RequestsTableComponent {
     });
   }
 
+  async exportData() {
+    await this.requestStore.exportData()
+  }
+
   cancelRequest(reqNumber: number) {
     if (!reqNumber) return;
     const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {

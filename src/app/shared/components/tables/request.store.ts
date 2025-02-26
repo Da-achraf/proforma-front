@@ -11,13 +11,14 @@ import {
   withState,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { debounceTime, pipe, switchMap, tap } from 'rxjs';
+import { debounceTime, lastValueFrom, pipe, switchMap, tap } from 'rxjs';
 import { RequestModel } from '../../../models/request.model';
+import { RoleEnum } from '../../../models/user/user.model';
 import { AuthService } from '../../../services/auth.service';
+import { RequestExportService } from '../../../services/request-export.service';
 import { RequestService } from '../../../services/request.service';
 import { TABLE_PAGE_SIZE } from './data';
 import { queryParamsByRole } from './helpers';
-import { RoleEnum } from '../../../models/user/user.model';
 
 type RequestState = {
   requests: RequestModel[];
@@ -64,6 +65,7 @@ export const RequestStore = signalStore(
 
   withProps(() => ({
     requestService: inject(RequestService),
+    requestExportService: inject(RequestExportService),
     authService: inject(AuthService),
     initialPageSize: inject(TABLE_PAGE_SIZE),
   })),
@@ -79,7 +81,7 @@ export const RequestStore = signalStore(
     }),
   })),
 
-  withMethods(({ requestService, ...store }) => ({
+  withMethods(({ requestService, requestExportService, ...store }) => ({
     load: rxMethod<{
       page: number;
       pageSize: number;
@@ -127,6 +129,19 @@ export const RequestStore = signalStore(
 
     setPagination: (page: number, pageSize: number) => {
       patchState(store, { page, pageSize, trigger: store.trigger() + 1 });
+    },
+
+    exportData: async () => {
+      try {
+        const blob = await lastValueFrom(requestExportService.exportRequests());
+
+        requestExportService.downloadBlob(
+          blob,
+          `Requests_Export_${new Date().toISOString()}.xlsx`
+        );
+      } catch (error) {
+        console.error('Export failed:', error);
+      }
     },
   })),
   withHooks(
