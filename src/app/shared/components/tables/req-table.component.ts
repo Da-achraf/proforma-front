@@ -33,6 +33,7 @@ import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog
 import { PAGE_SIZE_OPTIONS } from './data';
 import { getRequestModificationComponent } from './helpers';
 import { RequestStore } from './request.store';
+import { ReportFilterComponent } from './report-filter/report-filter.component';
 
 const REQUEST_EDITING_TIMOUT = 1500;
 
@@ -197,7 +198,8 @@ export class RequestsTableComponent {
   }
 
   async exportData() {
-    await this.requestStore.exportData();
+    this.dialog.open(ReportFilterComponent, {});
+    // await this.requestStore.exportData();
   }
 
   cancelRequest(reqNumber: number) {

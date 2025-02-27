@@ -35,6 +35,7 @@ import { Component, computed, input, output } from '@angular/core';
       </div>
     </button>
   `,
+  standalone: false
 })
 export class BaButtonComponent {
   // Signal Inputs

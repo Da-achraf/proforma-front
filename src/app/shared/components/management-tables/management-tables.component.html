@@ -12,7 +12,10 @@
         >
           <ba-search-bar class="w-1/3" (search)="searchValue.set($event)" />
           @if (showCreateButton()){
-            <app-create-button [title]="tableName().slice(0,-1)" />
+          <app-create-button
+            [title]="tableName().slice(0, -1)"
+            (create)="onCreate.emit()"
+          />
           }
         </div>
       </div>

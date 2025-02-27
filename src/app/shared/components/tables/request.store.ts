@@ -19,6 +19,8 @@ import { RequestExportService } from '../../../services/request-export.service';
 import { RequestService } from '../../../services/request.service';
 import { TABLE_PAGE_SIZE } from './data';
 import { queryParamsByRole } from './helpers';
+import { ToasterService } from '../../services/toaster.service';
+import { QueryParamType } from '../../helpers/types';
 
 type RequestState = {
   requests: RequestModel[];
@@ -27,8 +29,9 @@ type RequestState = {
   totalItems: number;
   totalPages: number;
   trigger: number;
-  filterParams: { [key: string]: any };
+  filterParams: QueryParamType;
   loading: boolean;
+  isExporting: boolean;
   //   filterParams: {
   //     userId?: number;
   //     shipPointIds?: number[];
@@ -48,6 +51,7 @@ const initialState: RequestState = {
   trigger: 0,
   filterParams: {},
   loading: true,
+  isExporting: false,
   //   filterParams: {
   //     userId: undefined,
   //     shipPointIds: undefined,
@@ -68,6 +72,7 @@ export const RequestStore = signalStore(
     requestExportService: inject(RequestExportService),
     authService: inject(AuthService),
     initialPageSize: inject(TABLE_PAGE_SIZE),
+    toaster: inject(ToasterService),
   })),
 
   withComputed(({ trigger, page, pageSize, filterParams }) => ({
@@ -85,7 +90,7 @@ export const RequestStore = signalStore(
     load: rxMethod<{
       page: number;
       pageSize: number;
-      filterParams?: { [key: string]: any };
+      filterParams?: QueryParamType;
     }>(
       pipe(
         tap(() => patchState(store, { loading: true })),
@@ -116,7 +121,7 @@ export const RequestStore = signalStore(
       )
     ),
 
-    setQueryParams: (filterParams: { [key: string]: any }) => {
+    setQueryParams: (filterParams: QueryParamType) => {
       patchState(store, {
         filterParams: { ...store.filterParams(), ...filterParams },
         trigger: store.trigger() + 1,
@@ -130,20 +135,45 @@ export const RequestStore = signalStore(
     setPagination: (page: number, pageSize: number) => {
       patchState(store, { page, pageSize, trigger: store.trigger() + 1 });
     },
+  })),
 
-    exportData: async () => {
+  withMethods(({ requestExportService, filterParams, toaster, ...store }) => ({
+    exportReport: async (queryParams: QueryParamType) => {
       try {
-        const blob = await lastValueFrom(requestExportService.exportRequests());
+        patchState(store, { isExporting: true });
+        const blob = await lastValueFrom(
+          requestExportService.exportRequestsReport({
+            ...filterParams(),
+            ...queryParams,
+          })
+        );
 
         requestExportService.downloadBlob(
           blob,
           `Requests_Export_${new Date().toISOString()}.xlsx`
         );
       } catch (error) {
-        console.error('Export failed:', error);
+        toaster.showInfo('No data found for export');
+      } finally {
+        patchState(store, { isExporting: false });
+      }
+    },
+
+    getReportPreview: async (queryParams: QueryParamType) => {
+      try {
+        const report = await lastValueFrom(
+          requestExportService.getReportPreview({
+            ...filterParams(),
+            ...queryParams,
+          })
+        );
+
+      } catch (error) {
+        toaster.showInfo('No data found for preview');
       }
     },
   })),
+
   withHooks(
     ({
       load,

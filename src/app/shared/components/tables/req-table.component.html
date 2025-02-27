@@ -21,7 +21,7 @@
             />
           </div>
           @if (showCreateButton()){
-          <app-create-button />
+          <app-create-button (create)="openCreateRequestDialog()" />
           }
 
           <!-- View report button -->

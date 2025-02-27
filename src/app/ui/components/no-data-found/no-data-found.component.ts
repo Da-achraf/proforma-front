@@ -4,6 +4,7 @@ import { Component, input, output } from '@angular/core';
   selector: 'app-no-data-found',
   templateUrl: 'no-data-found.component.html',
   styleUrl: 'no-data-found.component.css',
+  standalone: false
 })
 export class NoDataFoundComponent {
   icon = input<string>('fa-solid fa-table-list');

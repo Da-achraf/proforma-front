@@ -132,6 +132,8 @@ import { UserRoleForDisplayPipe } from './shared/pipes/user-role-for-display.pip
 import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
 import { UiModule } from './ui/ui.module';
+import { ReportFilterComponent } from './shared/components/tables/report-filter/report-filter.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [
@@ -211,6 +213,7 @@ import { UiModule } from './ui/ui.module';
     ToastComponent,
     ToastClassPipe,
     RequestStatusTabFilterComponent,
+    ReportFilterComponent
   ],
   imports: [
     BrowserModule,
@@ -262,6 +265,7 @@ import { UiModule } from './ui/ui.module';
     InputTextModule,
     Button,
     FormsModule,
+    MatDatepickerModule,
     UiModule,
   ],
   exports: [MatDialogModule],

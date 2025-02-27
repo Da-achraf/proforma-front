@@ -24,5 +24,6 @@ import { Component } from '@angular/core';
       }
     </div>
   `,
+  standalone: false
 })
 export class RadioFilterSkeletonComponent {}

@@ -1,20 +1,34 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URL_TOKEN } from '../config/api.config';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { QueryParamType } from '../shared/helpers/types';
+import { TransformedRequestModel } from '../models/request.model';
 
 @Injectable({ providedIn: 'root' })
 export class RequestExportService {
   private readonly url = inject(API_URL_TOKEN);
   private readonly http = inject(HttpClient);
 
-  exportRequests(): Observable<Blob> {
-    return this.http.post(`${this.url}/export/requests`, null, {
+  exportRequestsReport(params?: QueryParamType): Observable<Blob> {
+    return this.http.post(`${this.url}/report/requests`, null, {
+      params,
       responseType: 'blob',
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
     });
+  }
+
+  getReportPreview(
+    params?: QueryParamType
+  ): Observable<TransformedRequestModel[]> {
+    return this.http.get<TransformedRequestModel[]>(
+      `${this.url}/report/preview`,
+      {
+        params,
+      }
+    );
   }
 
   downloadBlob(blob: Blob, filename: string): void {

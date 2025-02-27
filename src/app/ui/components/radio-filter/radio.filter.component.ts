@@ -4,6 +4,7 @@ import { FilterOption } from './types';
 @Component({
   selector: 'app-radio-filter',
   templateUrl: 'radio-filter.component.html',
+  standalone: false
 })
 export class RadioFilterComponent {
   options = input.required<FilterOption[]>();
