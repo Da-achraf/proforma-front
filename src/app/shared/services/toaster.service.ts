@@ -1,7 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { MessageService } from 'primeng/api';
 
-const Toast_Life = 3000;
+// Constants for default values
+const TOAST_LIFE = 3000;
+const DEFAULT_INFO_SUMMARY = 'Info';
+const DEFAULT_SUCCESS_SUMMARY = 'Success';
+const DEFAULT_WARNING_SUMMARY = 'Warning';
+const DEFAULT_ERROR_SUMMARY = 'Error';
 
 @Injectable({
   providedIn: 'root',
@@ -17,9 +22,9 @@ export class ToasterService {
    * @param life Optional duration in milliseconds (default: 3000).
    */
   showInfo(
-    detail: string,
-    summary: string = 'Info',
-    life: number = Toast_Life
+    detail: string = 'Information message',
+    summary: string = DEFAULT_INFO_SUMMARY,
+    life: number = TOAST_LIFE
   ): void {
     this.messageService.add({ severity: 'info', summary, detail, life });
   }
@@ -31,9 +36,9 @@ export class ToasterService {
    * @param life Optional duration in milliseconds (default: 3000).
    */
   showSuccess(
-    detail: string,
-    summary: string = 'Success',
-    life: number = Toast_Life
+    detail: string = 'Operation completed successfully',
+    summary: string = DEFAULT_SUCCESS_SUMMARY,
+    life: number = TOAST_LIFE
   ): void {
     this.messageService.add({ severity: 'success', summary, detail, life });
   }
@@ -45,9 +50,9 @@ export class ToasterService {
    * @param life Optional duration in milliseconds (default: 3000).
    */
   showWarning(
-    detail: string,
-    summary: string = 'Warning',
-    life: number = Toast_Life
+    detail: string = 'Please proceed with caution',
+    summary: string = DEFAULT_WARNING_SUMMARY,
+    life: number = TOAST_LIFE
   ): void {
     this.messageService.add({ severity: 'warn', summary, detail, life });
   }
@@ -59,9 +64,9 @@ export class ToasterService {
    * @param life Optional duration in milliseconds (default: 3000).
    */
   showError(
-    detail: string,
-    summary: string = 'Error',
-    life: number = Toast_Life
+    detail: string = 'An error has occurred',
+    summary: string = DEFAULT_ERROR_SUMMARY,
+    life: number = TOAST_LIFE
   ): void {
     this.messageService.add({ severity: 'error', summary, detail, life });
   }

@@ -1,0 +1,64 @@
+<form
+  [formGroup]="form"
+  class="grid grid-cols-3 gap-3 p-4"
+  (ngSubmit)="saveChanges()"
+>
+  <p class="col-span-3 text-lg font-semibold">Update Historical Data</p>
+
+  <mat-form-field appearance="fill" class="col-span-1">
+    <mat-label>Material</mat-label>
+    <input matInput formControlName="material" name="material" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="col-span-1">
+    <mat-label>Unit Value</mat-label>
+    <input
+      matInput
+      type="number"
+      min="0"
+      formControlName="unitValue"
+      name="unitValue"
+    />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="col-span-1">
+    <mat-label>Unit</mat-label>
+    <input matInput formControlName="unit" name="unit" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="col-span-1">
+    <mat-label>HTS Code</mat-label>
+    <input matInput formControlName="htsCode" name="htsCode" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="col-span-1">
+    <mat-label>Country of Origin</mat-label>
+    <input matInput formControlName="coo" name="coo" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="col-span-1">
+    <mat-label>Description</mat-label>
+    <input matInput formControlName="description" name="description" />
+  </mat-form-field>
+
+  <!-- Action buttons -->
+  <div class="col-span-3 flex justify-end gap-2">
+    <button
+      type="button"
+      mat-button
+      (click)="resetForm()"
+      aria-label="Reset form"
+    >
+      <i class="fas fa-undo mr-2"></i> Reset
+    </button>
+    <button
+      [disabled]="!form?.valid || isFormSubmited()"
+      mat-raised-button
+      color="primary"
+      type="submit"
+      aria-label="Save changes"
+    >
+      <i class="fas fa-save mr-2"></i> Save
+    </button>
+  </div>
+</form>

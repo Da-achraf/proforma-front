@@ -32,6 +32,7 @@ import { RoleEnum } from './models/user/user.model';
 import { HomeRedirectResolver } from './resolvers/home-redirect.resolver';
 import { RequestsTableComponent } from './shared/components/tables/req-table.component';
 import { ScenariosListComponent } from './feature/scenario/scenarios-list/scenarios-list.component';
+import { HistoricalDataListComponent } from './feature/historical-data/historical-data-list/historical-data-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -196,6 +197,12 @@ const routes: Routes = [
       {
         path: 'scenarios',
         component: ScenariosListComponent,
+        canActivate: [AuthGuard, RoleGuard],
+        data: { expectedRoles: [RoleEnum.ADMIN] },
+      },
+      {
+        path: 'historical-data',
+        component: HistoricalDataListComponent,
         canActivate: [AuthGuard, RoleGuard],
         data: { expectedRoles: [RoleEnum.ADMIN] },
       },

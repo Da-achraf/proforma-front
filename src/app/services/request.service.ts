@@ -3,19 +3,12 @@ import { Injectable, inject, signal } from '@angular/core';
 import { saveAs } from 'file-saver';
 import { Observable, map } from 'rxjs';
 import { API_URL_TOKEN } from '../config/api.config';
+import { PagedResult } from '../models/api-types.model';
 import {
   RequestModel,
   UpdateFinanceRequestDTO,
   UpdateRequestByRequester,
 } from '../models/request.model';
-
-type PagedResult<T> = {
-  items: T[];
-  totalItems: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-};
 
 @Injectable({
   providedIn: 'root',

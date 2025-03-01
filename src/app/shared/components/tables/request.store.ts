@@ -20,7 +20,7 @@ import { RequestService } from '../../../services/request.service';
 import { TABLE_PAGE_SIZE } from './data';
 import { queryParamsByRole } from './helpers';
 import { ToasterService } from '../../services/toaster.service';
-import { QueryParamType } from '../../helpers/types';
+import { QueryParamType } from '../../../models/api-types.model';
 
 type RequestState = {
   requests: RequestModel[];

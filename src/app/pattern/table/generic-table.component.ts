@@ -3,14 +3,18 @@ import {
   Component,
   computed,
   contentChildren,
-  effect,
+  inject,
   input,
   OnInit,
   output,
-  signal,
   TemplateRef,
+  viewChild,
 } from '@angular/core';
 import { Table } from 'primeng/table';
+import {
+  PAGE_SIZE_OPTIONS,
+  TABLE_PAGE_SIZE,
+} from '../../shared/components/tables/data';
 import { TableColumn } from './table-types.interface';
 
 @Component({
@@ -22,6 +26,8 @@ import { TableColumn } from './table-types.interface';
 export class GenericTableComponent implements OnInit {
   templates = contentChildren<TemplateRef<any>>(TemplateRef);
 
+  private readonly dt1 = viewChild<Table>('dt1');
+
   page = output<number>();
   pageSize = output<number>();
 
@@ -30,6 +36,7 @@ export class GenericTableComponent implements OnInit {
   view = output<number>();
   delete = output<number>();
   review = output<number>();
+  search = output<string>();
 
   /**
    * the table model primary key. It's id for most of the time.
@@ -40,8 +47,18 @@ export class GenericTableComponent implements OnInit {
   readonly data = input<any[]>([]);
   readonly total = input.required<number>();
   readonly columns = input<TableColumn[]>([]);
+  /**
+   * This in order to support both search categories in the table:
+   * * (emitSearch = false) => do a local search based on globalFilterFields and local data (no server side search)
+   * * (emitSearch = true) => do a server side search based on emited search term
+   * *
+   */
+  readonly emitSearch = input(false);
   readonly globalFilterFields = input<string[]>([]);
-  readonly pageSizeOptions = input([25, 50, 100, 200]);
+
+  readonly pageSizeOptions = input<number[]>(inject(PAGE_SIZE_OPTIONS));
+  readonly defaultPageSize = input<number>(inject(TABLE_PAGE_SIZE));
+
   readonly loading = input(true);
 
   readonly withCreate = input(true);
@@ -50,16 +67,19 @@ export class GenericTableComponent implements OnInit {
   readonly withViewDetail = input(false);
   readonly withReview = input(false);
 
-  rows = signal(25);
-  first = signal(0);
-
   columnsLength = computed(() => this.columns().length);
-
-  private readonly size = 25;
 
   ngOnInit(): void {
     this.page.emit(1);
-    this.pageSize.emit(this.size);
+    this.pageSize.emit(this.defaultPageSize());
+  }
+
+  onSearch(searchTerm: string) {
+    if (this.emitSearch()) {
+      this.search.emit(searchTerm);
+      return;
+    }
+    this.dt1()?.filterGlobal(searchTerm, 'contains');
   }
 
   getTableDataTemplate(column: any): TemplateRef<any> | null {
@@ -84,19 +104,4 @@ export class GenericTableComponent implements OnInit {
   onFilter(event: any) {
     console.log('Filter: ', event);
   }
-
-  dataEffect = effect(() => {
-    const data = this.data()
-
-    console.log('data: ', data)
-  })
-
-  // onPageChange(event: PageEvent) {
-  //   const { pageIndex, pageSize } = event;
-
-  //   if (typeof pageIndex === 'number' && typeof pageSize === 'number') {
-  //     this.first.set(pageIndex * pageSize);
-  //     this.rows.set(pageSize);
-  //   }
-  // }
 }

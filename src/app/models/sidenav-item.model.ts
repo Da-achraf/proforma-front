@@ -63,5 +63,11 @@ export const allMenuItems: SidenavItem[] = [
         icon: 'pi pi-fw pi-cog',
         routerLink: '/home/scenarios',
         roles: [RoleEnum.ADMIN]
+    },
+    {
+        label: 'Historical Data',
+        icon: 'pi pi-history',
+        routerLink: '/home/historical-data',
+        roles: [RoleEnum.ADMIN]
     }
 ];

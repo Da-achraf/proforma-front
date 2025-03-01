@@ -13,11 +13,11 @@
     [value]="data()"
     [globalFilterFields]="globalFilterFields()"
     (onFilter)="onFilter($event)"
-    >
+  >
     <ng-template pTemplate="caption">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-x-3">
-          <ba-search-bar (search)="dt1.filterGlobal($event, 'contains')" />
+          <ba-search-bar (search)="onSearch($event)" />
           <p-button [outlined]="true" (click)="clear(dt1)" label="Clear">
             <ng-template pTemplate="icon">
               <i class="fa-solid fa-filter-circle-xmark bg-pr"></i>
@@ -26,7 +26,7 @@
         </div>
         <div class="flex items-center gap-x-2">
           @if (withCreate()) {
-            <app-create-button (create)="create.emit()" title="scenario" />
+          <app-create-button (create)="create.emit()" title="scenario" />
           }
         </div>
       </div>
@@ -64,7 +64,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-row>
-      <tr>
+      <tr [ngClass]="{ 'blur-sm': loading() && data().length != 0 }">
         @for (col of columns(); track $index) {
         <td>
           @switch (col.type) { @case ('custom') {
@@ -76,6 +76,8 @@
           {{ row[col.field] | date : "MMM d, y, h:mm a" }}
           } @case ('text') {
           {{ row[col.field] | titlecase }}
+          } @case ('numeric') {
+          {{ row[col.field] }}
           } }
         </td>
         }
@@ -117,11 +119,11 @@
 
     <ng-template pTemplate="emptymessage">
       @if (!loading() && data().length === 0) {
-        <tr>
-          <td [attr.colspan]="columnsLength() + 1">
-            <app-no-data-found />
-          </td>
-        </tr>  
+      <tr>
+        <td [attr.colspan]="columnsLength() + 1">
+          <app-no-data-found />
+        </td>
+      </tr>
       }
     </ng-template>
   </p-table>

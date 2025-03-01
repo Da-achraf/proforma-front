@@ -15,10 +15,11 @@ import {
 } from '@angular/common/http';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatAutocompleteModule, MatAutocompleteOrigin } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -94,6 +95,8 @@ import { TradcomplianceDashboardComponent } from './components/tradcompliance-da
 import { UsermanagmentComponent } from './components/usermanagment/usermanagment.component';
 import { UsersListComponent } from './components/users-list/users-list.component';
 import { WarehouseDashboardComponent } from './components/warehouse-dashboard/warehouse-dashboard.component';
+import { AddHistoricalDataComponent } from './feature/historical-data/add-historical-data/add-historical-data.component';
+import { HistoricalDataListComponent } from './feature/historical-data/historical-data-list/historical-data-list.component';
 import { AddScenarioComponent } from './feature/scenario/add-scenario/add-scenario.component';
 import { EditScenarioComponent } from './feature/scenario/edit-scenario/edit-scenario.component';
 import { ScenariosListComponent } from './feature/scenario/scenarios-list/scenarios-list.component';
@@ -113,7 +116,11 @@ import { LoadingDotsComponent } from './shared/components/loading-dots/loading-d
 import { ManagementTablesComponent } from './shared/components/management-tables/management-tables.component';
 import { ParcelsComponent } from './shared/components/parcels/parcels.component';
 import { RequestStatusComponent } from './shared/components/request-status/request-status.component';
-import { PAGE_SIZE_OPTIONS, TABLE_PAGE_SIZE } from './shared/components/tables/data';
+import {
+  PAGE_SIZE_OPTIONS,
+  TABLE_PAGE_SIZE,
+} from './shared/components/tables/data';
+import { ReportFilterComponent } from './shared/components/tables/report-filter/report-filter.component';
 import { RequestsTableComponent } from './shared/components/tables/req-table.component';
 import { TheInvoiceComponent } from './shared/components/the-invoice/the-invoice.component';
 import { CountryPipe } from './shared/pipes/country.pipe';
@@ -132,8 +139,7 @@ import { UserRoleForDisplayPipe } from './shared/pipes/user-role-for-display.pip
 import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
 import { UiModule } from './ui/ui.module';
-import { ReportFilterComponent } from './shared/components/tables/report-filter/report-filter.component';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { UpdateHistoricalDataComponent } from './feature/historical-data/update-historical-data/update-historical-data.component';
 
 @NgModule({
   declarations: [
@@ -213,7 +219,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     ToastComponent,
     ToastClassPipe,
     RequestStatusTabFilterComponent,
-    ReportFilterComponent
+    ReportFilterComponent,
+    HistoricalDataListComponent,
+    AddHistoricalDataComponent,
+    UpdateHistoricalDataComponent,
   ],
   imports: [
     BrowserModule,
@@ -250,6 +259,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
+    MatAutocompleteOrigin,
     MatDialogModule,
     BrowserAnimationsModule,
     NgSelectModule,
@@ -272,18 +282,18 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
   providers: [
     AuthService,
     RequestStrategyFactory,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: tokenInterceptor,
-      multi: true,
-    },
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: tokenInterceptor,
+    //   multi: true,
+    // },
     {
       provide: TABLE_PAGE_SIZE,
       useValue: 10,
     },
     {
       provide: PAGE_SIZE_OPTIONS,
-      useValue: [10, 20, 50, 100]
+      useValue: [10, 20, 50, 100],
     },
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),

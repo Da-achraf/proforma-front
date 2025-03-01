@@ -1,6 +1,6 @@
 import { Component, inject, model, OnInit, output } from '@angular/core';
-import { QueryParamType } from '../../../helpers/types';
 import { RequestStore } from '../request.store';
+import { QueryParamType } from '../../../../models/api-types.model';
 
 @Component({
   selector: 'app-report-filter',

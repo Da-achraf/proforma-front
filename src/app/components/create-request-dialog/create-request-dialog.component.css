@@ -80,3 +80,33 @@
   button.mat-button.submit-button:hover {
     background-color: #1a6e1a;
   }
+
+
+ /* Ensure proper positioning context */
+.mat-autocomplete-panel {
+  position: fixed !important;
+  transform: none !important;
+  margin-top: 5px;
+  width: inherit;
+  min-width: 100%;
+}
+
+.mat-form-field {
+  position: relative;
+}
+
+.cdk-virtual-scroll-viewport {
+  contain: none;
+}
+
+
+/* Ensure proper panel containment */
+.cdk-overlay-container {
+  position: fixed;
+  z-index: 1000; /* Ensure positive z-index */
+}
+
+/* Hide closed panels completely */
+.cdk-overlay-pane:not(.mat-autocomplete-panel-above) {
+  display: none !important;
+}

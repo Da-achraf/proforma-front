@@ -2,8 +2,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URL_TOKEN } from '../config/api.config';
-import { QueryParamType } from '../shared/helpers/types';
 import { TransformedRequestModel } from '../models/request.model';
+import { QueryParamType } from '../models/api-types.model';
 
 @Injectable({ providedIn: 'root' })
 export class RequestExportService {

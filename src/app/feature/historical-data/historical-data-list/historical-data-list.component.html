@@ -1,0 +1,21 @@
+<div class="w-full max-w-screen-2xl px-2 py-10">
+  <p
+    class="font-bold w-fit mb-5 font-mono text-orange-500 text-md border-b-2 opacity-75 border-b-blue-400"
+  >
+    {{ "historical data" | titlecase }}
+  </p>
+
+  <ba-generic-table
+    [data]="store.entities()"
+    [columns]="columns()"
+    [total]="store.total()"
+    [loading]="store.isLoading()"
+    [emitSearch]="true"
+    (page)="store.setPage($event)"
+    (pageSize)="store.setPageSize($event)"
+    (search)="onSearch($event)"
+    (create)="store.openCreateDataDialog()"
+    (edit)="store.openEditDataDialog($event)"
+    (delete)="store.openDeleteDataDialog($event)"
+  />
+</div>

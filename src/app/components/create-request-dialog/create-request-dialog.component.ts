@@ -2,16 +2,41 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
+  OnDestroy,
   OnInit,
+  QueryList,
   signal,
   untracked,
+  ViewChildren,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
-import { map, Observable, of, startWith } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  fromEvent,
+  map,
+  Observable,
+  of,
+  startWith,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
+import { HasEventTargetAddRemove } from 'rxjs/internal/observable/fromEvent';
 import { DeliveryAddress } from '../../models/delivery-address.model';
 import {
   ItemModel,
@@ -34,16 +59,23 @@ import { ShippointService } from '../../services/shippoint.service';
 import { UserStoreService } from '../../services/user-store.service';
 import { ToasterService } from '../../shared/services/toaster.service';
 import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-address-crud/delivery-address-crud.component';
+import { HistoricalData } from '../../models/historical-data.model';
+import { HistoricalDataService } from '../../feature/historical-data/hitorical-data.service';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { Overlay } from 'primeng/overlay';
+import { ScrollStrategyOptions } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-create-request-dialog',
   templateUrl: './create-request-dialog.component.html',
   styleUrls: ['./create-request-dialog.component.css'],
+  providers: [ToasterService],
 })
-export class CreateRequestDialogComponent implements OnInit {
+export class CreateRequestDialogComponent implements OnInit, OnDestroy {
   // Injected dependencies
   dialog = inject(MatDialog);
-  toastr = inject(ToasterService);
+  toaster = inject(ToasterService);
+  historicalDataService = inject(HistoricalDataService);
 
   requestForm!: FormGroup;
   shipPoints: Ship[] = [];
@@ -54,6 +86,9 @@ export class CreateRequestDialogComponent implements OnInit {
   shippedViaOptions = signal<string[]>(SHIPPED_VIA_OPTIONS);
   modesOfTransports: string[] = ModesOfTransports;
   userRole = inject(UserStoreService).userRole;
+
+  isLoadingMaterial = false;
+  private readonly destroy$ = new Subject<void>();
 
   filteredOptions!: Observable<string[]>;
 
@@ -141,7 +176,103 @@ export class CreateRequestDialogComponent implements OnInit {
     this.loadDeliveryAddresses();
     this.onScenarioChange();
     this.onShippingOrDeliveryChange();
+
+    this.fetchOptions();
   }
+
+  // Historical data labo
+  @ViewChildren(MatAutocompleteTrigger)
+  autocompleteTriggers!: QueryList<MatAutocompleteTrigger>;
+
+  private materialInputSubject = new Subject<{
+    value: string;
+    index: number;
+  }>();
+
+  onMaterialChange(value: string, index: number) {
+    this.materialInputSubject.next({ value, index });
+  }
+
+  selectMaterial(data: HistoricalData, formIndex: number) {
+    const itemForm = this.getFormAtIndex(formIndex);
+    if (!itemForm) return;
+
+    // Update form controls
+    const updateControl = (controlName: string, value: any) => {
+      const control = itemForm.get(controlName)?.get('value');
+      if (control) control.setValue(value);
+    };
+
+    updateControl('Material', data.material);
+    updateControl('Unit Value', data.unitValue);
+    updateControl('Unit', data.unit);
+    updateControl('Description', data.description);
+    updateControl('HtsCode', data.htsCode);
+    updateControl('Coo', data.coo);
+
+    // Clear autocomplete
+    this.materialOptions.set([]);
+  }
+
+  private getFormAtIndex(index: number) {
+    // This is just a placeholder - update with your actual form access method
+    return this.items.at(index);
+  }
+
+  materialOptions = signal<Record<number, HistoricalData[]>>({});
+
+  fetchOptions() {
+    this.materialInputSubject
+      .pipe(
+        debounceTime(1000),
+        distinctUntilChanged((prev, curr) => prev.value === curr.value),
+        filter(({ value }) => value.length != 0),
+        switchMap(({ value, index }) => {
+          const searchTerm = (value || '').trim();
+          if (searchTerm.length < 2) {
+            this.materialOptions.update((options) => {
+              options[index] = [];
+              return options;
+            });
+            return of({ result: [], index });
+          }
+
+          this.isLoadingMaterial = true;
+
+          return this.historicalDataService
+            .getHistoricalDataByMaterial(searchTerm)
+            .pipe(
+              map((result) => ({ result, index })),
+              catchError((err) => {
+                console.error('Error fetching material data', err);
+                this.toaster.showError('Failed to load material data');
+                return of({ result: [], index });
+              })
+            );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(({ result, index }) => {
+        this.isLoadingMaterial = false;
+
+        // Update options for specific index
+        this.materialOptions.update((options) => ({
+          ...options,
+          [index]: result || [],
+        }));
+
+        if (result?.length === 0) {
+          this.toaster.showWarning('No matching materials found');
+        }
+
+        // Open panel for specific index
+        setTimeout(() => {
+          const trigger = this.autocompleteTriggers.get(index);
+          trigger?.openPanel();
+        });
+      });
+  }
+  // Historical data labo ends here
 
   createItem(data?: any): FormGroup {
     const formItems = this.formItems();
@@ -162,12 +293,10 @@ export class CreateRequestDialogComponent implements OnInit {
         type: [fieldData ? fieldData?.type : item.type],
       });
     });
-    console.log(this.fb.group(group));
     return this.fb.group(group);
   }
 
   findDataOfItem(itemName: string, data: any[]) {
-    console.log('data: ', data);
     let foundData: any = null;
     data?.forEach((d) => {
       if (d['name'] === itemName) foundData = d;
@@ -178,11 +307,33 @@ export class CreateRequestDialogComponent implements OnInit {
 
   addItem() {
     this.items.push(this.createItem());
+    this.materialOptions.update((options) => ({
+      ...options,
+      [this.items.length - 1]: [],
+    }));
   }
 
   removeItem(index: number) {
     if (this.items.length <= 1) return;
     this.items.removeAt(index);
+    this.materialOptions.update((options) => {
+      delete options[index];
+      return { ...options };
+    });
+  }
+
+  emptyItem(index: number) {
+    const item = this.items.at(index) as FormGroup;
+
+    // Get all control names in the form group
+    Object.keys(item.controls).forEach((controlName) => {
+      // For each nested form group (like "Material", "Quantity", etc.)
+      const nestedGroup = item.get(controlName) as FormGroup;
+
+      if (nestedGroup && nestedGroup.contains('value')) {
+        nestedGroup.get('value')?.setValue('');
+      }
+    });
   }
 
   get items(): FormArray {
@@ -338,7 +489,10 @@ export class CreateRequestDialogComponent implements OnInit {
     }
   }
 
-  updateIncoterm(shippingPointId: number, deliveryAddressId: number): void {
+  private updateIncoterm(
+    shippingPointId: number,
+    deliveryAddressId: number
+  ): void {
     const shippingPoint = this.shipPoints.find(
       (point) => point.id_ship === shippingPointId
     );
@@ -352,8 +506,6 @@ export class CreateRequestDialogComponent implements OnInit {
       this.requestForm.patchValue({ incoterm: '' });
     }
   }
-
-  setDeliveryAddress(addressId: number) {}
 
   onDeliveryAddressChange(option: string) {
     if (option != 'other') return;
@@ -370,5 +522,11 @@ export class CreateRequestDialogComponent implements OnInit {
           addressControl?.patchValue(null);
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    this.materialInputSubject.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
