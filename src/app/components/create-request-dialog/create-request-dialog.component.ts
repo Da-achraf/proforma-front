@@ -2,7 +2,6 @@ import {
   Component,
   computed,
   effect,
-  ElementRef,
   inject,
   OnDestroy,
   OnInit,
@@ -11,14 +10,9 @@ import {
   untracked,
   ViewChildren,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
 import {
@@ -26,7 +20,6 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
-  fromEvent,
   map,
   Observable,
   of,
@@ -34,10 +27,10 @@ import {
   Subject,
   switchMap,
   takeUntil,
-  tap,
 } from 'rxjs';
-import { HasEventTargetAddRemove } from 'rxjs/internal/observable/fromEvent';
+import { HistoricalDataService } from '../../feature/historical-data/hitorical-data.service';
 import { DeliveryAddress } from '../../models/delivery-address.model';
+import { HistoricalData } from '../../models/historical-data.model';
 import {
   ItemModel,
   userRoleToMandatoryForMapper,
@@ -58,12 +51,12 @@ import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
 import { UserStoreService } from '../../services/user-store.service';
 import { ToasterService } from '../../shared/services/toaster.service';
+import {
+  enhanceItemsWithCacheData,
+  enhancementConfig,
+} from '../../shared/utils/historical-data.util';
 import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-address-crud/delivery-address-crud.component';
-import { HistoricalData } from '../../models/historical-data.model';
-import { HistoricalDataService } from '../../feature/historical-data/hitorical-data.service';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { Overlay } from 'primeng/overlay';
-import { ScrollStrategyOptions } from '@angular/cdk/overlay';
+import _ from 'lodash';
 
 @Component({
   selector: 'app-create-request-dialog',
@@ -87,18 +80,9 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
   modesOfTransports: string[] = ModesOfTransports;
   userRole = inject(UserStoreService).userRole;
 
+  private destroy$ = new Subject<void>();
+
   isLoadingMaterial = false;
-  private readonly destroy$ = new Subject<void>();
-
-  filteredOptions!: Observable<string[]>;
-
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.currencyCodes().filter((option) =>
-      option.toLowerCase().includes(filterValue)
-    );
-  }
 
   // Signals
   scenarios = toSignal(this.scenarioService.getScenarios(), {
@@ -151,13 +135,6 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<CreateRequestDialogComponent>
   ) {}
 
-  onChange(text: string) {
-    this.filteredOptions = of(text).pipe(
-      startWith(''),
-      map((value) => this._filter(value || ''))
-    );
-  }
-
   ngOnInit(): void {
     this.requestForm = this.fb.group({
       invoicesTypes: ['', Validators.required],
@@ -189,6 +166,46 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
     index: number;
   }>();
 
+  /**
+   * Signal tracking filtered historical data options for each request item in the form array.
+   * Maps item indices to historical data arrays that match user input during material field interactions.
+   *
+   * - Updated when a user starts typing in a material field (search phase)
+   * - Cleared/reset when the user finalizes their material selection
+   *
+   * @structure
+   * Key: Index position in the request items form array
+   * Value: Array of historical records matching the partial material input
+   */
+  filteredHistoricalDataOptions = signal<Record<number, HistoricalData[]>>({});
+
+  /**
+   * Signal acting as a cache for historical data selections made per request item.
+   * Stores complete historical records to automatically augment items with additional
+   * compliance fields required for approval workflows.
+   *
+   * Used to enrich request items with non-user-provided data from historical records:
+   * - Adds fields like HTS Code and COO that requesters don't input
+   * - Provides critical trade compliance data for subsequent approval stages
+   *
+   * @example
+   * // When material "11233-456" is selected for item index 1:
+   * {
+   *   1: {
+   *     id: 3,
+   *     material: "11233-456",
+   *     unitValue: 12.31,
+   *     unit: "Wagon",
+   *     description: "DESC Wagon",
+   *     htsCode: "1231230",  // Auto-added to request item
+   *     coo: "MA"            // Auto-added to request item
+   *   }
+   * }
+   */
+  filteredHistoricalDataOptionsCache = signal<Record<number, HistoricalData>>(
+    {}
+  );
+
   onMaterialChange(value: string, index: number) {
     this.materialInputSubject.next({ value, index });
   }
@@ -207,19 +224,19 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
     updateControl('Unit Value', data.unitValue);
     updateControl('Unit', data.unit);
     updateControl('Description', data.description);
-    updateControl('HtsCode', data.htsCode);
-    updateControl('Coo', data.coo);
 
-    // Clear autocomplete
-    this.materialOptions.set([]);
+    // Clear autocomplete and save selected historical data to a local cache
+    this.filteredHistoricalDataOptionsCache.update((options) => ({
+      ...options,
+      [formIndex]: data,
+    }));
+    this.filteredHistoricalDataOptions.set({});
   }
 
   private getFormAtIndex(index: number) {
     // This is just a placeholder - update with your actual form access method
     return this.items.at(index);
   }
-
-  materialOptions = signal<Record<number, HistoricalData[]>>({});
 
   fetchOptions() {
     this.materialInputSubject
@@ -230,7 +247,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
         switchMap(({ value, index }) => {
           const searchTerm = (value || '').trim();
           if (searchTerm.length < 2) {
-            this.materialOptions.update((options) => {
+            this.filteredHistoricalDataOptions.update((options) => {
               options[index] = [];
               return options;
             });
@@ -243,8 +260,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
             .getHistoricalDataByMaterial(searchTerm)
             .pipe(
               map((result) => ({ result, index })),
-              catchError((err) => {
-                console.error('Error fetching material data', err);
+              catchError(() => {
                 this.toaster.showError('Failed to load material data');
                 return of({ result: [], index });
               })
@@ -256,7 +272,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
         this.isLoadingMaterial = false;
 
         // Update options for specific index
-        this.materialOptions.update((options) => ({
+        this.filteredHistoricalDataOptions.update((options) => ({
           ...options,
           [index]: result || [],
         }));
@@ -307,7 +323,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
 
   addItem() {
     this.items.push(this.createItem());
-    this.materialOptions.update((options) => ({
+    this.filteredHistoricalDataOptions.update((options) => ({
       ...options,
       [this.items.length - 1]: [],
     }));
@@ -316,7 +332,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
   removeItem(index: number) {
     if (this.items.length <= 1) return;
     this.items.removeAt(index);
-    this.materialOptions.update((options) => {
+    this.filteredHistoricalDataOptions.update((options) => {
       delete options[index];
       return { ...options };
     });
@@ -409,7 +425,6 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    console.log('request form: ', this.requestForm.value);
     if (this.requestForm) {
       const userId = this.authService.getUserIdFromToken();
       const scenarioId = this.requestForm.value.scenarioId;
@@ -422,6 +437,13 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
           this.deliveryAddresses.find(
             (address) => address.id === this.requestForm.value.deliveryAddress
           )?.id ?? 0;
+
+        const enhancedItems = enhanceItemsWithCacheData(
+          _.cloneDeep(this.requestForm.value.items),
+          this.filteredHistoricalDataOptionsCache(),
+          enhancementConfig
+        );
+
         const requestData: CreateRequest = {
           invoicesTypes: this.requestForm.value.invoicesTypes,
           shipPointId: shippingPointId,
@@ -434,36 +456,22 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
           currency: this.requestForm.value.currency,
           modeOfTransport: this.requestForm.value.modeOfTransport,
           dimension: this.requestForm.value.dimension,
-          itemsWithValuesJson: JSON.stringify(this.requestForm.value.items),
+          itemsWithValuesJson: JSON.stringify(enhancedItems),
         };
+
         this.requestService.createRequest(requestData).subscribe(
           (response) => {
             this.dialogRef.close(response);
           },
-          (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Error creating request',
-            });
-            console.error('Error creating request:', error);
+          () => {
+            this.toaster.showError('Error creating request');
           }
         );
       } else {
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: 'Scenario ID is not a number',
-        });
-        console.error('Scenario ID is not a number');
+        this.toaster.showError('Scenario ID is not a number');
       }
     } else {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Form is invalid',
-      });
-      console.error('Form is invalid');
+      this.toaster.showError('Form is invalid');
     }
   }
 

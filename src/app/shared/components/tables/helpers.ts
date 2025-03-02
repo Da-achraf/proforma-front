@@ -25,45 +25,71 @@ export const getRequestModificationComponent = (
   }
 };
 
-// Function to convert an array of key-value pairs into an object
-const arrayToMap = (arr: JsonItemModel[]): { [key: string]: JsonItemModel } => {
-  return arr.reduce((acc, item) => {
-    acc[item.name] = item;
-    return acc;
-  }, {} as { [key: string]: JsonItemModel });
-};
+const arrayToMap = (arr: JsonItemModel[]): { [key: string]: JsonItemModel } =>
+  arr.reduce((acc, item) => ({ ...acc, [item.name]: item }), {});
 
-// Improved function to merge the two arrays
 export const mergeArrays = (
   oldArr: { values: JsonItemModel[] }[],
   newArr: { [key: string]: JsonItemModel }[]
 ): { [key: string]: JsonItemModel }[] => {
-  return oldArr.map((oldItem, index) => {
-    const newItem = newArr[index] || {};
+  // Process based on NEW array to respect deletions
+  return newArr.map((newItem, index) => {
+    const oldValues = oldArr[index]?.values || [];
+    const oldMap = arrayToMap(oldValues);
 
-    // Use the arrayToMap function to create the map from old values
-    const oldMap = arrayToMap(oldItem.values);
-
-    // Start merging values
-    const mergedItem: { [key: string]: JsonItemModel } = { ...oldMap }; // Start with oldMap
-
-    // Update or add values from newItem
-    for (const key in newItem) {
-      if (mergedItem[key]) {
-        // If the key exists in the old structure, update its value
-        mergedItem[key] = {
-          ...mergedItem[key],
-          value: newItem[key].value,
-        };
-      } else {
-        // If the key does not exist in oldItem, add the new value
-        mergedItem[key] = newItem[key];
-      }
-    }
-
-    return mergedItem;
+    // Merge strategy: new values override old ones, but preserve old metadata
+    return {
+      ...oldMap,
+      ...Object.fromEntries(
+        Object.entries(newItem).map(([key, newEntry]) => [
+          key,
+          oldMap[key]
+            ? { ...oldMap[key], value: newEntry.value } // Preserve old metadata
+            : newEntry,
+        ])
+      ),
+    };
   });
 };
+
+// // Function to convert an array of key-value pairs into an object
+// const arrayToMap = (arr: JsonItemModel[]): { [key: string]: JsonItemModel } =>
+//   arr.reduce((acc, item) => {
+//     acc[item.name] = item;
+//     return acc;
+//   }, {} as { [key: string]: JsonItemModel });
+
+//   // Improved function to merge the two arrays
+// export const mergeArrays = (
+//   oldArr: { values: JsonItemModel[] }[],
+//   newArr: { [key: string]: JsonItemModel }[]
+// ): { [key: string]: JsonItemModel }[] => {
+//   return oldArr.map((oldItem, index) => {
+//     const newItem = newArr[index] || {};
+
+//     // Use the arrayToMap function to create the map from old values
+//     const oldMap = arrayToMap(oldItem.values);
+
+//     // Start merging values
+//     const mergedItem: { [key: string]: JsonItemModel } = { ...oldMap }; // Start with oldMap
+
+//     // Update or add values from newItem
+//     for (const key in newItem) {
+//       if (mergedItem[key]) {
+//         // If the key exists in the old structure, update its value
+//         mergedItem[key] = {
+//           ...mergedItem[key],
+//           value: newItem[key].value,
+//         };
+//       } else {
+//         // If the key does not exist in oldItem, add the new value
+//         mergedItem[key] = newItem[key];
+//       }
+//     }
+
+//     return mergedItem;
+//   });
+// };
 
 export const queryParamsByRole = (
   role: RoleEnum,
