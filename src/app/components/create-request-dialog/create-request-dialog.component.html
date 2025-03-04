@@ -93,17 +93,6 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- <mat-form-field>
-        <mat-label>Currency</mat-label>
-        <input type="text" placeholder="Pick one" #currencyInput (input)="onChange(currencyInput.value)" matInput
-          formControlName="currency" [matAutocomplete]="auto">
-        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-          @for (option of currencyCodes; track option) {
-          <mat-option [value]="option">{{ option }}</mat-option>
-          }
-        </mat-autocomplete>
-      </mat-form-field> -->
-
       <mat-form-field>
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
@@ -127,7 +116,7 @@
     <div class="border border-gray-200 rounded-md overflow-hidden">
       <div class="bg-orange-200 p-2 mb-2 text-center">
         <span class="font-mono text-md w-fit text-orange-600">
-          Items
+          Number Of Items
           <span class="font-bold text-xs text-gray-800">
             ({{ items.length }})
           </span>

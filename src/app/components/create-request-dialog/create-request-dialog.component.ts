@@ -10,10 +10,11 @@ import {
   untracked,
   ViewChildren,
 } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import _ from 'lodash';
 import { MessageService } from 'primeng/api';
 import {
   catchError,
@@ -21,12 +22,10 @@ import {
   distinctUntilChanged,
   filter,
   map,
-  Observable,
   of,
-  startWith,
   Subject,
   switchMap,
-  takeUntil,
+  takeUntil
 } from 'rxjs';
 import { HistoricalDataService } from '../../feature/historical-data/hitorical-data.service';
 import { DeliveryAddress } from '../../models/delivery-address.model';
@@ -56,7 +55,6 @@ import {
   enhancementConfig,
 } from '../../shared/utils/historical-data.util';
 import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-address-crud/delivery-address-crud.component';
-import _ from 'lodash';
 
 @Component({
   selector: 'app-create-request-dialog',
@@ -96,7 +94,6 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
   formItems = computed(() => {
     const selectedScenarioItems: ItemModel[] =
       this.selectedScenario()?.items ?? [];
-
     const userRole = this.userRole();
 
     if (!selectedScenarioItems.length || !userRole) return [];
@@ -234,7 +231,6 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
   }
 
   private getFormAtIndex(index: number) {
-    // This is just a placeholder - update with your actual form access method
     return this.items.at(index);
   }
 

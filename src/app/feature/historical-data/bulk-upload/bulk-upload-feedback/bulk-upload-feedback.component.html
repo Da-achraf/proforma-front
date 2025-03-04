@@ -1,0 +1,134 @@
+@if (result(); as result) {
+  <div>
+    <div class="overflow-hidden rounded-xl bg-white shadow-xl">
+      <!-- Header -->
+      <div class="border-b bg-gray-100 px-6 py-4">
+        <h4 class="text-xl font-bold text-gray-800">Latest Upload Summary</h4>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6">
+        <!-- Stats Grid -->
+        <div class="mb-6 grid grid-cols-3 gap-4">
+          <!-- Total -->
+          <div class="rounded-lg bg-blue-50 p-4 text-center font-medium shadow">
+            <div class="text-2xl font-bold text-blue-600">
+              {{ result.totalRowCount | number }}
+            </div>
+            <div class="mt-1 text-sm text-blue-800">Total Records</div>
+          </div>
+
+          <!-- Success -->
+          <div
+            class="rounded-lg bg-green-50 p-4 text-center font-medium shadow"
+          >
+            <div class="text-2xl font-bold text-green-600">
+              {{ result.successCount | number }}
+            </div>
+            <div class="mt-1 text-sm text-green-800">Successful</div>
+          </div>
+
+          <!-- Errors -->
+          <div class="rounded-lg bg-red-50 p-4 text-center font-medium shadow">
+            <div class="text-2xl font-bold text-red-600">
+              {{ result.errors.length | number }}
+            </div>
+            <div class="mt-1 text-sm text-red-800">Errors</div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mb-6">
+          <div class="h-2 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="h-full bg-green-500 transition-all duration-500"
+              [style.width.%]="
+                (result.successCount / result.totalRowCount) * 100
+              "
+            ></div>
+          </div>
+          <div class="mt-1 text-center text-xs text-gray-500">
+            {{
+              (result.successCount / result.totalRowCount) * 100
+                | number: "1.0-0"
+            }}% Success Rate
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-3">
+          <button
+            *ngIf="result.errors.length"
+            mat-raised-button
+            color="secondary"
+            (click)="downloadErrors()"
+          >
+            <div class="!flex items-center gap-x-2">
+              <i class="fa-solid text-red-500 fa-circle-arrow-down"></i>
+              <span>Download Errors</span>
+            </div>
+          </button>
+
+          <button
+            *ngIf="result.errors.length"
+            mat-raised-button
+            color="secondary"
+            (click)="viewErrorsAsJSON()"
+          >
+            <div class="!flex items-center gap-x-2">
+              <i class="fa-solid fa-code"></i>
+              <span>View JSON</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 max-h-60 overflow-y-auto rounded-lg p-4 shadow-lg">
+      @if (result.errors.length != 0) {
+        <h5 class="mb-2 text-lg font-semibold">Error List</h5>
+
+        <table
+          mat-table
+          [dataSource]="paginatedErrors"
+          class="w-full rounded-lg border"
+        >
+          <!-- Row Number Column -->
+          <ng-container matColumnDef="rowNumber">
+            <th mat-header-cell *matHeaderCellDef class="p-2">Row</th>
+            <td mat-cell *matCellDef="let error" class="p-2">
+              {{ error.rowNumber }}
+            </td>
+          </ng-container>
+
+          <!-- Error Message Column -->
+          <ng-container matColumnDef="errorMessage">
+            <th mat-header-cell *matHeaderCellDef class="p-2">Error Message</th>
+            <td mat-cell *matCellDef="let error" class="p-2 text-red-600">
+              {{ error.errorMessage }}
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="['rowNumber', 'errorMessage']"
+          ></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: ['rowNumber', 'errorMessage']"
+          ></tr>
+        </table>
+
+        <!-- Pagination -->
+        <mat-paginator
+          [length]="result.errors.length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 20]"
+          (page)="onPageChange($event)"
+          class="mt-4"
+        >
+        </mat-paginator>
+      }
+    </div>
+  </div>
+}

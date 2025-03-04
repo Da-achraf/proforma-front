@@ -28,6 +28,10 @@
           @if (withCreate()) {
           <app-create-button (create)="create.emit()" title="scenario" />
           }
+
+          @if (withImport()) {
+            <app-upload-button (upload)="upload.emit()" />
+            }
         </div>
       </div>
     </ng-template>

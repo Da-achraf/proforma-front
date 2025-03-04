@@ -237,16 +237,18 @@
                   </div>
                 </div> -->
 
-<div class="min-h-screen flex items-center justify-center bg-gray-100 p-4 responsive-background">
-  <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg p-8 bg-opacity-80">
-    <h2 class="text-2xl font-bold text-center mb-8">Create an Account</h2>
+<div
+  class="responsive-background flex min-h-screen items-center justify-center bg-gray-100 p-4"
+>
+  <div class="w-full max-w-4xl rounded-lg bg-white bg-opacity-80 p-8 shadow-lg">
+    <h2 class="mb-8 text-center text-2xl font-bold">Create an Account</h2>
     <form
       [formGroup]="SignUpForm"
       (ngSubmit)="SignUpSubmited()"
       class="space-y-6"
     >
       <!-- Row 1: TE ID and Full Name -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div class="relative">
           <label for="TeId" class="block text-sm font-medium text-gray-700"
             >TE ID</label
@@ -255,19 +257,19 @@
             type="text"
             id="TeId"
             formControlName="teId"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-400 focus:outline-none focus:ring-[1px] focus:ring-orange-400"
             placeholder="TExxxxxx"
             required
           />
           <div
             *ngIf="teId.errors?.['required'] && teId.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             TE ID is required
           </div>
           <div
             *ngIf="teId.errors?.['pattern'] && teId.dirty"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Not a valid TE ID
           </div>
@@ -280,13 +282,13 @@
             type="text"
             id="username"
             formControlName="username"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-400 focus:outline-none focus:ring-[1px] focus:ring-orange-400"
             placeholder="Full name"
             required
           />
           <div
             *ngIf="username.errors?.['required'] && username.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Full name is required
           </div>
@@ -294,7 +296,7 @@
       </div>
 
       <!-- Row 2: Email and Plant(s) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div class="relative">
           <label for="email" class="block text-sm font-medium text-gray-700"
             >Email</label
@@ -303,19 +305,19 @@
             type="email"
             id="email"
             formControlName="email"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-400 focus:outline-none focus:ring-[1px] focus:ring-orange-400"
             placeholder="email@te.com"
             required
           />
           <div
             *ngIf="email.errors?.['required'] && email.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Email is required
           </div>
           <div
             *ngIf="email.errors?.['email'] && email.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Invalid email format
           </div>
@@ -332,7 +334,7 @@
           ></p-multiSelect>
           <div
             *ngIf="shipId.errors?.['required'] && shipId.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Plant is required
           </div>
@@ -340,7 +342,7 @@
       </div>
 
       <!-- Row 3: Backup Email and Department -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div class="relative">
           <label for="backup" class="block text-sm font-medium text-gray-700"
             >Backup Email</label
@@ -349,15 +351,21 @@
             type="text"
             id="backup"
             formControlName="backup"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-400 focus:outline-none focus:ring-[1px] focus:ring-orange-400"
             placeholder="email@te.com"
             required
           />
           <div
             *ngIf="backup.errors?.['required'] && backup.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Backup email is required
+          </div>
+          <div
+            *ngIf="backup.errors?.['email'] && backup.touched"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
+          >
+            Invalid email format
           </div>
         </div>
         <div class="relative">
@@ -369,7 +377,7 @@
           <select
             id="department"
             formControlName="departementId"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-400 focus:outline-none focus:ring-[1px] focus:ring-orange-400"
             required
           >
             <option
@@ -381,7 +389,7 @@
           </select>
           <div
             *ngIf="departementId.errors?.['required'] && departementId.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Department is required
           </div>
@@ -389,19 +397,19 @@
       </div>
 
       <!-- Row 4: Password and Role -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="relative ">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div class="relative">
           <label for="password" class="block text-sm font-medium text-gray-700"
             >Password</label
           >
           <div
-            class="mt-1 flex overflow-hidden items-center bg-white border border-gray-300 rounded-md focus-within:ring-[1px] focus-within:ring-orange-400 focus-within:border-orange-400"
+            class="mt-1 flex items-center overflow-hidden rounded-md border border-gray-300 bg-white focus-within:border-orange-400 focus-within:ring-[1px] focus-within:ring-orange-400"
           >
             <input
               [type]="passwordFieldType"
               id="password"
               formControlName="password"
-              class="w-full px-3 py-2 outline-none border-none"
+              class="w-full border-none px-3 py-2 outline-none"
               placeholder="Enter your password"
               required
             />
@@ -414,20 +422,26 @@
                 class="pi"
                 [ngClass]="{
                   'pi-eye': passwordFieldType === 'password',
-                  'pi-eye-slash': passwordFieldType === 'text'
+                  'pi-eye-slash': passwordFieldType === 'text',
                 }"
               ></i>
             </button>
           </div>
           <div
-            *ngIf="SignUpForm.get('password')?.errors?.['required'] && SignUpForm.get('password')?.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            *ngIf="
+              SignUpForm.get('password')?.errors?.['required'] &&
+              SignUpForm.get('password')?.touched
+            "
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Password is required
           </div>
           <div
-            *ngIf="SignUpForm.get('password')?.errors?.['minlength'] && SignUpForm.get('password')?.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            *ngIf="
+              SignUpForm.get('password')?.errors?.['minlength'] &&
+              SignUpForm.get('password')?.touched
+            "
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Password should be at least 6 characters long
           </div>
@@ -439,7 +453,7 @@
           <select
             id="role"
             formControlName="role"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[1px] focus:ring-orange-400 focus:border-orange-400"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-400 focus:outline-none focus:ring-[1px] focus:ring-orange-400"
           >
             <option *ngFor="let role of roles" [value]="role">
               {{ role | userRoleForDisplay }}
@@ -447,7 +461,7 @@
           </select>
           <div
             *ngIf="role.errors?.['required'] && role.touched"
-            class="text-red-500 text-xs mt-1 absolute top-[102%]"
+            class="absolute top-[102%] mt-1 text-xs text-red-500"
           >
             Role is required
           </div>
@@ -455,18 +469,18 @@
       </div>
 
       <!-- Submit Button Row -->
-      <div class="flex justify-center mt-8 w-full">
+      <div class="mt-8 flex w-full justify-center">
         <button
           type="submit"
           [disabled]="!SignUpForm.valid"
-          class="w-full px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full rounded-md bg-orange-500 px-6 py-2 text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           SignUp
         </button>
       </div>
 
       <!-- Login Link -->
-      <p class="text-center text-gray-600 mt-6">
+      <p class="mt-6 text-center text-gray-600">
         Already have an account?
         <a routerLink="/login" class="text-orange-500 hover:underline"
           >Login here</a

@@ -32,4 +32,5 @@ body { margin: 0; font-family: "Noto Sans", serif; }
   --thin-border: #5480d4;
   --thick-width: 0.2rem;
   --thin-width: 0.1px;
+  --header-height: 78px;
 }

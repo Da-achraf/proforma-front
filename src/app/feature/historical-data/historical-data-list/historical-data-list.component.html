@@ -11,11 +11,13 @@
     [total]="store.total()"
     [loading]="store.isLoading()"
     [emitSearch]="true"
+    [withImport]="true"
     (page)="store.setPage($event)"
     (pageSize)="store.setPageSize($event)"
     (search)="onSearch($event)"
     (create)="store.openCreateDataDialog()"
     (edit)="store.openEditDataDialog($event)"
     (delete)="store.openDeleteDataDialog($event)"
+    (upload)="bulkUploadStore.openUploadDataDialog()"
   />
 </div>

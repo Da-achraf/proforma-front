@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URL_TOKEN } from '../../config/api.config';
 import {
+  BulkUploadResult,
   HistoricalData,
   HistoricalDataCreate,
   HistoricalDataUpdate,
@@ -53,6 +54,24 @@ export class HistoricalDataService {
     id: number
   ): Observable<HistoricalData> {
     return this.http.put<HistoricalData>(`${this.baseUrl}/${id}`, body);
+  }
+
+  uploadExcel(
+    file: File,
+    currentUserId: number
+  ): Observable<BulkUploadResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const headers = new HttpHeaders({
+      'User-Id': currentUserId, // Retrieve this from your authentication service
+    });
+
+    return this.http.post<BulkUploadResult>(
+      `${this.baseUrl}/bulk-upload`,
+      formData,
+      { headers }
+    );
   }
 
   deleteOne(id: number): Observable<void> {

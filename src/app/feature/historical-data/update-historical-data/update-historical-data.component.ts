@@ -50,12 +50,17 @@ export class UpdateHistoricalDataComponent implements OnInit {
       unit: ['', Validators.required],
       description: ['', Validators.required],
       htsCode: ['', Validators.required],
-      coo: ['', Validators.required],
+      alpha2Code: ['', Validators.required],
     });
   }
 
   patchFormValue(data: HistoricalData) {
-    this.form.patchValue(data);
+    this.form.patchValue({
+      ...data,
+      alpha2Code: {
+        alpha2Code: data.coo
+      },
+    });
   }
 
   resetForm() {
@@ -63,6 +68,11 @@ export class UpdateHistoricalDataComponent implements OnInit {
   }
 
   saveChanges() {
-    this.dialogRef.close({ data: this.form.getRawValue() });
+    const body = {
+      ...this.form.getRawValue(),
+      coo: this.form.get('alpha2Code')?.value.alpa2Code,
+    };
+
+    this.dialogRef.close({ data: body });
   }
 }

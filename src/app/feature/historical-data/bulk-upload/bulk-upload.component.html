@@ -1,0 +1,118 @@
+<div class="flex flex-col p-6">
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <h2 class="text-xl font-semibold">Bulk Upload Historical Data</h2>
+    <button
+      mat-icon-button
+      (click)="dialogRef.close()"
+      class="rounded-full hover:bg-gray-100"
+    >
+      <mat-icon class="text-gray-600">close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Upload Actions -->
+  <div class="mb-6 flex flex-col gap-4">
+    <!-- Download Template -->
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="downloadTemplate()"
+      class="w-full justify-start"
+    >
+      <mat-icon>download</mat-icon>
+      <span>Download Template</span>
+    </button>
+
+    <!-- Divider -->
+    <div class="relative flex items-center">
+      <div class="flex-grow border-t border-gray-200"></div>
+      <span class="mx-4 flex-shrink text-gray-500">OR</span>
+      <div class="flex-grow border-t border-gray-200"></div>
+    </div>
+
+    <!-- File Upload -->
+    <div class="file-upload">
+      <input
+        #fileInput
+        type="file"
+        hidden
+        (change)="onFileSelected($event)"
+        [accept]="allowedExtensions.join(',')"
+      />
+      <button
+        mat-raised-button
+        (click)="fileInput.click()"
+        class="w-full justify-start"
+      >
+        <mat-icon>upload_file</mat-icon>
+        <span>Select File</span>
+      </button>
+      @if (file) {
+        <div class="mt-2 truncate text-sm text-gray-600">
+          Selected: {{ file.name }}
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Validation Errors -->
+  @if (validationErrors.length > 0) {
+    <div class="mb-4 space-y-2">
+      @for (error of validationErrors; track error) {
+        <div class="flex items-center text-sm text-red-600">
+          <mat-icon class="mr-2 text-sm">error</mat-icon>
+          {{ error }}
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Upload Progress -->
+  @if (bulkUploadStore.isUploading()) {
+    <div class="mb-4">
+      <mat-progress-bar mode="indeterminate" class="mb-2"></mat-progress-bar>
+      <div class="text-sm text-gray-600">
+        Uploading... {{ bulkUploadStore.progress() }}%
+      </div>
+    </div>
+  }
+
+  <!-- Upload Feedback -->
+  <app-bulk-upload-feedback [result]="bulkUploadStore.result()" />
+
+  <!-- Actions -->
+  <div class="mt-4 flex justify-end gap-2">
+    @if (bulkUploadStore.isUploading()) {
+      <button
+        mat-button
+        (click)="bulkUploadStore.abortUpload()"
+        class="hover:bg-gray-100"
+      >
+        Abort Upload
+      </button>
+    } @else {
+      <button
+        mat-button
+        (click)="dialogRef.close()"
+        class="hover:bg-gray-100"
+        matTooltipPosition="below"
+        matTooltipShowDelay="600"
+        matTooltip="Closing the dialog will not cancel the upload!"
+      >
+        Close
+      </button>
+    }
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="upload()"
+      [disabled]="!isValidFile || bulkUploadStore.isUploading()"
+    >
+      <div class="!flex items-center gap-x-2">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span>Upload</span>
+      </div>
+    </button>
+  </div>
+</div>

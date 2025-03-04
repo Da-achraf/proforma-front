@@ -11,6 +11,7 @@ import { CreateButtonComponent } from './components/create-button/create-button.
 import { NoDataFoundComponent } from './components/no-data-found/no-data-found.component';
 import { RadioFilterSkeletonComponent } from './components/radio-filter/radio-filter-skeleton.component';
 import { RadioFilterComponent } from './components/radio-filter/radio.filter.component';
+import { UploadButtonComponent } from './components/upload-button/upload-button.component';
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import { RadioFilterComponent } from './components/radio-filter/radio.filter.com
     BaButtonComponent,
     NoDataFoundComponent,
     CreateButtonComponent,
+    UploadButtonComponent,
     RadioFilterComponent,
     RadioFilterSkeletonComponent,
   ],
@@ -32,6 +34,7 @@ import { RadioFilterComponent } from './components/radio-filter/radio.filter.com
     BaButtonComponent,
     NoDataFoundComponent,
     CreateButtonComponent,
+    UploadButtonComponent,
     RadioFilterComponent,
     RadioFilterSkeletonComponent,
   ],

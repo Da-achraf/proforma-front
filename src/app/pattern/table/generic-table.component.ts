@@ -33,6 +33,7 @@ export class GenericTableComponent implements OnInit {
 
   create = output<void>();
   edit = output<number>();
+  upload = output<void>();
   view = output<number>();
   delete = output<number>();
   review = output<number>();
@@ -64,6 +65,7 @@ export class GenericTableComponent implements OnInit {
   readonly withCreate = input(true);
   readonly withEdit = input(true);
   readonly withDelete = input(true);
+  readonly withImport = input(false);
   readonly withViewDetail = input(false);
   readonly withReview = input(false);
 

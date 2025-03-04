@@ -15,7 +15,10 @@ import {
 } from '@angular/common/http';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteModule, MatAutocompleteOrigin } from '@angular/material/autocomplete';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteOrigin,
+} from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
@@ -23,6 +26,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
@@ -140,6 +145,9 @@ import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
 import { UiModule } from './ui/ui.module';
 import { UpdateHistoricalDataComponent } from './feature/historical-data/update-historical-data/update-historical-data.component';
+import { BulkUploadComponent } from './feature/historical-data/bulk-upload/bulk-upload.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { BulkUploadFeedbackComponent } from './feature/historical-data/bulk-upload/bulk-upload-feedback/bulk-upload-feedback.component';
 
 @NgModule({
   declarations: [
@@ -223,6 +231,8 @@ import { UpdateHistoricalDataComponent } from './feature/historical-data/update-
     HistoricalDataListComponent,
     AddHistoricalDataComponent,
     UpdateHistoricalDataComponent,
+    BulkUploadComponent,
+    BulkUploadFeedbackComponent,
   ],
   imports: [
     BrowserModule,
@@ -276,6 +286,10 @@ import { UpdateHistoricalDataComponent } from './feature/historical-data/update-
     Button,
     FormsModule,
     MatDatepickerModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatCardModule,
+    MatTableModule,
     UiModule,
   ],
   exports: [MatDialogModule],

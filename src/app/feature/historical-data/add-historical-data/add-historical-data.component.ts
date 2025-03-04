@@ -1,15 +1,12 @@
-import {
-  Component,
-  inject,
-  OnInit,
-  signal
-} from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { CURRENCY_CODES } from '../../../models/request.model';
 
 @Component({
   selector: 'app-add-historical-data',
   templateUrl: './add-historical-data.component.html',
+  styleUrl: './add-historical-data.component.css',
 })
 export class AddHistoricalDataComponent implements OnInit {
   // Injected dependencies
@@ -21,6 +18,7 @@ export class AddHistoricalDataComponent implements OnInit {
 
   // Component signals and computed values
   protected readonly isFormSubmited = signal(false);
+  currencyCodes = signal<string[]>(CURRENCY_CODES);
 
   // Component hooks
   ngOnInit(): void {
@@ -44,6 +42,13 @@ export class AddHistoricalDataComponent implements OnInit {
   }
 
   createData() {
-    this.dialogRef.close({ data: this.form.getRawValue() });
+    console.log('data: ', this.form.getRawValue());
+
+    const body = {
+      ...this.form.getRawValue(),
+      coo: this.form.get('coo')?.value.alpha2Code,
+    };
+
+    this.dialogRef.close({ data: body });
   }
 }

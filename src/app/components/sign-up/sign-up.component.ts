@@ -103,7 +103,7 @@ export class SignUpComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       departementId: ['', Validators.required],
       nPlus1: [''],
-      backup: ['', Validators.required],
+      backup: ['', [Validators.required, Validators.email]],
       role: [''],
       yourpassword: ['', [Validators.required, Validators.minLength(8)]],
       plantId: [[]],
