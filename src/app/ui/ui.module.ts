@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BaButtonComponent } from './components/button.component';
@@ -12,6 +11,8 @@ import { NoDataFoundComponent } from './components/no-data-found/no-data-found.c
 import { RadioFilterSkeletonComponent } from './components/radio-filter/radio-filter-skeleton.component';
 import { RadioFilterComponent } from './components/radio-filter/radio.filter.component';
 import { UploadButtonComponent } from './components/upload-button/upload-button.component';
+import { FileExtensionPipe } from './pipes/file-extension.pipe';
+import { FileSizePipe } from './pipes/file-size.pipe';
 
 @NgModule({
   imports: [
@@ -29,6 +30,8 @@ import { UploadButtonComponent } from './components/upload-button/upload-button.
     UploadButtonComponent,
     RadioFilterComponent,
     RadioFilterSkeletonComponent,
+    FileSizePipe,
+    FileExtensionPipe,
   ],
   exports: [
     BaButtonComponent,
@@ -37,6 +40,8 @@ import { UploadButtonComponent } from './components/upload-button/upload-button.
     UploadButtonComponent,
     RadioFilterComponent,
     RadioFilterSkeletonComponent,
+    FileSizePipe,
+    FileExtensionPipe,
   ],
   providers: [],
 })

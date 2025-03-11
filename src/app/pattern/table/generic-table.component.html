@@ -1,12 +1,12 @@
 <div class="relative w-full">
   @if (loading(); as loading) {
-  <div
-    class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-5 z-10 backdrop-blur-sm transition-opacity duration-300"
-    [class.opacity-0]="!loading"
-    [class.opacity-100]="loading"
-  >
-    <i class="fa-solid fa-spinner animate-spin text-3xl text-primary"></i>
-  </div>
+    <div
+      class="absolute inset-0 z-10 flex items-center justify-center bg-black bg-opacity-5 backdrop-blur-sm transition-opacity duration-300"
+      [class.opacity-0]="!loading"
+      [class.opacity-100]="loading"
+    >
+      <i class="fa-solid fa-spinner animate-spin text-3xl text-primary"></i>
+    </div>
   }
   <p-table
     #dt1
@@ -26,12 +26,12 @@
         </div>
         <div class="flex items-center gap-x-2">
           @if (withCreate()) {
-          <app-create-button (create)="create.emit()" title="scenario" />
+            <app-create-button (create)="create.emit()" title="scenario" />
           }
 
           @if (withImport()) {
             <app-upload-button (upload)="upload.emit()" />
-            }
+          }
         </div>
       </div>
     </ng-template>
@@ -39,29 +39,30 @@
     <ng-template pTemplate="header">
       <tr>
         @for (col of columns(); track $index) {
-        <th
-          [style.minWidth]="'auto'"
-          [pSortableColumn]="col.sortable ? col.sortField : undefined"
-        >
-          @if (col.filterTemplate) {
-          <ng-template [ngTemplateOutlet]="getFilterTemplate(col)" />
-          } @else {
-          <div class="flex items-center">
-            <span>
-              {{ col.header }}
-            </span>
-            @if (col.sortable) {
-            <p-sortIcon [field]="col.sortField"></p-sortIcon>
-            } @if (col.filter; as filter) {
-            <p-columnFilter
-              [type]="filter.type"
-              [field]="filter.field"
-              display="menu"
-            ></p-columnFilter>
+          <th
+            [style.minWidth]="'auto'"
+            [pSortableColumn]="col.sortable ? col.sortField : undefined"
+          >
+            @if (col.filterTemplate) {
+              <ng-template [ngTemplateOutlet]="getFilterTemplate(col)" />
+            } @else {
+              <div class="flex items-center">
+                <span>
+                  {{ col.header }}
+                </span>
+                @if (col.sortable) {
+                  <p-sortIcon [field]="col.sortField"></p-sortIcon>
+                }
+                @if (col.filter; as filter) {
+                  <p-columnFilter
+                    [type]="filter.type"
+                    [field]="filter.field"
+                    display="menu"
+                  ></p-columnFilter>
+                }
+              </div>
             }
-          </div>
-          }
-        </th>
+          </th>
         }
         <th [style.minWidth]="'auto'">Actions</th>
       </tr>
@@ -70,52 +71,59 @@
     <ng-template pTemplate="body" let-row>
       <tr [ngClass]="{ 'blur-sm': loading() && data().length != 0 }">
         @for (col of columns(); track $index) {
-        <td>
-          @switch (col.type) { @case ('custom') {
-          <ng-template
-            [ngTemplateOutlet]="getTableDataTemplate(col)"
-            [ngTemplateOutletContext]="{ $implicit: row }"
-          />
-          } @case ('date') {
-          {{ row[col.field] | date : "MMM d, y, h:mm a" }}
-          } @case ('text') {
-          {{ row[col.field] | titlecase }}
-          } @case ('numeric') {
-          {{ row[col.field] }}
-          } }
-        </td>
+          <td>
+            @switch (col.type) {
+              @case ("custom") {
+                <ng-template
+                  [ngTemplateOutlet]="getTableDataTemplate(col)"
+                  [ngTemplateOutletContext]="{ $implicit: row }"
+                />
+              }
+              @case ("date") {
+                {{ row[col.field] | date: "MMM d, y, h:mm a" }}
+              }
+              @case ("text") {
+                {{ row[col.field] | titlecase }}
+              }
+              @case ("numeric") {
+                {{ row[col.field] }}
+              }
+            }
+          </td>
         }
         <td class="flex items-center text-gray-400">
           @if (withEdit()) {
-          <button
-            matTooltip="Edit"
-            matTooltipPosition="above"
-            matTooltipShowDelay="500"
-            class="hover:text-primary-200 hover:bg-blue-50 p-2 rounded-md transition-all duration-150"
-            (click)="edit.emit(row['id'])"
-          >
-            <i class="fa-solid fa-edit"></i>
-          </button>
-          } @if (withDelete()) {
-          <button
-            matTooltip="Delete"
-            matTooltipPosition="above"
-            matTooltipShowDelay="500"
-            class="hover:text-red-400 hover:bg-red-50 p-2 rounded-md transition-all duration-150"
-            (click)="delete.emit(row[key()])"
-          >
-            <i class="fa-solid fa-trash"></i>
-          </button>
-          } @if (withViewDetail()) {
-          <button
-            matTooltip="View Details"
-            matTooltipPosition="above"
-            matTooltipShowDelay="500"
-            class="hover:text-primary-200 hover:bg-teal-50 p-2 rounded-md transition-all duration-150"
-            (click)="view.emit(row['id'])"
-          >
-            <i class="fa-solid fa-eye"></i>
-          </button>
+            <button
+              matTooltip="Edit"
+              matTooltipPosition="above"
+              matTooltipShowDelay="500"
+              class="rounded-md p-2 transition-all duration-150 hover:bg-blue-50 hover:text-primary-200"
+              (click)="edit.emit(row['id'])"
+            >
+              <i class="fa-solid fa-edit"></i>
+            </button>
+          }
+          @if (withDelete()) {
+            <button
+              matTooltip="Delete"
+              matTooltipPosition="above"
+              matTooltipShowDelay="500"
+              class="rounded-md p-2 transition-all duration-150 hover:bg-red-50 hover:text-red-400"
+              (click)="delete.emit(row[key()])"
+            >
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          }
+          @if (withViewDetail()) {
+            <button
+              matTooltip="View Details"
+              matTooltipPosition="above"
+              matTooltipShowDelay="500"
+              class="rounded-md p-2 transition-all duration-150 hover:bg-teal-50 hover:text-primary-200"
+              (click)="view.emit(row['id'])"
+            >
+              <i class="fa-solid fa-eye"></i>
+            </button>
           }
         </td>
       </tr>
@@ -123,11 +131,11 @@
 
     <ng-template pTemplate="emptymessage">
       @if (!loading() && data().length === 0) {
-      <tr>
-        <td [attr.colspan]="columnsLength() + 1">
-          <app-no-data-found />
-        </td>
-      </tr>
+        <tr>
+          <td [attr.colspan]="columnsLength() + 1">
+            <app-no-data-found />
+          </td>
+        </tr>
       }
     </ng-template>
   </p-table>

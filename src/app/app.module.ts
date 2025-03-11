@@ -145,7 +145,7 @@ import { WeightCalculatorPipe } from './shared/pipes/weight-calculator.pipe';
 import { RequestStrategyFactory } from './shared/services/requests-strategies/requests-strategies-factory';
 import { UiModule } from './ui/ui.module';
 import { UpdateHistoricalDataComponent } from './feature/historical-data/update-historical-data/update-historical-data.component';
-import { BulkUploadComponent } from './feature/historical-data/bulk-upload/bulk-upload.component';
+import { BulkUploadComponent } from './feature/historical-data/bulk-upload/bulk-upload/bulk-upload.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BulkUploadFeedbackComponent } from './feature/historical-data/bulk-upload/bulk-upload-feedback/bulk-upload-feedback.component';
 

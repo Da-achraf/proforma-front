@@ -1,8 +1,9 @@
-import { DestroyRef, inject } from '@angular/core';
+import { computed, DestroyRef, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   patchState,
   signalStore,
+  withComputed,
   withMethods,
   withProps,
   withState,
@@ -12,23 +13,27 @@ import { BulkUploadResult } from '../../../models/historical-data.model';
 import { AuthService } from '../../../services/auth.service';
 import { BulkUploadSignalRService } from '../bulk-upload-progress.service';
 import { HistoricalDataService } from '../hitorical-data.service';
-import { BulkUploadComponent } from './bulk-upload.component';
+import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
 
 type HistoricalDataBulkUploadState = {
+  file: File | null;
+  isUploading: boolean;
+  isProcessing: boolean;
   progress: number;
+  preValidationErrors: string[];
   result: BulkUploadResult | null;
   error: Error | null;
-  isProcessing: boolean;
-  isUploading: boolean;
   subscription: Subscription | null;
 };
 
 const initialState: HistoricalDataBulkUploadState = {
-  progress: 0,
-  result: null,
-  error: null,
+  file: null,
   isUploading: false,
   isProcessing: false,
+  progress: 0,
+  preValidationErrors: [],
+  result: null,
+  error: null,
   subscription: null,
 };
 
@@ -45,10 +50,15 @@ export const HistoricalDataBulkUploadStore = signalStore(
     authService: inject(AuthService),
   })),
 
+  withComputed(({ preValidationErrors, file }) => ({
+    isFileValid: computed(() => file() && preValidationErrors().length === 0),
+  })),
+
   withMethods(
     ({
       dataService,
       isUploading,
+      file,
       progress,
       result,
       error,
@@ -57,8 +67,14 @@ export const HistoricalDataBulkUploadStore = signalStore(
       authService,
       ...store
     }) => ({
-      bulkUpload: (file: File) => {
-        if (isUploading()) return;
+      setFile: (file: File | null) => {
+        patchState(store, { file });
+      },
+
+      bulkUpload: () => {
+        const _file = file();
+
+        if (isUploading() || !_file) return;
 
         signalRService.startConnection();
         signalRService.getProgressUpdates().subscribe((progress) => {
@@ -77,7 +93,7 @@ export const HistoricalDataBulkUploadStore = signalStore(
         });
 
         const upload$ = dataService
-          .uploadExcel(file, authService.getUserIdFromToken())
+          .uploadExcel(_file, authService.getUserIdFromToken())
           .pipe(
             tap((result) => {
               patchState(store, {
@@ -95,7 +111,7 @@ export const HistoricalDataBulkUploadStore = signalStore(
                 progress: 0, // Reset progress on error
               });
               return of(null);
-            })
+            }),
           );
 
         // Store the subscription
@@ -116,7 +132,23 @@ export const HistoricalDataBulkUploadStore = signalStore(
           });
         }
       },
-    })
+
+      resetState: () => {
+        patchState(store, {
+          file: null,
+          isUploading: false,
+          isProcessing: false,
+          progress: 0,
+          result: null,
+          error: null,
+          preValidationErrors: [],
+        });
+      },
+
+      setPreValidationErrors: (preValidationErrors: string[]) => {
+        patchState(store, { preValidationErrors });
+      },
+    }),
   ),
 
   withMethods(({ dialog }) => ({
@@ -131,5 +163,5 @@ export const HistoricalDataBulkUploadStore = signalStore(
         console.log('uploading....');
       });
     },
-  }))
+  })),
 );

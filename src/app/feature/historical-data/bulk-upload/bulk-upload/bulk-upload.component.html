@@ -3,9 +3,8 @@
   <div class="mb-6 flex items-center justify-between">
     <h2 class="text-xl font-semibold">Bulk Upload Historical Data</h2>
     <button
-      mat-icon-button
       (click)="dialogRef.close()"
-      class="rounded-full hover:bg-gray-100"
+      class="text-gray-400 hover:text-gray-500"
     >
       <mat-icon class="text-gray-600">close</mat-icon>
     </button>
@@ -38,7 +37,7 @@
         type="file"
         hidden
         (change)="onFileSelected($event)"
-        [accept]="allowedExtensions.join(',')"
+        [accept]="fileValidator.allowedExtensions.join(',')"
       />
       <button
         mat-raised-button
@@ -48,18 +47,42 @@
         <mat-icon>upload_file</mat-icon>
         <span>Select File</span>
       </button>
-      @if (file) {
-        <div class="mt-2 truncate text-sm text-gray-600">
-          Selected: {{ file.name }}
+      @if (bulkUploadStore.file(); as file) {
+        <div
+          class="mt-2 flex items-center justify-between gap-x-2 rounded-md border border-gray-100 px-3 py-2 text-sm text-gray-600 shadow"
+        >
+          <div class="flex items-center gap-x-2">
+            <div class="rounded-md border border-gray-50 bg-teal-100 p-2">
+              <i class="fa-regular fa-file-excel text-teal-400"></i>
+            </div>
+            <div class="flex flex-col gap-y-0">
+              <span class="truncate font-semibold">
+                {{ file.name }}
+              </span>
+              <div class="flex items-center gap-x-1">
+                <span class="font-light uppercase tracking-wide">
+                  {{ file.name | fileExtension }}
+                </span>
+                <span class="text-lg font-semibold"> - </span>
+                <span class="font-light">
+                  {{ file.size | fileize }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <button
+            (click)="unSelectFile()"
+            class="fas fa-xmark text-lg text-gray-400 hover:text-gray-500"
+          ></button>
         </div>
       }
     </div>
   </div>
 
   <!-- Validation Errors -->
-  @if (validationErrors.length > 0) {
+  @if (bulkUploadStore.preValidationErrors().length != 0) {
     <div class="mb-4 space-y-2">
-      @for (error of validationErrors; track error) {
+      @for (error of bulkUploadStore.preValidationErrors(); track error) {
         <div class="flex items-center text-sm text-red-600">
           <mat-icon class="mr-2 text-sm">error</mat-icon>
           {{ error }}
@@ -79,7 +102,9 @@
   }
 
   <!-- Upload Feedback -->
-  <app-bulk-upload-feedback [result]="bulkUploadStore.result()" />
+  @if (bulkUploadStore.result(); as result) {
+    <app-bulk-upload-feedback [result]="result" />
+  }
 
   <!-- Actions -->
   <div class="mt-4 flex justify-end gap-2">
@@ -107,7 +132,9 @@
       mat-raised-button
       color="primary"
       (click)="upload()"
-      [disabled]="!isValidFile || bulkUploadStore.isUploading()"
+      [disabled]="
+        !bulkUploadStore.isFileValid() || bulkUploadStore.isUploading()
+      "
     >
       <div class="!flex items-center gap-x-2">
         <i class="fa-solid fa-cloud-arrow-up"></i>
