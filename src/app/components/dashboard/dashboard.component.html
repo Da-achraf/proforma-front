@@ -1,32 +1,99 @@
-<div class="dashboard">
-  <!-- Cartes d'aperçu -->
-  <div class="overview-box">
-    <h2>Number of Requests</h2>
-    <p>{{scenarioCount}}</p>
-  </div>
-  <div class="overview-box">
-    <h2>Average Flow Time per Request</h2>
-    <p>{{averageFlowTime}} min</p>
-  </div>
+<div class="min-h-screen bg-gray-50 p-8">
+  <div class="mx-auto max-w-7xl">
+    <!-- Header -->
+    <!-- <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">
+        Process Analytics Dashboard
+      </h1>
+      <p class="mt-2 text-gray-600">
+        Key performance indicators and process metrics
+      </p>
+    </div> -->
 
-  <!-- Graphiques -->
-  <div class="chart-card">
-    <h3>Requests by Scenario</h3>
-    <p-chart type="bar" [data]="scenarioChartData" [options]="scenarioChartOptions"></p-chart>
-  </div>
+    <!-- Overview Cards -->
+    <div class="mb-8 flex items-center gap-6">
+      <div
+        class="rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
+        <div class="flex items-center">
+          <div class="rounded-lg bg-blue-100 p-3">
+            <i class="fas fa-chart-line text-xl text-blue-600"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-600">Total Requests</h3>
+            <p class="text-2xl font-semibold text-gray-900">
+              {{ scenarioCount }}
+            </p>
+          </div>
+        </div>
+      </div>
 
-  <div class="chart-card">
-    <h3>Requests by Cost Center</h3>
-    <p-chart type="bar" [data]="costCenterChartData" [options]="costCenterChartOptions"></p-chart>
-  </div>
+      <div
+        class="rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
+        <div class="flex items-center">
+          <div class="rounded-lg bg-green-100 p-3">
+            <i class="fas fa-clock text-xl text-green-600"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-600">Avg Flow Time</h3>
+            <p class="text-2xl font-semibold text-gray-900">
+              {{ averageFlowTime }} min
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="chart-card">
-    <h3>Requests by Cost Center Per Day</h3>
-    <p-chart type="line" [data]="costCenterPerDayChartData" [options]="costCenterPerDayChartOptions"></p-chart>
-  </div>
+    <!-- Charts Grid -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <!-- Requests by Scenario -->
+      <div
+        class="rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
+        <h3 class="mb-4 text-lg font-semibold text-gray-800">
+          Requests by Scenario
+        </h3>
+        <div class="h-[400px]" echarts [options]="scenarioChartOptions"></div>
+      </div>
 
-  <div class="chart-card">
-    <h3>Average Flow Time per Request</h3>
-    <p-chart type="bar" [data]="averageFlowTimeChartData" [options]="averageFlowTimeChartOptions"></p-chart>
+      <!-- Requests by Cost Center -->
+      <div
+        class="rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
+        <h3 class="mb-4 text-lg font-semibold text-gray-800">
+          Requests by Cost Center
+        </h3>
+        <div class="h-[400px]" echarts [options]="costCenterChartOptions"></div>
+      </div>
+
+      <!-- Cost Center Per Day -->
+      <div
+        class="rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
+        <h3 class="mb-4 text-lg font-semibold text-gray-800">
+          Daily Cost Center Trends
+        </h3>
+        <div
+          class="h-[400px]"
+          echarts
+          [options]="costCenterPerDayChartOptions"
+        ></div>
+      </div>
+
+      <!-- Average Flow Time -->
+      <div
+        class="rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+      >
+        <h3 class="mb-4 text-lg font-semibold text-gray-800">
+          Request Flow Times
+        </h3>
+        <div
+          class="h-[400px]"
+          echarts
+          [options]="averageFlowTimeChartOptions"
+        ></div>
+      </div>
+    </div>
   </div>
 </div>

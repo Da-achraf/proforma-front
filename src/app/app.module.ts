@@ -148,6 +148,8 @@ import { UpdateHistoricalDataComponent } from './feature/historical-data/update-
 import { BulkUploadComponent } from './feature/historical-data/bulk-upload/bulk-upload/bulk-upload.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BulkUploadFeedbackComponent } from './feature/historical-data/bulk-upload/bulk-upload-feedback/bulk-upload-feedback.component';
+import { NgxEchartsModule } from 'ngx-echarts';
+import * as echarts from 'echarts';
 
 @NgModule({
   declarations: [
@@ -291,6 +293,7 @@ import { BulkUploadFeedbackComponent } from './feature/historical-data/bulk-uplo
     MatCardModule,
     MatTableModule,
     UiModule,
+    NgxEchartsModule.forRoot({ echarts })
   ],
   exports: [MatDialogModule],
   providers: [
