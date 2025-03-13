@@ -7,9 +7,7 @@
     >]
   </span>
 
-  @if (requestSig()?.status; as status) {
-    <app-request-status [status]="status" />
-  }
+  <app-request-status [status]="requestSig()?.status ?? -1" />
 </div>
 
 <div class="form-container">
@@ -106,7 +104,6 @@
           formControlName="pallets"
         />
       </mat-form-field>
-
     </div>
 
     <!-- Items Array -->

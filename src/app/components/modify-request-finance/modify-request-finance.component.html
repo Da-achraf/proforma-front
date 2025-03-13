@@ -7,40 +7,38 @@
     >]
   </span>
 
-  @if (requestSig()?.status; as status) {
-    <app-request-status [status]="status" />
-  }
+  <app-request-status [status]="requestSig()?.status ?? -1" />
 </div>
 <div mat-dialog-content>
   <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
-    <div fxLayout="row wrap" fxLayoutGap="16px">
+    <div fxLayout="row wrap" class="form-grid">
       <!-- Normal fields -->
-      <mat-form-field fxFlex="30%" appearance="fill">
+      <mat-form-field appearance="fill">
         <mat-label>Invoice Type</mat-label>
         <input matInput formControlName="invoicesTypes" readonly />
       </mat-form-field>
 
-      <mat-form-field fxFlex="30%" appearance="fill">
+      <mat-form-field appearance="fill">
         <mat-label>Scenario</mat-label>
         <input matInput formControlName="scenarioId" readonly />
       </mat-form-field>
 
-      <mat-form-field fxFlex="30%" appearance="fill">
+      <mat-form-field appearance="fill">
         <mat-label>Shipping Point</mat-label>
         <input matInput formControlName="shippingPoint" readonly />
       </mat-form-field>
 
-      <mat-form-field fxFlex="30%" appearance="fill">
+      <mat-form-field appearance="fill">
         <mat-label>Delivery Address</mat-label>
         <input matInput formControlName="deliveryAddress" readonly />
       </mat-form-field>
 
-      <mat-form-field fxFlex="30%" appearance="fill">
+      <mat-form-field appearance="fill">
         <mat-label>Mode Of Transport</mat-label>
         <input matInput formControlName="modeOfTransport" readonly />
       </mat-form-field>
 
-      <mat-form-field fxFlex="30%" appearance="fill">
+      <mat-form-field appearance="fill">
         <mat-label>Incoterm</mat-label>
         <mat-select formControlName="incoterm">
           @for (term of incoterms; track term) {

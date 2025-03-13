@@ -7,9 +7,7 @@
     >]
   </span>
 
-  @if (requestSig()?.status; as status) {
-    <app-request-status [status]="status" />
-  }
+  <app-request-status [status]="requestSig()?.status ?? -1" />
 </div>
 
 <div mat-dialog-content>
