@@ -1,3 +1,4 @@
+import { AsyncPipe } from '@angular/common';
 import {
   Component,
   computed,
@@ -7,12 +8,23 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
+  MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import _ from 'lodash';
 import { MessageService } from 'primeng/api';
 import {
@@ -28,7 +40,6 @@ import {
   switchMap,
 } from 'rxjs';
 import {
-  financeMandatoryFields,
   ItemModel,
   userRoleToMandatoryForMapper,
 } from '../../models/request-item.model';
@@ -37,20 +48,34 @@ import {
   INCOTERMES,
   ModeOfTransportEnum,
   RequestModel,
-  StandardFieldEnum,
   UpdateFinanceRequestDTO,
 } from '../../models/request.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
+import { UserStoreService } from '../../services/user-store.service';
+import { LoadingDotsComponent } from '../../shared/components/loading-dots/loading-dots.component';
+import { RequestStatusComponent } from '../../shared/components/request-status/request-status.component';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
-import { UserStoreService } from '../../services/user-store.service';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-modify-request-finance',
   templateUrl: './modify-request-finance.component.html',
   styleUrls: ['./modify-request-finance.component.css'],
+  imports: [
+    RequestStatusComponent,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInput,
+    MatSelectModule,
+    MatAutocompleteModule,
+    LoadingDotsComponent,
+    AsyncPipe,
+    MatDialogModule,
+    MatButtonModule
+  ],
 })
 export class ModifyRequestFinanceComponent implements OnInit {
   scenarioService = inject(ScenarioService);
@@ -78,11 +103,11 @@ export class ModifyRequestFinanceComponent implements OnInit {
     catchError((err) => {
       this.onNoClick();
       throw err;
-    })
+    }),
   );
   requestModeOfTransport$ = this.request$.pipe(
     filter((request: RequestModel) => request != undefined),
-    switchMap((request: RequestModel) => of(request.modeOfTransport))
+    switchMap((request: RequestModel) => of(request.modeOfTransport)),
   );
 
   requestSig = toSignal(this.request$);
@@ -96,7 +121,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
   scenearioIdSubject = new BehaviorSubject<number>(0);
   scenarioAttributes$ = this.scenearioIdSubject.pipe(
     filter((id: number) => id != 0),
-    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
+    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id)),
   );
   scenarioAttributes = toSignal(this.scenarioAttributes$);
 
@@ -120,7 +145,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
 
     return selectedScenarioItems.map((item) => {
       const matchingAttribute = scenarioAttributes.find(
-        (attr) => attr.attributeName === item.nameItem
+        (attr) => attr.attributeName === item.nameItem,
       );
       return {
         ...item,
@@ -166,7 +191,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
   onChange(text: string) {
     this.filteredOptions = of(text).pipe(
       startWith(''),
-      map((value) => this._filter(value || ''))
+      map((value) => this._filter(value || '')),
     );
   }
 
@@ -174,7 +199,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
     const filterValue = value.toLowerCase();
 
     return this.currencyCodes().filter((option) =>
-      option.toLowerCase().includes(filterValue)
+      option.toLowerCase().includes(filterValue),
     );
   }
 
@@ -303,7 +328,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
         })),
         userId: userId,
         itemsWithValuesJson: JSON.stringify(
-          mergeArrays(existingItemsData, itemsCopy)
+          mergeArrays(existingItemsData, itemsCopy),
         ),
       };
 
@@ -325,7 +350,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
               detail: 'Error updating request',
             });
             console.error('Error updating request:', error);
-          }
+          },
         );
     } else {
       this.messageService.add({
@@ -376,7 +401,7 @@ export class ModifyRequestFinanceComponent implements OnInit {
             detail: 'Error rejecting request',
           });
           console.error('Error rejecting request:', error);
-        }
+        },
       );
   }
 

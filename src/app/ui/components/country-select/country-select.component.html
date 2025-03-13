@@ -1,0 +1,10 @@
+<ng-select
+  [items]="countries"
+  bindLabel="name"
+  bindValue="code"
+  [disabled]="disabled"
+  placeholder="Select a country"
+  [(ngModel)]="selectedCountryCode"
+  (ngModelChange)="onSelectChange($event)"
+>
+</ng-select>

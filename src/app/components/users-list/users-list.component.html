@@ -1,92 +1,96 @@
-<app-management-tables 
-    [tableName]="TableNameEnum.USER"
-    [items]="users$ | async"
-    [tableProperties]="userTableProperties"
-    [columns]="userTableColumns"
-    [showCreateButton]="false"
+<app-management-tables
+  [tableName]="TableNameEnum.USER"
+  [items]="users$ | async"
+  [tableProperties]="userTableProperties"
+  [columns]="userTableColumns"
+  [showCreateButton]="false"
 
-    (onUpdate)="onUpdate($event)"
-    (onDelete)="onDelete($event)"
-/>
+  (onUpdate)="onUpdate($event)"
+  (onDelete)="onDelete($event)"
+  />
 
 
-<!-- User Update Dialog -->
-<p-dialog header="Update User" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw', height: '700px'}">
+  <!-- User Update Dialog -->
+  <p-dialog header="Update User" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw', height: '700px'}">
     <!-- <div class="update-user-container"> -->
-      <form (ngSubmit)="updateUser()" class="update-user-form">
-        <label>
-          TeId:
-          <input type="text" [(ngModel)]="user.teId" name="teId">
-        </label>
-        <br>
+    <form (ngSubmit)="updateUser()" class="update-user-form">
+      <label>
+        TeId:
+        <input type="text" [(ngModel)]="user.teId" name="teId">
+      </label>
+      <br>
         <label>
           Username:
           <input type="text" [(ngModel)]="user.userName" name="userName">
         </label>
         <br>
-        <label>
-          Email:
-          <input type="email" [(ngModel)]="user.email" name="email" >
-        </label>
-        <br>
-        <label>
-          N+1:
-          <input type="text" [(ngModel)]="user.nPlus1" name="nPlus1" required>
-        </label>
-        <br>
-        <label>
-          Backup:
-          <input type="text" [(ngModel)]="user.backUp" name="backUp" >
-        </label>
-        <br>
-        <label>
-          Role:
-          <select [(ngModel)]="user.role" name="role" required>
-            <option *ngFor="let role of roles$ | async" [value]="role">{{ role | userRoleForDisplay }}</option>
-          </select>
-        </label>
-        <br>
-        <label>
-          Department:
-          <select [(ngModel)]="user.departementId" name="departementId" (change)="onDepartmentChange($event)">
-            <option *ngFor="let department of departments$ | async" [value]="department.id_departement">
-              {{ department.name }}
-            </option>
-          </select>
-        </label>
-        <br>
-        <!-- Old version using plants -->
-        <!-- <label>
-          Plants:
-          <p-multiSelect [(ngModel)]="user.plantsIds" name="plantId" [options]="(plants$ | async) ?? []" optionLabel="label" optionValue="value" (onChange)="loadPlants()"></p-multiSelect>
-        </label>
-        <br> -->
-        
-        <!-- New version using ship points -->
-        <!-- <label class="z-40">
-          Plants:
-          <p-multiSelect [(ngModel)]="user.shipPointsIds" name="shipId" [options]="(shipPoints$ | async) ?? []" optionLabel="label" optionValue="value" (onChange)="loadShipPoints()"></p-multiSelect>
-        </label> -->
-        <label>
-          Plants:
-          <p-multiSelect 
-            [(ngModel)]="user.shipPointsIds" 
-            name="shipId" 
-            [options]="(shipPoints$ | async) ?? []" 
-            optionLabel="label" 
-            optionValue="value" 
-            (onChange)="loadShipPoints()"
-          ></p-multiSelect>
-        </label>
-        <br>
-        <div class="button-SR">
-          <button type="submit" class="icon-submit-btn">
-            <i class="pi pi-check"></i>
-          </button>
-        </div>
-      </form>
-    <!-- </div> -->
-  </p-dialog>
+          <label>
+            Email:
+            <input type="email" [(ngModel)]="user.email" name="email" >
+          </label>
+          <br>
+            <label>
+              N+1:
+              <input type="text" [(ngModel)]="user.nPlus1" name="nPlus1" required>
+            </label>
+            <br>
+              <label>
+                Backup:
+                <input type="text" [(ngModel)]="user.backUp" name="backUp" >
+              </label>
+              <br>
+                <label>
+                  Role:
+                  <select [(ngModel)]="user.role" name="role" required>
+                    @for (role of roles$ | async; track role) {
+                      <option [value]="role">{{ role | userRoleForDisplay }}</option>
+                    }
+                  </select>
+                </label>
+                <br>
+                  <label>
+                    Department:
+                    <select [(ngModel)]="user.departementId" name="departementId" (change)="onDepartmentChange($event)">
+                      @for (department of departments$ | async; track department) {
+                        <option [value]="department.id_departement">
+                          {{ department.name }}
+                        </option>
+                      }
+                    </select>
+                  </label>
+                  <br>
+                    <!-- Old version using plants -->
+                    <!-- <label>
+                    Plants:
+                    <p-multiSelect [(ngModel)]="user.plantsIds" name="plantId" [options]="(plants$ | async) ?? []" optionLabel="label" optionValue="value" (onChange)="loadPlants()"></p-multiSelect>
+                  </label>
+                  <br> -->
+
+                  <!-- New version using ship points -->
+                  <!-- <label class="z-40">
+                  Plants:
+                  <p-multiSelect [(ngModel)]="user.shipPointsIds" name="shipId" [options]="(shipPoints$ | async) ?? []" optionLabel="label" optionValue="value" (onChange)="loadShipPoints()"></p-multiSelect>
+                </label> -->
+                <label>
+                  Plants:
+                  <p-multiSelect
+                    [(ngModel)]="user.shipPointsIds"
+                    name="shipId"
+                    [options]="(shipPoints$ | async) ?? []"
+                    optionLabel="label"
+                    optionValue="value"
+                    (onChange)="loadShipPoints()"
+                  ></p-multiSelect>
+                </label>
+                <br>
+                  <div class="button-SR">
+                    <button type="submit" class="icon-submit-btn">
+                      <i class="pi pi-check"></i>
+                    </button>
+                  </div>
+                </form>
+              <!-- </div> -->
+            </p-dialog>
 
 
 
@@ -101,88 +105,88 @@
 
 
 
-  <!-- <p-dialog header="Update User" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
-    <div >
-      <form [formGroup]="userUpdateForm" (ngSubmit)="updateUser()" class="flex flex-wrap gap-4">
-        <mat-form-field appearance="fill" class="flex-grow">
-          <mat-label>TeId</mat-label>
-          <input matInput formControlName="teId" type="text">
-        </mat-form-field>
-  
-        <mat-form-field appearance="fill" class="flex-grow">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="userName" type="text">
-          @if (userUpdateForm.get('userName')?.touched && userUpdateForm.get('userName')?.invalid) {
-            <mat-error>Username is required</mat-error>
-          }
-        </mat-form-field>
-  
-        <mat-form-field appearance="fill" class="flex-grow">
-          <mat-label>Email</mat-label>
-          <input matInput formControlName="email" type="email">
-          @if (userUpdateForm.get('email')?.touched && userUpdateForm.get('email')?.invalid) {
-            <mat-error>
-              @if (userUpdateForm.get('email')?.errors?.['required']) {
-                Email is required
-              }
-              @if (userUpdateForm.get('email')?.errors?.['email']) {
-                Invalid email format
-              }
-            </mat-error>
-          }
-        </mat-form-field>
-  
-        <mat-form-field appearance="fill" class="flex-grow" color="warn">
-          <mat-label>N+1</mat-label>
-          <input matInput formControlName="nPlus1" type="text">
-          @if (userUpdateForm.get('nPlus1')?.touched && userUpdateForm.get('nPlus1')?.invalid) {
-            <mat-error>N+1 is required</mat-error>
-          }
-        </mat-form-field>
-  
-        <mat-form-field appearance="fill" class="flex-grow">
-          <mat-label>Backup</mat-label>
-          <input matInput formControlName="backUp" type="text">
-        </mat-form-field>
-  
-        <mat-form-field appearance="fill" class="flex-grow">
-          <mat-label>Role</mat-label>
-          <mat-select formControlName="role" required>
-            @for (role of roles$ | async; track role) {
-              <mat-option [value]="role">{{ role | userRoleForDisplay }}</mat-option>
-            }
-          </mat-select>
-          @if (userUpdateForm.get('role')?.touched && userUpdateForm.get('role')?.invalid) {
-            <mat-error>Role is required</mat-error>
-          }
-        </mat-form-field>
-  
-        <mat-form-field appearance="fill" class="flex-grow">
-          <mat-label>Department</mat-label>
-          <mat-select formControlName="departementId" (selectionChange)="onDepartmentChange($event)">
-            @for (department of departments$ | async; track department.id_departement) {
-              <mat-option [value]="department.id_departement">
-                {{ department.name }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-  
-        <mat-form-field class="w-full" appearance="fill" class="flex-grow">
-          <mat-label>Plants</mat-label>
-          <mat-select formControlName="shipPointsIds" multiple>
-            @for (shipPoint of shipPoints$ | async; track shipPoint.label) {
-              <mat-option [value]="shipPoint.value">{{shipPoint.label}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-  
-        <div class="button-SR">
-          <button mat-raised-button color="primary" type="submit" [disabled]="userUpdateForm.invalid">
-            <mat-icon>check</mat-icon>
-            Update
-          </button>
-        </div>
-      </form>
-    </div>
-  </p-dialog> -->
+            <!-- <p-dialog header="Update User" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
+            <div >
+              <form [formGroup]="userUpdateForm" (ngSubmit)="updateUser()" class="flex flex-wrap gap-4">
+                <mat-form-field appearance="fill" class="flex-grow">
+                  <mat-label>TeId</mat-label>
+                  <input matInput formControlName="teId" type="text">
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="flex-grow">
+                  <mat-label>Username</mat-label>
+                  <input matInput formControlName="userName" type="text">
+                  @if (userUpdateForm.get('userName')?.touched && userUpdateForm.get('userName')?.invalid) {
+                    <mat-error>Username is required</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="flex-grow">
+                  <mat-label>Email</mat-label>
+                  <input matInput formControlName="email" type="email">
+                  @if (userUpdateForm.get('email')?.touched && userUpdateForm.get('email')?.invalid) {
+                    <mat-error>
+                      @if (userUpdateForm.get('email')?.errors?.['required']) {
+                        Email is required
+                      }
+                      @if (userUpdateForm.get('email')?.errors?.['email']) {
+                        Invalid email format
+                      }
+                    </mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="flex-grow" color="warn">
+                  <mat-label>N+1</mat-label>
+                  <input matInput formControlName="nPlus1" type="text">
+                  @if (userUpdateForm.get('nPlus1')?.touched && userUpdateForm.get('nPlus1')?.invalid) {
+                    <mat-error>N+1 is required</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="flex-grow">
+                  <mat-label>Backup</mat-label>
+                  <input matInput formControlName="backUp" type="text">
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="flex-grow">
+                  <mat-label>Role</mat-label>
+                  <mat-select formControlName="role" required>
+                    @for (role of roles$ | async; track role) {
+                      <mat-option [value]="role">{{ role | userRoleForDisplay }}</mat-option>
+                    }
+                  </mat-select>
+                  @if (userUpdateForm.get('role')?.touched && userUpdateForm.get('role')?.invalid) {
+                    <mat-error>Role is required</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="flex-grow">
+                  <mat-label>Department</mat-label>
+                  <mat-select formControlName="departementId" (selectionChange)="onDepartmentChange($event)">
+                    @for (department of departments$ | async; track department.id_departement) {
+                      <mat-option [value]="department.id_departement">
+                        {{ department.name }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="w-full" appearance="fill" class="flex-grow">
+                  <mat-label>Plants</mat-label>
+                  <mat-select formControlName="shipPointsIds" multiple>
+                    @for (shipPoint of shipPoints$ | async; track shipPoint.label) {
+                      <mat-option [value]="shipPoint.value">{{shipPoint.label}}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <div class="button-SR">
+                  <button mat-raised-button color="primary" type="submit" [disabled]="userUpdateForm.invalid">
+                    <mat-icon>check</mat-icon>
+                    Update
+                  </button>
+                </div>
+              </form>
+            </div>
+          </p-dialog> -->

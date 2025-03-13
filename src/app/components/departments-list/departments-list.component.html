@@ -1,17 +1,17 @@
-<app-management-tables 
-    [tableName]="TableNameEnum.DEPARTMENT"
-    [items]="departments$ | async"
-    [tableProperties]="tableProperties"
-    [columns]="tableColumns"
+<app-management-tables
+  [tableName]="TableNameEnum.DEPARTMENT"
+  [items]="departments$ | async"
+  [tableProperties]="tableProperties"
+  [columns]="tableColumns"
 
-    (onCreate)="onCreate()"
-    (onUpdate)="onUpdate($event)"
-    (onDelete)="onDelete($event)"
-/>
+  (onCreate)="onCreate()"
+  (onUpdate)="onUpdate($event)"
+  (onDelete)="onDelete($event)"
+  />
 
 
-<!-- Update department Dialog -->
-<p-dialog header="Update Department" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
+  <!-- Update department Dialog -->
+  <p-dialog header="Update Department" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw'}">
     <div class="form-container">
       <form (ngSubmit)="updateDepartement()">
         <label>
@@ -22,9 +22,11 @@
           Manager:
           <input type="text" [(ngModel)]="department.manager" [formControl]="managerControl" [matAutocomplete]="autoManager" name="manager" required>
           <mat-autocomplete #autoManager="matAutocomplete">
-            <mat-option *ngFor="let manager of filteredManagers | async" [value]="manager">
-              {{ manager }}
-            </mat-option>
+            @for (manager of filteredManagers | async; track manager) {
+              <mat-option [value]="manager">
+                {{ manager }}
+              </mat-option>
+            }
           </mat-autocomplete>
         </label>
         <div class="button-SR">
@@ -48,9 +50,11 @@
           Manager:
           <input type="text" [formControl]="managerControl" [matAutocomplete]="autoManager" placeholder=" ">
           <mat-autocomplete #autoManager="matAutocomplete">
-            <mat-option *ngFor="let manager of filteredManagers | async" [value]="manager">
-              {{ manager }}
-            </mat-option>
+            @for (manager of filteredManagers | async; track manager) {
+              <mat-option [value]="manager">
+                {{ manager }}
+              </mat-option>
+            }
           </mat-autocomplete>
         </label>
         <div class="button-SR">

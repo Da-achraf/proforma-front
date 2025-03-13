@@ -4,18 +4,26 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MessageService } from 'primeng/api';
 import { delay, filter, switchMap } from 'rxjs';
-import { DeliveryAddress, deliveryAddressTableColumns, deliveryAddressTableProperties, emptyDeliveryAddress } from '../../../models/delivery-address.model';
+import {
+  DeliveryAddress,
+  deliveryAddressTableColumns,
+  deliveryAddressTableProperties,
+  emptyDeliveryAddress,
+} from '../../../models/delivery-address.model';
 import { TableNameEnum } from '../../../models/table.model';
 import { DeliveryAddressService } from '../../../services/delivery-address.service';
 import { DeleteConfirmationDialogComponent } from '../../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { HTTP_REQUEST_DELAY } from '../../../shared/constants/http-requests.constant';
 import { ToasterService } from '../../../shared/services/toaster.service';
 import { DeliveryAddressCrudComponent } from '../delivery-address-crud/delivery-address-crud.component';
+import { ManagementTablesComponent } from '../../../shared/components/management-tables/management-tables.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-delivery-address-list',
   templateUrl: './delivery-address-list.component.html',
   styleUrl: './delivery-address-list.component.css',
+  imports: [ManagementTablesComponent, AsyncPipe],
 })
 export class DeliveryAddressListComponent implements OnInit {
   deliveryAddressService = inject(DeliveryAddressService);
@@ -68,9 +76,7 @@ export class DeliveryAddressListComponent implements OnInit {
       .afterClosed()
       .pipe(
         filter((result) => result),
-        switchMap(() =>
-          this.deliveryAddressService.deleteDeliveryAddress(id)
-        )
+        switchMap(() => this.deliveryAddressService.deleteDeliveryAddress(id)),
       )
       .subscribe({
         next: () => {
@@ -126,7 +132,7 @@ export class DeliveryAddressListComponent implements OnInit {
         },
         (error) => {
           console.error('Error updating departement:', error);
-        }
+        },
       );
   }
 

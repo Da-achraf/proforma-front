@@ -42,6 +42,7 @@ interface DeleteDialogData {
       </div>
     </ba-base-dialog>
   `,
+  imports: [BaButtonComponent, BaseDialogComponent]
 })
 export class DeleteDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<DeleteDialogComponent>);

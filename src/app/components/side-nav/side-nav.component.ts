@@ -1,23 +1,26 @@
 import { Component, inject, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { allMenuItems } from '../../models/sidenav-item.model';
 import { RoleEnum } from '../../models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { SideNavService } from '../../shared/services/side-nav.service';
-import { allMenuItems } from '../../models/sidenav-item.model';
 
 @Component({
   selector: 'app-side-nav',
   templateUrl: './side-nav.component.html',
-  styleUrl: './side-nav.component.css'
+  styleUrl: './side-nav.component.css',
+  imports: [RouterLink, RouterLinkActive],
 })
 export class SideNavComponent {
-
   // Injected dependencies
-  sideNavService = inject(SideNavService)
-  auth = inject(AuthService)
+  sideNavService = inject(SideNavService);
+  auth = inject(AuthService);
 
   // Signals and computed values
-  items = signal(this.sideNavService.getMenuItemsBasedOnRole(
-    allMenuItems,
-    this.auth.getRoleFromToken() as RoleEnum
-  ))
+  items = signal(
+    this.sideNavService.getMenuItemsBasedOnRole(
+      allMenuItems,
+      this.auth.getRoleFromToken() as RoleEnum,
+    ),
+  );
 }

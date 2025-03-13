@@ -1,12 +1,24 @@
 import { Component, inject, model, OnInit, output } from '@angular/core';
-import { RequestStore } from '../request.store';
+import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInput, MatInputModule } from '@angular/material/input';
 import { QueryParamType } from '../../../../models/api-types.model';
+import { RequestStore } from '../request.store';
+import { BaButtonComponent } from '../../../../ui/components/button.component';
 
 @Component({
   selector: 'app-report-filter',
   templateUrl: 'report-filter.component.html',
   styleUrl: 'report-filter.component.css',
-  standalone: false,
+  imports: [
+    MatFormFieldModule,
+    MatInput,
+    MatInputModule,
+    MatDatepickerModule,
+    FormsModule,
+    BaButtonComponent,
+  ],
 })
 export class ReportFilterComponent implements OnInit {
   protected readonly requestStore = inject(RequestStore);
@@ -44,7 +56,7 @@ export class ReportFilterComponent implements OnInit {
     const firstDayLastMonth = new Date(
       today.getFullYear(),
       today.getMonth() - 1,
-      1
+      1,
     );
     const lastDayLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
 
@@ -58,12 +70,12 @@ export class ReportFilterComponent implements OnInit {
     const today = new Date();
     const sixtyDaysAgo = new Date(today);
     sixtyDaysAgo.setDate(today.getDate() - 60);
-    
+
     this.startDate = sixtyDaysAgo;
     this.endDate = today;
     this.activeFilter = 'last-60-days';
     this.dateError = false;
-   }
+  }
 
   setAllTime() {
     this.startDate = null;

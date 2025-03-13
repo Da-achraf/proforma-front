@@ -1,17 +1,19 @@
 import { Component, inject, OnInit, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { RoleEnum } from '../../models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { UserStoreService } from '../../services/user-store.service';
 import { ToasterService } from '../../shared/services/toaster.service';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
+  imports: [ReactiveFormsModule, NgClass, RouterLink]
 })
 export class LoginComponent implements OnInit {
   LoginForm: FormGroup;
@@ -39,7 +41,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('returnUrl: ', this.returnUrl());
   }
 
   loginSubmitted() {
@@ -77,6 +78,7 @@ export class LoginComponent implements OnInit {
   get password(): FormControl {
     return this.LoginForm.get('password') as FormControl;
   }
+  
   togglePasswordVisibility() {
     this.passwordFieldType =
       this.passwordFieldType === 'password' ? 'text' : 'password';

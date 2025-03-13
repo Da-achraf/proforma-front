@@ -1,10 +1,11 @@
+import { NgClass } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 
 @Component({
-  selector: 'app-no-data-found',
-  templateUrl: 'no-data-found.component.html',
-  styleUrl: 'no-data-found.component.css',
-  standalone: false
+    selector: 'app-no-data-found',
+    templateUrl: 'no-data-found.component.html',
+    styleUrl: 'no-data-found.component.css',
+    imports: [NgClass]
 })
 export class NoDataFoundComponent {
   icon = input<string>('fa-solid fa-table-list');

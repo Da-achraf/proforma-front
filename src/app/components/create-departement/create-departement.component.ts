@@ -1,17 +1,38 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormControl,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of } from 'rxjs';
-import { switchMap, debounceTime, catchError, startWith, tap } from 'rxjs/operators';
+import {
+  switchMap,
+  debounceTime,
+  catchError,
+  startWith,
+  tap,
+} from 'rxjs/operators';
 import { Departement } from '../../models/user/departement';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { AsyncPipe } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-create-departement',
   templateUrl: './create-departement.component.html',
-  styleUrls: ['./create-departement.component.scss']
+  styleUrls: ['./create-departement.component.scss'],
+  imports: [
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    AsyncPipe,
+    MatIconModule,
+  ],
 })
 export class CreateDepartementComponent implements OnInit {
   createDepartementForm!: FormGroup;
@@ -23,7 +44,7 @@ export class CreateDepartementComponent implements OnInit {
     private fb: FormBuilder,
     private departementService: DepartementService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
@@ -38,22 +59,21 @@ export class CreateDepartementComponent implements OnInit {
     });
   }
 
-
   private setupManagerAutocomplete() {
     this.filteredManagers = this.managerControl.valueChanges.pipe(
       debounceTime(300),
       startWith(''),
-      tap(value => console.log("Querying for:", value)),
-      switchMap(value => {
+      tap((value) => console.log('Querying for:', value)),
+      switchMap((value) => {
         if (!value) return of([]);
         return this.departementService.searchManagers(value).pipe(
-          catchError(err => {
+          catchError((err) => {
             console.error('Error fetching managers:', err);
             this.showError('Error fetching managers');
             return of([]);
-          })
+          }),
         );
-      })
+      }),
     );
   }
 
@@ -62,10 +82,13 @@ export class CreateDepartementComponent implements OnInit {
       const newDepartement: Departement = {
         name: this.createDepartementForm.value.name,
         manager: this.createDepartementForm.value.manager,
-        id_departement: 0
+        id_departement: 0,
       };
 
-      console.log('Payload à envoyer :', JSON.stringify(newDepartement, null, 2));
+      console.log(
+        'Payload à envoyer :',
+        JSON.stringify(newDepartement, null, 2),
+      );
 
       this.departementService.createDepartement(newDepartement).subscribe({
         next: (response) => {
@@ -76,13 +99,12 @@ export class CreateDepartementComponent implements OnInit {
         error: (error) => {
           console.error('Erreur lors de la création du département', error);
           this.showError('Failed to create department: ' + error.message);
-        }
+        },
       });
     } else {
       console.log('Formulaire invalide', this.createDepartementForm);
     }
   }
-
 
   private resetFormAndNavigate() {
     this.createDepartementForm.reset();
@@ -93,14 +115,14 @@ export class CreateDepartementComponent implements OnInit {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
       verticalPosition: 'top',
-      panelClass: ['green-snackbar']
+      panelClass: ['green-snackbar'],
     });
   }
 
   private showError(message: string) {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
-      verticalPosition: 'top'
+      verticalPosition: 'top',
     });
   }
 

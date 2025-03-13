@@ -1,10 +1,11 @@
+import { NgClass } from '@angular/common';
 import { Component, effect, input, output, signal } from '@angular/core';
 import { FilterOption } from './types';
 
 @Component({
   selector: 'app-radio-filter',
   templateUrl: 'radio-filter.component.html',
-  standalone: false
+  imports: [NgClass],
 })
 export class RadioFilterComponent {
   options = input.required<FilterOption[]>();
@@ -31,7 +32,7 @@ export class RadioFilterComponent {
         this.optionSelected.emit(initial || options[0].value);
       }
     },
-    { allowSignalWrites: true }
+    { allowSignalWrites: true },
   );
 
   onOptionChange(value: string): void {

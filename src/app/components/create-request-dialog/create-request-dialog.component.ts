@@ -11,9 +11,30 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
+import { MatDivider } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import _ from 'lodash';
 import { MessageService } from 'primeng/api';
 import {
@@ -25,7 +46,7 @@ import {
   of,
   Subject,
   switchMap,
-  takeUntil
+  takeUntil,
 } from 'rxjs';
 import { HistoricalDataService } from '../../feature/historical-data/hitorical-data.service';
 import { DeliveryAddress } from '../../models/delivery-address.model';
@@ -43,6 +64,7 @@ import {
   SHIPPED_VIA_OPTIONS,
 } from '../../models/request.model';
 import { Ship } from '../../models/ship.model';
+import { ToastComponent } from '../../pattern/toast/toast.component';
 import { AuthService } from '../../services/auth.service';
 import { DeliveryAddressService } from '../../services/delivery-address.service';
 import { RequestService } from '../../services/request.service';
@@ -56,11 +78,26 @@ import {
 } from '../../shared/utils/historical-data.util';
 import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-address-crud/delivery-address-crud.component';
 
+
 @Component({
   selector: 'app-create-request-dialog',
   templateUrl: './create-request-dialog.component.html',
   styleUrls: ['./create-request-dialog.component.css'],
   providers: [ToasterService],
+  imports: [
+    ToastComponent,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInput,
+    MatSelectModule,
+    MatTooltipModule,
+    MatAutocompleteModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatDivider,
+    MatDialogModule
+  ],
 })
 export class CreateRequestDialogComponent implements OnInit, OnDestroy {
   // Injected dependencies
@@ -88,7 +125,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
   });
   selectedScenarioId = signal(0);
   selectedScenario = computed(() =>
-    this.scenarios().find((s) => s.id_scenario === this.selectedScenarioId())
+    this.scenarios().find((s) => s.id_scenario === this.selectedScenarioId()),
   );
 
   formItems = computed(() => {
@@ -105,7 +142,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
         ...item,
         isMandatory:
           item && mandatoryForUser
-            ? item.mandatoryFor?.includes(mandatoryForUser) ?? false
+            ? (item.mandatoryFor?.includes(mandatoryForUser) ?? false)
             : false,
       };
     });
@@ -129,7 +166,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
     private requestService: RequestService,
     private authService: AuthService,
     private messageService: MessageService,
-    public dialogRef: MatDialogRef<CreateRequestDialogComponent>
+    public dialogRef: MatDialogRef<CreateRequestDialogComponent>,
   ) {}
 
   ngOnInit(): void {
@@ -200,7 +237,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
    * }
    */
   filteredHistoricalDataOptionsCache = signal<Record<number, HistoricalData>>(
-    {}
+    {},
   );
 
   onMaterialChange(value: string, index: number) {
@@ -259,10 +296,10 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
               catchError(() => {
                 this.toaster.showError('Failed to load material data');
                 return of({ result: [], index });
-              })
+              }),
             );
         }),
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
       )
       .subscribe(({ result, index }) => {
         this.isLoadingMaterial = false;
@@ -368,7 +405,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
           detail: 'Error loading shipping points',
         });
         console.error('Error loading shipping points:', error);
-      }
+      },
     );
   }
 
@@ -384,7 +421,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
           detail: 'Error loading delivery addresses',
         });
         console.error('Error loading delivery addresses:', error);
-      }
+      },
     );
   }
 
@@ -427,17 +464,17 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
       if (typeof scenarioId === 'number') {
         const shippingPointId =
           this.shipPoints.find(
-            (point) => point.id_ship === this.requestForm.value.shippingPoint
+            (point) => point.id_ship === this.requestForm.value.shippingPoint,
           )?.id_ship ?? 0;
         const deliveryAddressId =
           this.deliveryAddresses.find(
-            (address) => address.id === this.requestForm.value.deliveryAddress
+            (address) => address.id === this.requestForm.value.deliveryAddress,
           )?.id ?? 0;
 
         const enhancedItems = enhanceItemsWithCacheData(
           _.cloneDeep(this.requestForm.value.items),
           this.filteredHistoricalDataOptionsCache(),
-          enhancementConfig
+          enhancementConfig,
         );
 
         const requestData: CreateRequest = {
@@ -461,7 +498,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
           },
           () => {
             this.toaster.showError('Error creating request');
-          }
+          },
         );
       } else {
         this.toaster.showError('Scenario ID is not a number');
@@ -495,13 +532,13 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
 
   private updateIncoterm(
     shippingPointId: number,
-    deliveryAddressId: number
+    deliveryAddressId: number,
   ): void {
     const shippingPoint = this.shipPoints.find(
-      (point) => point.id_ship === shippingPointId
+      (point) => point.id_ship === shippingPointId,
     );
     const deliveryAddress = this.deliveryAddresses.find(
-      (address) => address.id === deliveryAddressId
+      (address) => address.id === deliveryAddressId,
     );
 
     if (shippingPoint?.isTe && deliveryAddress?.isTe) {

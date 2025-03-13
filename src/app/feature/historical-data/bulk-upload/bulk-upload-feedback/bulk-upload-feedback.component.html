@@ -21,7 +21,7 @@
           <!-- Success -->
           <div
             class="rounded-lg bg-green-50 p-4 text-center font-medium shadow"
-          >
+            >
             <div class="text-2xl font-bold text-green-600">
               {{ result.successCount | number }}
             </div>
@@ -49,37 +49,39 @@
           </div>
           <div class="mt-1 text-center text-xs text-gray-500">
             {{
-              (result.successCount / result.totalRowCount) * 100
-                | number: "1.0-0"
+            (result.successCount / result.totalRowCount) * 100
+            | number: "1.0-0"
             }}% Success Rate
           </div>
         </div>
 
         <!-- Actions -->
         <div class="flex justify-end gap-3">
-          <button
-            *ngIf="result.errors.length"
-            mat-raised-button
-            color="secondary"
-            (click)="downloadErrors()"
-          >
-            <div class="!flex items-center gap-x-2">
-              <i class="fa-solid text-red-500 fa-circle-arrow-down"></i>
-              <span>Download Errors</span>
-            </div>
-          </button>
+          @if (result.errors.length) {
+            <button
+              mat-raised-button
+              color="secondary"
+              (click)="downloadErrors()"
+              >
+              <div class="!flex items-center gap-x-2">
+                <i class="fa-solid text-red-500 fa-circle-arrow-down"></i>
+                <span>Download Errors</span>
+              </div>
+            </button>
+          }
 
-          <button
-            *ngIf="result.errors.length"
-            mat-raised-button
-            color="secondary"
-            (click)="viewErrorsAsJSON()"
-          >
-            <div class="!flex items-center gap-x-2">
-              <i class="fa-solid fa-code"></i>
-              <span>View JSON</span>
-            </div>
-          </button>
+          @if (result.errors.length) {
+            <button
+              mat-raised-button
+              color="secondary"
+              (click)="viewErrorsAsJSON()"
+              >
+              <div class="!flex items-center gap-x-2">
+                <i class="fa-solid fa-code"></i>
+                <span>View JSON</span>
+              </div>
+            </button>
+          }
         </div>
       </div>
     </div>
@@ -92,7 +94,7 @@
           mat-table
           [dataSource]="paginatedErrors"
           class="w-full rounded-lg border"
-        >
+          >
           <!-- Row Number Column -->
           <ng-container matColumnDef="rowNumber">
             <th mat-header-cell *matHeaderCellDef class="p-2">Row</th>
@@ -126,7 +128,7 @@
           [pageSizeOptions]="[5, 10, 20]"
           (page)="onPageChange($event)"
           class="mt-4"
-        >
+          >
         </mat-paginator>
       }
     </div>

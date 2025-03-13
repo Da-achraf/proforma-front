@@ -8,8 +8,8 @@ describe('RejectCommentDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RejectCommentDialogComponent]
-    })
+    imports: [RejectCommentDialogComponent]
+})
     .compileComponents();
     
     fixture = TestBed.createComponent(RejectCommentDialogComponent);

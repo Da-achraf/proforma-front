@@ -4,11 +4,14 @@ import { HistoricalDataBulkUploadStore } from './feature/historical-data/bulk-up
 import { UserService } from './services/user.service';
 import { SideNavService } from './shared/services/side-nav.service';
 import { UploadProtectionService } from './shared/services/upload-protection-service.service';
+import { ToastComponent } from './pattern/toast/toast.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
+  imports: [ToastComponent, RouterOutlet],
 })
 export class AppComponent implements OnDestroy {
   private readonly userService = inject(UserService);

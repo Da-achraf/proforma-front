@@ -1,14 +1,14 @@
 <div class="flex items-center justify-between p-4">
   <span class="text-xl font-semibold">
     Edit Request
-    <span class="text-gray-500 text-sm">(Trade & Compliance)</span> [<span
-      class="text-cyan-600 font-semibold font-serif"
+    <span class="text-sm text-gray-500">(Trade & Compliance)</span> [<span
+      class="font-serif font-semibold text-cyan-600"
       >{{ data.requestNumber }}</span
     >]
   </span>
 
   @if (requestSig()?.status; as status) {
-  <app-request-status [status]="status" />
+    <app-request-status [status]="status" />
   }
 </div>
 
@@ -35,11 +35,11 @@
         <mat-label>Mode Of Transport</mat-label>
         <input matInput formControlName="modeOfTransport" readonly />
       </mat-form-field>
-      @if (modeOfTransport() === 'By Air') {
-      <mat-form-field appearance="fill">
-        <mat-label>DHL Account</mat-label>
-        <input matInput formControlName="dhlAccount" readonly />
-      </mat-form-field>
+      @if (modeOfTransport() === "By Air") {
+        <mat-form-field appearance="fill">
+          <mat-label>DHL Account</mat-label>
+          <input matInput formControlName="dhlAccount" readonly />
+        </mat-form-field>
       }
 
       <mat-form-field appearance="fill">
@@ -67,72 +67,72 @@
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
           @for (option of currencyCodes(); track option) {
-          <mat-option [value]="option">{{ option }}</mat-option>
+            <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
     </div>
 
     @if (items.controls.length !== 0) {
-    <div class="border border-gray-200 rounded-md overflow-hidden">
-      <div class="bg-orange-200 p-2 mb-2 text-center">
-        <span class="font-mono text-md w-fit text-orange-600">
-          Number Of Items
-          <span class="font-bold text-xs text-gray-800">
-            ({{ items.length }})
+      <div class="overflow-hidden rounded-md border border-gray-200">
+        <div class="mb-2 bg-orange-200 p-2 text-center">
+          <span class="text-md w-fit font-mono text-orange-600">
+            Number Of Items
+            <span class="text-xs font-bold text-gray-800">
+              ({{ items.length }})
+            </span>
           </span>
-        </span>
-      </div>
-      @defer {
-      <div class="p-2" formArrayName="items">
-        @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-        <div
-          [formGroupName]="i"
-          class="mb-4 p-2 border border-gray-300 rounded shadow-md"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <span class="font-bold">Item {{ i + 1 }}</span>
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            @for (field of formItems() || []; track field) { @if (field.nameItem
-            === 'COO') {
-            <div [formGroupName]="field.nameItem" class="w-full">
-              <mat-select-country
-                class="test"
-                panelWidth="2"
-                appearance="fill"
-                label="COO"
-                [required]="field.isMandatory ?? false"
-                formControlName="value"
-              >
-              </mat-select-country>
-            </div>
-            } @else {
-            <div [formGroupName]="field.nameItem">
-              <mat-form-field appearance="fill" class="w-full mb-2">
-                <mat-label>{{ field.nameItem }}</mat-label>
-                <input
-                  matInput
-                  formControlName="value"
-                  [type]="field.type"
-                  [readonly]="field.readOnly"
-                  [required]="field.isMandatory ?? false"
-                />
-              </mat-form-field>
-            </div>
-            } }
-          </div>
         </div>
+        @defer {
+          <div class="p-2" formArrayName="items">
+            @for (
+              itemGroup of items.controls;
+              track itemGroup;
+              let i = $index
+            ) {
+              <div
+                [formGroupName]="i"
+                class="mb-4 rounded border border-gray-300 p-2 shadow-md"
+              >
+                <div class="mb-2 flex items-center justify-between">
+                  <span class="font-bold">Item {{ i + 1 }}</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  @for (field of formItems() || []; track field) {
+                    @if (field.nameItem === "COO") {
+                      <div [formGroupName]="field.nameItem">
+                        <app-country-selector
+                          formControlName="value"
+                          [required]="true"
+                        />
+                      </div>
+                    } @else {
+                      <div [formGroupName]="field.nameItem">
+                        <mat-form-field appearance="fill" class="w-full">
+                          <mat-label>{{ field.nameItem }}</mat-label>
+                          <input
+                            matInput
+                            formControlName="value"
+                            [type]="field.type"
+                            [readonly]="field.readOnly"
+                            [required]="field.isMandatory ?? false"
+                          />
+                        </mat-form-field>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @placeholder (minimum 700ms) {
+          <loading-dots [diameter]="25" />
         }
       </div>
-      } @placeholder (minimum 700ms) {
-      <loading-dots [diameter]="25" />
-      }
-    </div>
     }
 
     <!-- Actions -->
-    <div class="mt-4 flex items-center gap-x-3 justify-end">
+    <div class="mt-4 flex items-center justify-end gap-x-3">
       <button
         mat-raised-button
         color="warn"
@@ -143,6 +143,7 @@
       </button>
       <button
         mat-raised-button
+        color="primary"
         type="button"
         (click)="onSubmit()"
         [disabled]="!requestForm.valid"

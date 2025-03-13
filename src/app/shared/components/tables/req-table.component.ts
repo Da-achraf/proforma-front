@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import {
   Component,
   computed,
@@ -9,8 +9,9 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter, switchMap } from 'rxjs';
 import { CreateRequestDialogComponent } from '../../../components/create-request-dialog/create-request-dialog.component';
@@ -22,18 +23,26 @@ import {
 } from '../../../models/request.model';
 import { RequestStatus } from '../../../models/requeststatus.model';
 import { RoleEnum } from '../../../models/user/user.model';
+import { RequestStatusTabFilterComponent } from '../../../pattern/request-tab-filter/request-status-tab-filter.component';
+import { SearchBarComponent } from '../../../pattern/search/search-bar.component';
 import { AuthService } from '../../../services/auth.service';
 import { RequestService } from '../../../services/request.service';
 import { UserStoreService } from '../../../services/user-store.service';
+import { CreateButtonComponent } from '../../../ui/components/create-button/create-button.component';
+import { NoDataFoundComponent } from '../../../ui/components/no-data-found/no-data-found.component';
+import { InvoiceAvailabilityPipe } from '../../pipes/invoice-availablity.pipe';
 import { InvoiceService } from '../../services/invoice.service';
 import { RequestStrategyFactory } from '../../services/requests-strategies/requests-strategies-factory';
 import { SideNavService } from '../../services/side-nav.service';
 import { ToasterService } from '../../services/toaster.service';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { LoadingDotsComponent } from '../loading-dots/loading-dots.component';
+import { RequestStatusComponent } from '../request-status/request-status.component';
+import { TheInvoiceComponent } from '../the-invoice/the-invoice.component';
 import { PAGE_SIZE_OPTIONS } from './data';
 import { getRequestModificationComponent } from './helpers';
-import { RequestStore } from './request.store';
 import { ReportFilterComponent } from './report-filter/report-filter.component';
+import { RequestStore } from './request.store';
 
 const REQUEST_EDITING_TIMOUT = 1500;
 
@@ -41,6 +50,20 @@ const REQUEST_EDITING_TIMOUT = 1500;
   selector: 'app-reqs-table',
   templateUrl: './req-table.component.html',
   styleUrl: './req-table.component.css',
+  imports: [
+    RequestStatusTabFilterComponent,
+    SearchBarComponent,
+    CreateButtonComponent,
+    NgClass,
+    DatePipe,
+    RequestStatusComponent,
+    InvoiceAvailabilityPipe,
+    MatTooltip,
+    LoadingDotsComponent,
+    NoDataFoundComponent,
+    MatPaginator,
+    TheInvoiceComponent,
+  ],
   providers: [DatePipe],
 })
 export class RequestsTableComponent {
@@ -91,8 +114,8 @@ export class RequestsTableComponent {
 
   canViewReport = computed(() =>
     [RoleEnum.ADMIN, RoleEnum.WAREHOUSE_APPROVER].some(
-      (r) => r === this.loggedInUser()?.role
-    )
+      (r) => r === this.loggedInUser()?.role,
+    ),
   );
 
   onStatusChange(status: RequestStatus | undefined) {
@@ -214,7 +237,7 @@ export class RequestsTableComponent {
       .afterClosed()
       .pipe(
         filter((result) => result),
-        switchMap((_) => this.requestService.deleteRequest(reqNumber))
+        switchMap((_) => this.requestService.deleteRequest(reqNumber)),
       )
       .subscribe({
         next: () => {
@@ -240,7 +263,7 @@ export class RequestsTableComponent {
         req.requestNumber,
         this.invoiceElement,
         this.renderer,
-        this.elementRef
+        this.elementRef,
       );
     } catch (error) {
       console.error('error generating pdf: ', error);

@@ -1,3 +1,4 @@
+import { TitleCasePipe } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -7,15 +8,18 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { OverlayPanel } from 'primeng/overlaypanel';
+import { OverlayPanelModule, OverlayPanel } from 'primeng/overlaypanel';
+import { Toolbar } from 'primeng/toolbar';
 import { AuthService } from '../../services/auth.service';
 import { UserStoreService } from '../../services/user-store.service';
 import { UserService } from '../../services/user.service';
+import { UserRoleForDisplayPipe } from '../../shared/pipes/user-role-for-display.pipe';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
+  imports: [Toolbar, TitleCasePipe, OverlayPanelModule, UserRoleForDisplayPipe],
 })
 export class HeaderComponent implements OnInit {
   protected readonly userStore = inject(UserStoreService);
@@ -23,7 +27,9 @@ export class HeaderComponent implements OnInit {
   protected readonly api = inject(UserService);
   protected readonly authservice = inject(AuthService);
 
-  private readonly trigger = viewChild('overlayPanelTrigger', { read: ElementRef });
+  private readonly trigger = viewChild('overlayPanelTrigger', {
+    read: ElementRef,
+  });
   private readonly overlayPanel = viewChild(OverlayPanel);
 
   toggleSidebarForMe = output();

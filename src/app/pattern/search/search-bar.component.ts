@@ -1,10 +1,13 @@
+import { NgClass } from "@angular/common";
 import { Component, effect, output, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
+import { FormsModule } from "@angular/forms";
 import { BehaviorSubject, debounceTime, of, skip, switchMap, tap } from "rxjs";
 
 @Component({
     selector: 'ba-search-bar',
     templateUrl: './search-bar.component.html',
+    imports: [NgClass, FormsModule]
   })
   export class SearchBarComponent {
     

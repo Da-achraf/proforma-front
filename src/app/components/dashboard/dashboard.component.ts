@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { KpiService } from '../../services/KpiService';
 import { EChartsOption } from 'echarts';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { KpiService } from '../../services/KpiService';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
+  imports: [NgxEchartsDirective,],
 })
 export class DashboardComponent implements OnInit {
   // Scenario Chart

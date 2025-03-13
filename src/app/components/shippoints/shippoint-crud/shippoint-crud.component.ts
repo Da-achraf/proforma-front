@@ -7,17 +7,38 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 import { finalize } from 'rxjs';
 import { ShipPointModel } from '../../../models/ship.model';
 import { ShippointService } from '../../../services/shippoint.service';
 import { ToasterService } from '../../../shared/services/toaster.service';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-shippoint-crud',
   templateUrl: './shippoint-crud.component.html',
   styleUrl: './shippoint-crud.component.css',
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatCheckboxModule,
+    MatInput,
+    MatDialogModule,
+    MatButtonModule,
+  ],
 })
 export class ShippointCrudComponent implements OnInit {
   // Injected dependencies
@@ -34,7 +55,7 @@ export class ShippointCrudComponent implements OnInit {
   isFormSubmited = signal(false);
   isUpdateMode = computed(() => this.data()?.isUpdateMode);
   shipPoint = computed<ShipPointModel | undefined>(
-    () => this.data()?.shipPoint
+    () => this.data()?.shipPoint,
   );
 
   formHeaderText = computed(() => {
@@ -49,7 +70,6 @@ export class ShippointCrudComponent implements OnInit {
 
     untracked(() => this.patchShipPointFormValue(shipPoint));
   });
-
 
   // Component hooks
   ngOnInit(): void {

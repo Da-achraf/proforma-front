@@ -3,7 +3,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
 import { delay, filter, map, Observable, of, switchMap, tap } from 'rxjs';
 import { TableNameEnum } from '../../models/table.model';
-import { emptyUser, mainRoles, User, userTableColumns, userTableProperties } from '../../models/user/user.model';
+import {
+  emptyUser,
+  mainRoles,
+  User,
+  userTableColumns,
+  userTableProperties,
+} from '../../models/user/user.model';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
 import { UserService } from '../../services/user.service';
@@ -13,59 +19,73 @@ import { SideNavService } from '../../shared/services/side-nav.service';
 import { ShippointService } from '../../services/shippoint.service';
 import { Ship } from '../../models/ship.model';
 import { ToasterService } from '../../shared/services/toaster.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  Validators,
+} from '@angular/forms';
+import { ManagementTablesComponent } from '../../shared/components/management-tables/management-tables.component';
+import { AsyncPipe } from '@angular/common';
+import { Dialog } from 'primeng/dialog';
+import { UserRoleForDisplayPipe } from '../../shared/pipes/user-role-for-display.pipe';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({
   selector: 'app-users-list',
   templateUrl: './users-list.component.html',
-  styleUrl: './users-list.component.css'
+  styleUrl: './users-list.component.css',
+  imports: [
+    ManagementTablesComponent,
+    AsyncPipe,
+    Dialog,
+    FormsModule,
+    UserRoleForDisplayPipe,
+    MultiSelectModule,
+  ],
 })
 export class UsersListComponent implements OnInit {
-  fb = inject(FormBuilder)
-  userService = inject(UserService)
-  departmentService = inject(DepartementService)
-  plantService = inject(PlantService)
-  shipPointService = inject(ShippointService)
-  sideNavService = inject(SideNavService)
-  dialog = inject(MatDialog)
-  messageService = inject(MessageService)
-  toastr = inject(ToasterService)
+  fb = inject(FormBuilder);
+  userService = inject(UserService);
+  departmentService = inject(DepartementService);
+  plantService = inject(PlantService);
+  shipPointService = inject(ShippointService);
+  sideNavService = inject(SideNavService);
+  dialog = inject(MatDialog);
+  messageService = inject(MessageService);
+  toastr = inject(ToasterService);
 
-  displayUpdateDialog = model(false)
-  user: User = emptyUser
+  displayUpdateDialog = model(false);
+  user: User = emptyUser;
 
   userUpdateForm: FormGroup;
 
   // Observables
-  users$ = this.userService.getUsers().pipe(
-    delay(HTTP_REQUEST_DELAY)
-  )
-  departments$ = this.departmentService.getDepartements()
-  plants$ = this.plantService.getPlants().pipe( 
+  users$ = this.userService.getUsers().pipe(delay(HTTP_REQUEST_DELAY));
+  departments$ = this.departmentService.getDepartements();
+  plants$ = this.plantService.getPlants().pipe(
     map((data: any[]) => {
       return data.map((plant) => ({
         label: plant.location as string,
-        value: plant.id_plant as string
+        value: plant.id_plant as string,
       }));
-    })
+    }),
   );
-  shipPoints$ = this.shipPointService.getShipPoints().pipe( 
+  shipPoints$ = this.shipPointService.getShipPoints().pipe(
     map((data: any[]) => {
       return data.map((shipPoint: Ship) => ({
         label: shipPoint.shipPoint as string,
-        value: shipPoint.id_ship
+        value: shipPoint.id_ship,
       }));
-    })
+    }),
   );
-  roles$ = of(mainRoles)
-  filteredShipPoints$ = Observable<Ship[]>
+  roles$ = of(mainRoles);
+  filteredShipPoints$ = Observable<Ship[]>;
 
-  userTableProperties = userTableProperties
-  userTableColumns = userTableColumns
+  userTableProperties = userTableProperties;
+  userTableColumns = userTableColumns;
 
-  TableNameEnum = TableNameEnum
-
+  TableNameEnum = TableNameEnum;
 
   constructor() {
     this.userUpdateForm = this.fb.group({
@@ -76,12 +96,12 @@ export class UsersListComponent implements OnInit {
       backUp: [''],
       role: ['', Validators.required],
       departementId: [''],
-      shipPointsIds: [[], Validators.required]
+      shipPointsIds: [[], Validators.required],
     });
   }
 
   ngOnInit(): void {
-    this.loadUsers()
+    this.loadUsers();
 
     // this.filteredShipPoints$ = this.user.shipPointsIds
   }
@@ -95,51 +115,50 @@ export class UsersListComponent implements OnInit {
       backUp: user.backUp,
       role: user.role,
       departementId: user.departementId,
-      shipPointsIds: user.shipPointsIds || []
+      shipPointsIds: user.shipPointsIds || [],
     });
   }
 
   onUpdate(user: User): void {
-    this.user = user
+    this.user = user;
     this.user.plantsIds = user.plantsIds;
     this.user.shipPointsIds = user.shipPointsIds;
     this.user.departementId = user.departementId;
-    this.displayUpdateDialog.set(true)
+    this.displayUpdateDialog.set(true);
 
-    this.populateForm(user)
+    this.populateForm(user);
   }
-
 
   onDepartmentChange(event: any) {
     this.user.departementId = event.target.value;
   }
 
   loadPlants(): void {
-    this.plants$ = this.plantService.getPlants().pipe( 
+    this.plants$ = this.plantService.getPlants().pipe(
       map((data: any[]) => {
         return data.map((plant) => ({
           label: plant.location as string,
-          value: plant.id_plant as string
+          value: plant.id_plant as string,
         }));
-      })
+      }),
     );
   }
 
   loadShipPoints(): void {
-    this.plants$ = this.plantService.getPlants().pipe( 
+    this.plants$ = this.plantService.getPlants().pipe(
       map((data: any[]) => {
         return data.map((plant) => ({
           label: plant.location as string,
-          value: plant.id_plant as string
+          value: plant.id_plant as string,
         }));
-      })
+      }),
     );
   }
 
   loadUsers(): void {
-    this.users$ = this.userService.getUsers().pipe(
-      tap(this.sideNavService.users.set)
-    )
+    this.users$ = this.userService
+      .getUsers()
+      .pipe(tap(this.sideNavService.users.set));
   }
 
   updateUser(): void {
@@ -165,41 +184,46 @@ export class UsersListComponent implements OnInit {
       },
       (error) => {
         console.error('Error updating user:', error);
-      }
+      },
     );
   }
 
   onDelete(id: number) {
-    if (!id) return
+    if (!id) return;
     const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
       data: {
-        label: TableNameEnum.USER
-      }
-    })
-
-    dialogRef.afterClosed().pipe(
-      filter(result => result),
-      switchMap(_ => this.userService.deleteUser(id))
-    ).subscribe({
-      next: () => {
-        this.toastr.showSuccess('User Deleted successfully.')
-        this.loadUsers();
+        label: TableNameEnum.USER,
       },
-      error: () => {
-        this.toastr.showError('Error in deleting ship point')
-      }
-    })
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter((result) => result),
+        switchMap((_) => this.userService.deleteUser(id)),
+      )
+      .subscribe({
+        next: () => {
+          this.toastr.showSuccess('User Deleted successfully.');
+          this.loadUsers();
+        },
+        error: () => {
+          this.toastr.showError('Error in deleting ship point');
+        },
+      });
   }
 
   private _filter(shipPoints: Ship[], shipPointName: string): any[] {
     const filterValue = shipPointName.toLowerCase();
 
-    return shipPoints.filter(option => option.shipPoint.toLowerCase().includes(filterValue));
+    return shipPoints.filter((option) =>
+      option.shipPoint.toLowerCase().includes(filterValue),
+    );
   }
 
   // Helper method to mark all controls as touched
   private markFormGroupTouched(formGroup: FormGroup) {
-    Object.values(formGroup.controls).forEach(control => {
+    Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
 
       if (control instanceof FormGroup) {

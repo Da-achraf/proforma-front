@@ -2,7 +2,7 @@
 
 <h1 mat-dialog-title>Create Request</h1>
 
-<div mat-dialog-content cdkScrollable class="scroll-container">
+<div mat-dialog-content class="scroll-container">
   <form [formGroup]="requestForm">
     <div class="notes-container">
       <div class="note">
@@ -26,9 +26,11 @@
       <mat-form-field appearance="fill">
         <mat-label>Select Invoice Type</mat-label>
         <mat-select formControlName="invoicesTypes">
-          <mat-option *ngFor="let type of invoiceTypes()" [value]="type">{{
-            type
-          }}</mat-option>
+          @for (type of invoiceTypes(); track type) {
+            <mat-option [value]="type">{{
+              type
+            }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
@@ -36,214 +38,220 @@
         <mat-select
           formControlName="scenarioId"
           (selectionChange)="onScenarioChange()"
-        >
-          <mat-option
-            *ngFor="let scenario of scenarios()"
-            [value]="scenario.id_scenario"
-            >{{ scenario.name }}
-          </mat-option>
+          >
+          @for (scenario of scenarios(); track scenario) {
+            <mat-option
+              [value]="scenario.id_scenario"
+              >{{ scenario.name }}
+            </mat-option>
+          }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Select Shipping Point</mat-label>
         <mat-select formControlName="shippingPoint">
-          <mat-option
-            *ngFor="let point of shipPoints"
-            [value]="point.id_ship"
-            >{{ point.shipPoint }}</mat-option
-          >
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Select Delivery Address</mat-label>
-        <mat-select
-          formControlName="deliveryAddress"
-          (selectionChange)="onDeliveryAddressChange($event.value)"
-        >
-          <mat-option value="other">Other</mat-option>
-          <mat-option
-            *ngFor="let address of deliveryAddresses"
-            [value]="address.id"
-            >{{ address.customerId }}</mat-option
-          >
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Select Incoterm</mat-label>
-        <mat-select formControlName="incoterm">
-          <mat-option *ngFor="let term of incotermOptions()" [value]="term">{{
-            term
-          }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="fill">
-        <mat-label>Cost Center</mat-label>
-        <input matInput formControlName="costCenter" />
-      </mat-form-field>
-
-      <mat-form-field appearance="fill">
-        <mat-label>Mode Of Transport</mat-label>
-        <mat-select formControlName="modeOfTransport">
-          <mat-option
-            *ngFor="let modeOfTransport of modesOfTransports"
-            [value]="modeOfTransport"
-            >{{ modeOfTransport }}</mat-option
-          >
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Currency</mat-label>
-        <mat-select formControlName="currency" name="currency">
-          @for (option of currencyCodes(); track option) {
-          <mat-option [value]="option">{{ option }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Shiped Via</mat-label>
-        <mat-select formControlName="shippedVia" name="shippedVia">
-          @for (option of shippedViaOptions(); track option) {
-          <mat-option [value]="option">{{ option }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    @if (items.length !== 0 && items.controls.length !== 0) {
-    <div class="border border-gray-200 rounded-md overflow-hidden">
-      <div class="bg-orange-200 p-2 mb-2 text-center">
-        <span class="font-mono text-md w-fit text-orange-600">
-          Number Of Items
-          <span class="font-bold text-xs text-gray-800">
-            ({{ items.length }})
-          </span>
-        </span>
-      </div>
-      <div class="p-2" formArrayName="items">
-        @for (itemGroup of items.controls; track itemGroup; let index = $index)
-        {
-        <div
-          [formGroupName]="index"
-          class="mb-4 p-2 border border-gray-300 rounded shadow-md"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <span class="font-bold">Item {{ index + 1 }}</span>
-            <div class="flex items-center gap-x-4">
-              <button
-                type="button"
-                class="text-red-600 hover:text-red-800 transition-colors"
-                matTooltipPosition="above"
-                matTooltip="Empty the fields"
-                (click)="emptyItem(index)"
+          @for (point of shipPoints; track point) {
+            <mat-option
+              [value]="point.id_ship"
+              >{{ point.shipPoint }}</mat-option
               >
-                <i class="fa-regular fa-trash-can"></i>
-              </button>
-              <button
-                type="button"
-                class="text-red-600 hover:text-red-800 rounded-full transition-colors"
-                matTooltipPosition="above"
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Select Delivery Address</mat-label>
+          <mat-select
+            formControlName="deliveryAddress"
+            (selectionChange)="onDeliveryAddressChange($event.value)"
+            >
+            <mat-option value="other">Other</mat-option>
+            @for (address of deliveryAddresses; track address) {
+              <mat-option
+                [value]="address.id"
+                >{{ address.customerId }}</mat-option
+                >
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Select Incoterm</mat-label>
+            <mat-select formControlName="incoterm">
+              @for (term of incotermOptions(); track term) {
+                <mat-option [value]="term">{{
+                  term
+                }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Cost Center</mat-label>
+            <input matInput formControlName="costCenter" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Mode Of Transport</mat-label>
+            <mat-select formControlName="modeOfTransport">
+              @for (modeOfTransport of modesOfTransports; track modeOfTransport) {
+                <mat-option
+                  [value]="modeOfTransport"
+                  >{{ modeOfTransport }}</mat-option
+                  >
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Currency</mat-label>
+              <mat-select formControlName="currency" name="currency">
+                @for (option of currencyCodes(); track option) {
+                  <mat-option [value]="option">{{ option }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Shiped Via</mat-label>
+              <mat-select formControlName="shippedVia" name="shippedVia">
+                @for (option of shippedViaOptions(); track option) {
+                  <mat-option [value]="option">{{ option }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          @if (items.length !== 0 && items.controls.length !== 0) {
+            <div class="border border-gray-200 rounded-md overflow-hidden">
+              <div class="bg-orange-200 p-2 mb-2 text-center">
+                <span class="font-mono text-md w-fit text-orange-600">
+                  Number Of Items
+                  <span class="font-bold text-xs text-gray-800">
+                    ({{ items.length }})
+                  </span>
+                </span>
+              </div>
+              <div class="p-2" formArrayName="items">
+                @for (itemGroup of items.controls; track itemGroup; let index = $index)
+                  {
+                  <div
+                    [formGroupName]="index"
+                    class="mb-4 p-2 border border-gray-300 rounded shadow-md"
+                    >
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="font-bold">Item {{ index + 1 }}</span>
+                      <div class="flex items-center gap-x-4">
+                        <button
+                          type="button"
+                          class="text-red-600 hover:text-red-800 transition-colors"
+                          matTooltipPosition="above"
+                          matTooltip="Empty the fields"
+                          (click)="emptyItem(index)"
+                          >
+                          <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="text-red-600 hover:text-red-800 rounded-full transition-colors"
+                          matTooltipPosition="above"
                 [matTooltip]="
                   items.length === 1
                     ? 'A request should have at least one item'
                     : 'Remove this item'
                 "
-                (click)="removeItem(index)"
-                [class.opacity-50]="items.length <= 1"
-                [disabled]="items.length <= 1"
-              >
-                <i class="fa-solid fa-circle-minus"></i>
-              </button>
-            </div>
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            @for (field of formItems() || []; track field) {
-            @if (field.nameItem === 'Material') {
-            <div [formGroupName]="field.nameItem">
-              <mat-form-field appearance="fill" class="w-full mb-2">
-                <mat-label>{{ field.nameItem }}</mat-label>
-                <div matAutocompleteOrigin #origin="matAutocompleteOrigin">
-                  <input
-                    matInput
-                    #materialInput
-                    [matAutocomplete]="auto"
-                    (input)="onMaterialChange(materialInput.value, index)"
-                    formControlName="value"
-                    [type]="field.type"
-                    [required]="field.isMandatory"
-                  />
+                          (click)="removeItem(index)"
+                          [class.opacity-50]="items.length <= 1"
+                          [disabled]="items.length <= 1"
+                          >
+                          <i class="fa-solid fa-circle-minus"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      @for (field of formItems() || []; track field) {
+                        @if (field.nameItem === 'Material') {
+                          <div [formGroupName]="field.nameItem">
+                            <mat-form-field appearance="fill" class="w-full mb-2">
+                              <mat-label>{{ field.nameItem }}</mat-label>
+                              <div matAutocompleteOrigin #origin="matAutocompleteOrigin">
+                                <input
+                                  matInput
+                                  #materialInput
+                                  [matAutocomplete]="auto"
+                                  (input)="onMaterialChange(materialInput.value, index)"
+                                  formControlName="value"
+                                  [type]="field.type"
+                                  [required]="field.isMandatory"
+                                  />
+                                </div>
+                                <mat-autocomplete #auto="matAutocomplete">
+                                  @if (isLoadingMaterial) {
+                                    <mat-option disabled>
+                                      <mat-spinner diameter="30"></mat-spinner>
+                                    </mat-option>
+                                    } @for (option of filteredHistoricalDataOptions()[index] || []; track
+                                    option.id) {
+                                    <mat-option
+                                      (onSelectionChange)="selectMaterial(option, index)"
+                                      [value]="option.material"
+                                      >
+                                      {{ option.material }}
+                                    </mat-option>
+                                  }
+                                </mat-autocomplete>
+                              </mat-form-field>
+                            </div>
+                          } @else {
+                            <div [formGroupName]="field.nameItem">
+                              <mat-form-field appearance="fill" class="w-full mb-2">
+                                <mat-label>{{ field.nameItem }}</mat-label>
+                                <input
+                                  matInput
+                                  formControlName="value"
+                                  [type]="field.type"
+                                  [required]="field.isMandatory"
+                                  />
+                                </mat-form-field>
+                              </div>
+                            }
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                  <div class="p-2">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      matTooltipPosition="above"
+                      matTooltip="Add another item"
+                      (click)="addItem()"
+                      type="button"
+                      >
+                      <mat-icon>add_circle</mat-icon>
+                    </button>
+                  </div>
                 </div>
-                <mat-autocomplete #auto="matAutocomplete">
-                  @if (isLoadingMaterial) {
-                  <mat-option disabled>
-                    <mat-spinner diameter="30"></mat-spinner>
-                  </mat-option>
-                  } @for (option of filteredHistoricalDataOptions()[index] || []; track
-                  option.id) {
-                  <mat-option
-                    (onSelectionChange)="selectMaterial(option, index)"
-                    [value]="option.material"
+              }
+
+              <mat-divider class="my-3" />
+
+              <div class="mt-2 flex items-center gap-x-3 justify-end">
+                <button
+                  mat-raised-button
+                  color="warn"
+                  type="button"
+                  (click)="dialogRef.close()"
                   >
-                    {{ option.material }}
-                  </mat-option>
-                  }
-                </mat-autocomplete>
-              </mat-form-field>
-            </div>
-            } @else {
-            <div [formGroupName]="field.nameItem">
-              <mat-form-field appearance="fill" class="w-full mb-2">
-                <mat-label>{{ field.nameItem }}</mat-label>
-                <input
-                  matInput
-                  formControlName="value"
-                  [type]="field.type"
-                  [required]="field.isMandatory"
-                />
-              </mat-form-field>
-            </div>
-            }
-          }
+                  Cancel
+                </button>
+                <button
+                  mat-raised-button
+                  [disabled]="!requestForm.valid"
+                  class="submit-button"
+                  (click)="onSubmit()"
+                  >
+                  Create Request
+                </button>
+              </div>
+            </form>
           </div>
-        </div>
-        }
-      </div>
-      <div class="p-2">
-        <button
-          mat-icon-button
-          color="primary"
-          matTooltipPosition="above"
-          matTooltip="Add another item"
-          (click)="addItem()"
-          type="button"
-        >
-          <mat-icon>add_circle</mat-icon>
-        </button>
-      </div>
-    </div>
-    }
-
-    <mat-divider class="my-3" />
-
-    <div class="mt-2 flex items-center gap-x-3 justify-end">
-      <button
-        mat-raised-button
-        color="warn"
-        type="button"
-        (click)="dialogRef.close()"
-      >
-        Cancel
-      </button>
-      <button
-        mat-raised-button
-        [disabled]="!requestForm.valid"
-        class="submit-button"
-        (click)="onSubmit()"
-      >
-        Create Request
-      </button>
-    </div>
-  </form>
-</div>

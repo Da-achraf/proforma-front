@@ -31,26 +31,16 @@
     <input matInput formControlName="htsCode" name="htsCode" />
   </mat-form-field>
 
-  <!-- <mat-form-field appearance="fill" class="col-span-1">
-    <mat-label>Country of Origin</mat-label>
-    <input matInput formControlName="coo" name="coo" />
-  </mat-form-field> -->
-
   <mat-form-field appearance="fill" class="col-span-1">
     <mat-label>Description</mat-label>
     <input matInput formControlName="description" name="description" />
   </mat-form-field>
 
-  <mat-select-country
-    appearance="fill"
-    label="Select country"
-    class="col-span-1 !w-full"
-    formControlName="alpha2Code"
-    name="alpha2Code"
-    placeHolder="Select Country"
-  >
-  </mat-select-country>
-
+  <app-country-selector
+    class="col-span-1"
+    formControlName="coo"
+    [required]="true"
+  />
   <!-- Action buttons -->
   <div class="col-span-3 flex justify-end gap-2">
     <button
@@ -62,7 +52,7 @@
       <i class="fas fa-undo mr-2"></i> Reset
     </button>
     <button
-      [disabled]="!form?.valid || isFormSubmited()"
+      [disabled]="!form.valid || isFormSubmited()"
       mat-raised-button
       color="primary"
       type="submit"

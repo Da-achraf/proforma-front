@@ -8,8 +8,8 @@ describe('EditRequestTradcomplianceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [EditRequestTradcomplianceComponent]
-    })
+    imports: [EditRequestTradcomplianceComponent]
+})
     .compileComponents();
     
     fixture = TestBed.createComponent(EditRequestTradcomplianceComponent);

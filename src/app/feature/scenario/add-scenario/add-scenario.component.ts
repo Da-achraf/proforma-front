@@ -11,9 +11,21 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
+  ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
+import { MatDivider } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { forkJoin, switchMap } from 'rxjs';
 import { CreateItemDialogComponent } from '../../../components/create-item-dialog/create-item-dialog.component';
 import {
   MANDATORY_FOR_OPTIONS,
@@ -26,15 +38,26 @@ import { ApproverService } from '../../../services/approver.service';
 import { RequestItemService } from '../../../services/request-item.service';
 import { ScenarioItemConfigurationService } from '../../../services/scenario-item-configuration.service';
 import { ScenarioService } from '../../../services/scenario.service';
+import { LoadingDotsComponent } from '../../../shared/components/loading-dots/loading-dots.component';
 import { ToasterService } from '../../../shared/services/toaster.service';
-import { ScenarioStore } from '../scenario.store';
-import { forkJoin, switchMap } from 'rxjs';
 import { ScenarioUtilService } from '../scenario-util.service';
+import { ScenarioStore } from '../scenario.store';
 
 @Component({
   selector: 'app-add-scenario',
   templateUrl: './add-scenario.component.html',
   styleUrl: './add-scenario.component.css',
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInput,
+    MatDivider,
+    MatSelectModule,
+    MatIcon,
+    LoadingDotsComponent,
+    MatDialogModule,
+    MatButtonModule,
+  ],
 })
 export class AddScenarioComponent implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<AddScenarioComponent>);
@@ -47,7 +70,7 @@ export class AddScenarioComponent implements OnInit {
   protected readonly requestItemService = inject(RequestItemService);
   protected readonly approverService = Inject(ApproverService);
   protected readonly scenarioItemConfigurationService = inject(
-    ScenarioItemConfigurationService
+    ScenarioItemConfigurationService,
   );
   protected readonly scenarioUtilService = inject(ScenarioUtilService);
 
@@ -109,7 +132,7 @@ export class AddScenarioComponent implements OnInit {
       this.fb.group({
         role: ['', Validators.required],
         class: ['', Validators.required],
-      })
+      }),
     );
   }
 
@@ -134,7 +157,7 @@ export class AddScenarioComponent implements OnInit {
       this.fb.group({
         requestItemId: ['', Validators.required],
         isMandatory: [[MandatoryForEnum.None]],
-      })
+      }),
     );
   }
 
@@ -147,7 +170,7 @@ export class AddScenarioComponent implements OnInit {
   onItemFieldSelected(itemField: any, index: number) {
     const itemFieldId = itemField.value.requestItemId;
     const itemFieldsIds = this.items.controls.map(
-      (control) => control.value.requestItemId
+      (control) => control.value.requestItemId,
     );
     console.log(itemFieldsIds);
     if (itemFieldsIds.length !== new Set(itemFieldsIds).size) {
@@ -202,7 +225,7 @@ export class AddScenarioComponent implements OnInit {
                 mandatoryFor: item.isMandatory.join(','),
               };
               return this.scenarioItemConfigurationService.CreatescenarioItemsConfiguration(
-                itemConfig
+                itemConfig,
               );
             });
 
@@ -211,9 +234,9 @@ export class AddScenarioComponent implements OnInit {
               switchMap(() => {
                 // Fetch the scenario with all its items using the scenario ID
                 return this.scenarioService.getScenarioById(scenarioId);
-              })
+              }),
             );
-          })
+          }),
         )
         .subscribe({
           next: (scenario) => {
@@ -221,7 +244,7 @@ export class AddScenarioComponent implements OnInit {
           },
           error: (error) => {
             this.toastr.showError(
-              'Failed to create scenario or fetch scenario details'
+              'Failed to create scenario or fetch scenario details',
             );
           },
         });
@@ -238,7 +261,7 @@ export class AddScenarioComponent implements OnInit {
     this.scenarioUtilService.onMandatoryForChange(
       selectedValues,
       index,
-      isMandatoryControl
+      isMandatoryControl,
     );
   }
 

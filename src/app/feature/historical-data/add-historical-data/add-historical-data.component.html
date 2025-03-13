@@ -36,15 +36,12 @@
     <input matInput formControlName="description" name="description" />
   </mat-form-field>
 
-  <mat-select-country
-    appearance="fill"
-    label="Select country"
-    class="col-span-1 !w-full"
+  <app-country-selector
+    class="!col-span-1"
     formControlName="coo"
-    name="coo"
-    placeHolder="Select Country"
-  >
-  </mat-select-country>
+    placeholder="COO"
+    [required]="true"
+  />
 
   <!-- Action buttons -->
   <div class="col-span-3 flex justify-end gap-2">
@@ -57,7 +54,7 @@
       <i class="fas fa-undo mr-2"></i> Reset
     </button>
     <button
-      [disabled]="!form?.valid || isFormSubmited()"
+      [disabled]="form.invalid"
       mat-raised-button
       color="primary"
       type="submit"

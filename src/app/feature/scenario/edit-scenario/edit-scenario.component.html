@@ -11,55 +11,56 @@
     </div>
 
     <div formArrayName="items" class="items-container">
-      <div
-        class="item-box"
-        *ngFor="let item of items.controls; let i = index"
-        [formGroupName]="i"
-      >
-        <mat-form-field appearance="fill">
-          <mat-label>Request item</mat-label>
-          <mat-select
-            formControlName="requestItemId"
-            (selectionChange)="onItemFieldSelected(item, i)"
+      @for (item of items.controls; track item; let i = $index) {
+        <div
+          class="item-box"
+          [formGroupName]="i"
           >
-            <mat-option
-              *ngFor="let requestItem of myItems()"
-              [value]="requestItem.id_request_item"
-            >
-              {{ requestItem.nameItem }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Mandatory For</mat-label>
-          <mat-select
-            formControlName="isMandatory"
-            multiple
-            (selectionChange)="onMandatoryForChange($event.value, i)"
-          >
-            <mat-option
-              *ngFor="let option of mandatoryForOptions()"
-              [value]="option"
-            >
-              {{ option }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <div class="border-l border-gray-300">
-          <button
-            mat-icon-button
-            color="warn"
-            matTooltipPosition="above"
-            matTooltip="Remove this item"
-            (click)="subtractItem(i)"
-            type="button"
-          >
-            <mat-icon>remove_circle</mat-icon>
-          </button>
+          <mat-form-field appearance="fill">
+            <mat-label>Request item</mat-label>
+            <mat-select
+              formControlName="requestItemId"
+              (selectionChange)="onItemFieldSelected(item, i)"
+              >
+              @for (requestItem of myItems(); track requestItem) {
+                <mat-option
+                  [value]="requestItem.id_request_item"
+                  >
+                  {{ requestItem.nameItem }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Mandatory For</mat-label>
+            <mat-select
+              formControlName="isMandatory"
+              multiple
+              (selectionChange)="onMandatoryForChange($event.value, i)"
+              >
+              @for (option of mandatoryForOptions(); track option) {
+                <mat-option
+                  [value]="option"
+                  >
+                  {{ option }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <div class="border-l border-gray-300">
+            <button
+              mat-icon-button
+              color="warn"
+              matTooltipPosition="above"
+              matTooltip="Remove this item"
+              (click)="subtractItem(i)"
+              type="button"
+              >
+              <mat-icon>remove_circle</mat-icon>
+            </button>
+          </div>
         </div>
-      </div>
+      }
     </div>
 
     <mat-divider class="my-3" />
@@ -71,7 +72,7 @@
           type="button"
           class="btn btn-sec"
           (click)="createItem()"
-        >
+          >
           Create New Item
         </button>
         <button
@@ -81,7 +82,7 @@
           matTooltip="Add item"
           (click)="addItem()"
           type="button"
-        >
+          >
           <mat-icon>add_circle</mat-icon>
         </button>
       </div>
@@ -90,7 +91,7 @@
           type="submit"
           mat-raised-button
           [disabled]="!scenarioForm.valid"
-        >
+          >
           Save Changes
         </button>
         <button
@@ -98,7 +99,7 @@
           color="warn"
           type="button"
           (click)="dialogRef.close()"
-        >
+          >
           Cancel
         </button>
       </div>

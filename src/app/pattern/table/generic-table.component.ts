@@ -1,3 +1,4 @@
+import { DatePipe, NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,11 +11,17 @@ import {
   TemplateRef,
   viewChild,
 } from '@angular/core';
-import { Table } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { Table, TableModule } from 'primeng/table';
 import {
   PAGE_SIZE_OPTIONS,
   TABLE_PAGE_SIZE,
 } from '../../shared/components/tables/data';
+import { CreateButtonComponent } from '../../ui/components/create-button/create-button.component';
+import { NoDataFoundComponent } from '../../ui/components/no-data-found/no-data-found.component';
+import { UploadButtonComponent } from '../../ui/components/upload-button/upload-button.component';
+import { PaginatorComponent } from '../paginator/paginator.component';
+import { SearchBarComponent } from '../search/search-bar.component';
 import { TableColumn } from './table-types.interface';
 
 @Component({
@@ -22,6 +29,19 @@ import { TableColumn } from './table-types.interface';
   templateUrl: './generic-table.component.html',
   styleUrl: './generic-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    TableModule,
+    SearchBarComponent,
+    ButtonModule,
+    CreateButtonComponent,
+    UploadButtonComponent,
+    NgClass,
+    DatePipe,
+    TitleCasePipe,
+    NoDataFoundComponent,
+    PaginatorComponent,
+    NgTemplateOutlet,
+  ],
 })
 export class GenericTableComponent implements OnInit {
   templates = contentChildren<TemplateRef<any>>(TemplateRef);
@@ -86,7 +106,7 @@ export class GenericTableComponent implements OnInit {
 
   getTableDataTemplate(column: any): TemplateRef<any> | null {
     const template = this.templates().find(
-      (t: any) => t['_declarationTContainer'].localNames[0] === column.template
+      (t: any) => t['_declarationTContainer'].localNames[0] === column.template,
     );
     return template || null;
   }
@@ -94,7 +114,7 @@ export class GenericTableComponent implements OnInit {
   getFilterTemplate(column: any): TemplateRef<any> | null {
     const template = this.templates().find(
       (t: any) =>
-        t['_declarationTContainer'].localNames[0] === column.filterTemplate
+        t['_declarationTContainer'].localNames[0] === column.filterTemplate,
     );
     return template || null;
   }

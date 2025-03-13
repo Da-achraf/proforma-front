@@ -42,7 +42,7 @@ export const HistoricalDataStore = signalStore(
     }) => ({
       openCreateDataDialog: () => {
         const dialogRef = dialog.open(AddHistoricalDataComponent, {
-          width: '800px',
+          width: '900px',
         });
 
         dialogRef
@@ -60,7 +60,7 @@ export const HistoricalDataStore = signalStore(
         const historicalData = entityMap()[id];
 
         const dialogRef = dialog.open(UpdateHistoricalDataComponent, {
-          width: '800px',
+          width: '900px',
           data: { historicalData },
         });
 
@@ -91,7 +91,7 @@ export const HistoricalDataStore = signalStore(
 
       openUploadDataDialog: () => {
         const dialogRef = dialog.open(BulkUploadComponent, {
-          width: '800px',
+          width: '900px',
         });
 
         dialogRef.afterClosed().subscribe((file) => {

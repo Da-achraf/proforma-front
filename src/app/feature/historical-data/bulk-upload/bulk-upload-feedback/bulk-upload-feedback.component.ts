@@ -1,5 +1,12 @@
-import { Component, input, Input } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
+import { DecimalPipe } from '@angular/common';
+import { Component, input } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  PageEvent,
+} from '@angular/material/paginator';
+import { MatTable, MatTableModule } from '@angular/material/table';
 import {
   BulkUploadError,
   BulkUploadResult,
@@ -14,12 +21,20 @@ import {
         @apply w-full border-collapse border border-gray-300;
       }
       th {
-        @apply bg-gray-100 p-2 border border-gray-300 text-left;
+        @apply border border-gray-300 bg-gray-100 p-2 text-left;
       }
       td {
-        @apply p-2 border border-gray-300;
+        @apply border border-gray-300 p-2;
       }
     `,
+  ],
+  imports: [
+    DecimalPipe,
+    MatTable,
+    MatPaginator,
+    MatButtonModule,
+    MatTableModule,
+    MatPaginatorModule,
   ],
 })
 export class BulkUploadFeedbackComponent {

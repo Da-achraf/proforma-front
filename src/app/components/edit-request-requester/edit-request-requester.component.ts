@@ -9,13 +9,29 @@ import {
   signal,
   ViewChildren,
 } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
+  MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTooltip } from '@angular/material/tooltip';
 import _ from 'lodash';
 import { MessageService } from 'primeng/api';
 import {
@@ -24,15 +40,15 @@ import {
   distinctUntilChanged,
   filter,
   map,
-  Observable,
   of,
   shareReplay,
-  startWith,
   Subject,
   switchMap,
   takeUntil,
 } from 'rxjs';
+import { HistoricalDataService } from '../../feature/historical-data/hitorical-data.service';
 import { DeliveryAddress } from '../../models/delivery-address.model';
+import { HistoricalData } from '../../models/historical-data.model';
 import {
   ItemModel,
   userRoleToMandatoryForMapper,
@@ -52,22 +68,37 @@ import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
 import { UserStoreService } from '../../services/user-store.service';
+import { LoadingDotsComponent } from '../../shared/components/loading-dots/loading-dots.component';
+import { RequestStatusComponent } from '../../shared/components/request-status/request-status.component';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import { ToasterService } from '../../shared/services/toaster.service';
-import { CreateRequestDialogComponent } from '../create-request-dialog/create-request-dialog.component';
-import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-address-crud/delivery-address-crud.component';
-import { HistoricalData } from '../../models/historical-data.model';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { HistoricalDataService } from '../../feature/historical-data/hitorical-data.service';
 import {
   enhanceItemsWithCacheData,
   enhancementConfig,
 } from '../../shared/utils/historical-data.util';
+import { CreateRequestDialogComponent } from '../create-request-dialog/create-request-dialog.component';
+import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-address-crud/delivery-address-crud.component';
+import { MatInput } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-edit-request-requester',
   templateUrl: './edit-request-requester.component.html',
   styleUrl: './edit-request-requester.component.css',
+  imports: [
+    RequestStatusComponent,
+    ReactiveFormsModule,
+    MatIcon,
+    MatFormFieldModule,
+    MatInput,
+    MatTooltip,
+    MatSelectModule,
+    MatAutocompleteModule,
+    MatProgressSpinner,
+    LoadingDotsComponent,
+    MatDialogModule,
+    MatButtonModule,
+  ],
 })
 export class EditRequestRequesterComponent implements OnInit, OnDestroy {
   // Injected dependencies
@@ -95,7 +126,7 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
     catchError((err) => {
       this.onNoClick();
       throw err;
-    })
+    }),
   );
   requestSig = toSignal(this.request$);
 
@@ -107,7 +138,7 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
   patchedScenario = computed(() => this.requestSig()?.scenario);
 
   selectedScenario = computed(() =>
-    this.scenarios()?.find((s) => s.id_scenario === this.selectedScenarioId())
+    this.scenarios()?.find((s) => s.id_scenario === this.selectedScenarioId()),
   );
 
   formItems = computed(() => {
@@ -117,8 +148,8 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
     const scenarioItems: ItemModel[] = selectedScenario
       ? selectedScenario.items
       : patchedScenario
-      ? patchedScenario.items
-      : [];
+        ? patchedScenario.items
+        : [];
 
     const userRole = this.userRole();
 
@@ -131,7 +162,7 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
         ...item,
         isMandatory:
           item && mandatoryForUser
-            ? item.mandatoryFor?.includes(mandatoryForUser) ?? false
+            ? (item.mandatoryFor?.includes(mandatoryForUser) ?? false)
             : false,
       };
     });
@@ -150,7 +181,7 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
     private deliveryAddressService: DeliveryAddressService,
     private requestService: RequestService,
     private messageService: MessageService,
-    public dialogRef: MatDialogRef<CreateRequestDialogComponent>
+    public dialogRef: MatDialogRef<CreateRequestDialogComponent>,
   ) {
     effect(() => {
       const changed = this.selectedScenarioChanged();
@@ -180,7 +211,7 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
 
   filteredHistoricalDataOptions = signal<Record<number, HistoricalData[]>>({});
   filteredHistoricalDataOptionsCache = signal<Record<number, HistoricalData>>(
-    {}
+    {},
   );
   private materialInputSubject = new Subject<{
     value: string;
@@ -312,7 +343,7 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
           detail: 'Error loading shipping points',
         });
         console.error('Error loading shipping points:', error);
-      }
+      },
     );
   }
 
@@ -328,7 +359,7 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
           detail: 'Error loading delivery addresses',
         });
         console.error('Error loading delivery addresses:', error);
-      }
+      },
     );
   }
 
@@ -395,10 +426,10 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
               catchError((err) => {
                 this.toaster.showError('Failed to load material data');
                 return of({ result: [], index });
-              })
+              }),
             );
         }),
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
       )
       .subscribe(({ result, index }) => {
         this.isLoadingMaterial = false;
@@ -453,18 +484,18 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
       if (typeof scenarioId === 'number') {
         const shippingPointId =
           this.shipPoints.find(
-            (point) => point.id_ship === this.requestForm.value.shippingPoint
+            (point) => point.id_ship === this.requestForm.value.shippingPoint,
           )?.id_ship ?? 0;
         const deliveryAddressId =
           this.deliveryAddresses.find(
-            (address) => address.id === this.requestForm.value.deliveryAddress
+            (address) => address.id === this.requestForm.value.deliveryAddress,
           )?.id ?? 0;
 
         const existingItemsData = this.existingItemsData() ?? [];
         const enhancedItems = enhanceItemsWithCacheData(
           _.cloneDeep(this.requestForm.value.items),
           this.filteredHistoricalDataOptionsCache(),
-          enhancementConfig
+          enhancementConfig,
         );
 
         const requestData: UpdateRequestByRequester = {
@@ -478,7 +509,7 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
           currency: this.requestForm.value.currency,
           modeOfTransport: this.requestForm.value.modeOfTransport,
           itemsWithValuesJson: JSON.stringify(
-            mergeArrays(existingItemsData, enhancedItems)
+            mergeArrays(existingItemsData, enhancedItems),
           ),
         };
 
@@ -523,10 +554,10 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
 
   updateIncoterm(shippingPointId: number, deliveryAddressId: number): void {
     const shippingPoint = this.shipPoints.find(
-      (point) => point.id_ship === shippingPointId
+      (point) => point.id_ship === shippingPointId,
     );
     const deliveryAddress = this.deliveryAddresses.find(
-      (address) => address.id === deliveryAddressId
+      (address) => address.id === deliveryAddressId,
     );
 
     if (shippingPoint?.isTe && deliveryAddress?.isTe) {

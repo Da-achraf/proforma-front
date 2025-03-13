@@ -1,8 +1,9 @@
+import { NgClass } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
 
 @Component({
-  selector: 'ba-button',
-  template: `
+    selector: 'ba-button',
+    template: `
     <button
       type="submit"
       [type]="type()"
@@ -35,7 +36,7 @@ import { Component, computed, input, output } from '@angular/core';
       </div>
     </button>
   `,
-  standalone: false
+  imports: [NgClass]
 })
 export class BaButtonComponent {
   // Signal Inputs

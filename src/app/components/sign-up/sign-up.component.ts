@@ -1,18 +1,35 @@
+import { NgClass } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { pureRoles } from '../../models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
-import { UserService } from '../../services/user.service';
-import { pureRoles } from '../../models/user/user.model';
 import { ShippointService } from '../../services/shippoint.service';
+import { UserService } from '../../services/user.service';
+import { UserRoleForDisplayPipe } from '../../shared/pipes/user-role-for-display.pipe';
 
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
   styleUrls: ['./sign-up.component.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  imports: [
+    ReactiveFormsModule,
+    MultiSelectModule,
+    NgClass,
+    UserRoleForDisplayPipe,
+    RouterLink,
+  ],
 })
 export class SignUpComponent implements OnInit {
   Repeatpass: string = 'none';
@@ -25,8 +42,7 @@ export class SignUpComponent implements OnInit {
 
   passwordFieldType: string = 'password';
 
-
-  roles = pureRoles
+  roles = pureRoles;
 
   constructor(
     private authService: AuthService,
@@ -35,11 +51,11 @@ export class SignUpComponent implements OnInit {
     private plantService: PlantService,
     private shipPointService: ShippointService,
     private fb: FormBuilder,
-    private router: Router
-  ) { }
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
-    console.log('test: ', this.authService.baseServerUrl)
+    console.log('test: ', this.authService.baseServerUrl);
     this.loadPlants();
     this.loadShipPoints();
     this.loadDepartements();
@@ -51,14 +67,14 @@ export class SignUpComponent implements OnInit {
       (plants) => {
         this.plants = plants.map((plant) => ({
           label: plant.location,
-          value: plant.id_plant
+          value: plant.id_plant,
         }));
         console.log('Loaded plants:', this.plants); // Log loaded plants
       },
       (error) => {
         console.error('Erreur lors du chargement des plantes:', error);
         this.showError('Error when loading plants: ' + error);
-      }
+      },
     );
   }
 
@@ -67,14 +83,14 @@ export class SignUpComponent implements OnInit {
       (shipPoints) => {
         this.shipPoints = shipPoints.map((shipPoint) => ({
           label: shipPoint.shipPoint,
-          value: shipPoint.id_ship
+          value: shipPoint.id_ship,
         }));
         console.log('Loaded ship points:', this.shipPoints); // Log loaded plants
       },
       (error) => {
         console.error('Erreur lors du chargement des plantes:', error);
         this.showError('Error when loading plants: ' + error);
-      }
+      },
     );
   }
 
@@ -87,7 +103,7 @@ export class SignUpComponent implements OnInit {
       (error) => {
         console.error('Erreur lors du chargement des départements:', error);
         this.showError('Error when loading departments: ' + error);
-      }
+      },
     );
   }
 
@@ -105,7 +121,7 @@ export class SignUpComponent implements OnInit {
       nPlus1: [''],
       backup: ['', [Validators.required, Validators.email]],
       role: [''],
-      yourpassword: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
       plantId: [[]],
       shipId: [[], Validators.required],
     });
@@ -140,14 +156,20 @@ export class SignUpComponent implements OnInit {
   get backup(): FormControl {
     return this.SignUpForm.get('backup') as FormControl;
   }
-  get yourpassword(): FormControl {
-    return this.SignUpForm.get('yourpassword') as FormControl;
+  get password(): FormControl {
+    return this.SignUpForm.get('password') as FormControl;
   }
 
   SignUpSubmited() {
     if (this.SignUpForm.valid) {
-      const plantId = this.SignUpForm.get('plantId')!.value?.map((plant: { value: number }) => plant.value) ?? [];
-      const shipId = this.SignUpForm.get('shipId')!.value.map((ship: { value: number }) => ship.value) ?? [];
+      const plantId =
+        this.SignUpForm.get('plantId')!.value?.map(
+          (plant: { value: number }) => plant.value,
+        ) ?? [];
+      const shipId =
+        this.SignUpForm.get('shipId')!.value.map(
+          (ship: { value: number }) => ship.value,
+        ) ?? [];
 
       const userPayload = {
         // user: {
@@ -157,7 +179,7 @@ export class SignUpComponent implements OnInit {
         nPlus1: this.SignUpForm.value.nPlus1 || null,
         backUp: this.SignUpForm.value.backup,
         role: this.SignUpForm.value.role || null,
-        pwd: this.SignUpForm.get('yourpassword')!.value,
+        pwd: this.SignUpForm.get('password')!.value,
         departementId: Number(this.SignUpForm.value.departementId),
         plants: plantId,
         shipPoints: shipId,
@@ -177,13 +199,14 @@ export class SignUpComponent implements OnInit {
           console.error('Error creating user', error);
           this.displayMsg = 'Failed to create account: ' + error.message;
           this.isAccountCreated = false;
-        }
+        },
       });
     }
   }
 
   togglePasswordVisibility() {
-    this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
+    this.passwordFieldType =
+      this.passwordFieldType === 'password' ? 'text' : 'password';
   }
 
   resetFormAndNavigate() {

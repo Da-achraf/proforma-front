@@ -1,6 +1,6 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import {
   PAGE_SIZE_OPTIONS,
   TABLE_PAGE_SIZE,
@@ -20,6 +20,7 @@ import {
     >
     </mat-paginator>
   `,
+  imports: [MatPaginator]
 })
 export class PaginatorComponent {
   readonly total = input.required<number>();

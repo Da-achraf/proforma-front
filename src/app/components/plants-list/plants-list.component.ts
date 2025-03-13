@@ -1,7 +1,10 @@
+import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, Component, inject, model, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
+import { Dialog } from 'primeng/dialog';
 import {
   catchError,
   debounceTime,
@@ -23,12 +26,21 @@ import { Roles } from '../../models/user/user.model';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { ManagementTablesComponent } from '../../shared/components/management-tables/management-tables.component';
 import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
 
 @Component({
   selector: 'app-plants-list',
   templateUrl: './plants-list.component.html',
   styleUrl: './plants-list.component.css',
+  imports: [
+    ManagementTablesComponent,
+    Dialog,
+    FormsModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    AsyncPipe,
+  ],
 })
 export class PlantsListComponent implements AfterViewInit, OnInit {
   departmentService = inject(DepartementService);
@@ -84,7 +96,7 @@ export class PlantsListComponent implements AfterViewInit, OnInit {
       .afterClosed()
       .pipe(
         filter((result) => result),
-        switchMap((_) => this.plantService.deletePlant(id))
+        switchMap((_) => this.plantService.deletePlant(id)),
       )
       .subscribe({
         next: () => {
@@ -106,7 +118,7 @@ export class PlantsListComponent implements AfterViewInit, OnInit {
       },
       (error) => {
         console.error('Error updating plant:', error);
-      }
+      },
     );
   }
 
@@ -124,7 +136,7 @@ export class PlantsListComponent implements AfterViewInit, OnInit {
       },
       (error) => {
         console.error('Error registering plant:', error);
-      }
+      },
     );
   }
 
@@ -139,9 +151,9 @@ export class PlantsListComponent implements AfterViewInit, OnInit {
           catchError((err) => {
             console.error('Error fetching managers:', err);
             return of([]);
-          })
+          }),
         );
-      })
+      }),
     );
   }
 

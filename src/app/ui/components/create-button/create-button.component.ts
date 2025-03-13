@@ -1,10 +1,11 @@
 import { Component, input, output } from '@angular/core';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-create-button',
   templateUrl: 'create-button.component.html',
   styleUrl: 'create-button.component.css',
-  standalone: false
+  imports: [MatTooltip],
 })
 export class CreateButtonComponent {
   title = input('request', {

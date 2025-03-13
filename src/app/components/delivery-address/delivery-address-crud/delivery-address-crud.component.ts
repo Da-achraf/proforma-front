@@ -6,8 +6,17 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 import { finalize } from 'rxjs';
 import {
   DeliveryAddress,
@@ -20,6 +29,15 @@ import { ToasterService } from '../../../shared/services/toaster.service';
   selector: 'app-delivery-address-crud',
   templateUrl: './delivery-address-crud.component.html',
   styleUrl: './delivery-address-crud.component.css',
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatFormFieldModule,
+    MatCheckboxModule,
+    MatInput,
+    MatDialogModule,
+    MatButtonModule,
+  ],
 })
 export class DeliveryAddressCrudComponent implements OnInit {
   // Injected dependencies
@@ -36,7 +54,7 @@ export class DeliveryAddressCrudComponent implements OnInit {
   isFormSubmited = signal(false);
   isUpdateMode = computed(() => this.data()?.isUpdateMode);
   deliveryAddress = computed<DeliveryAddress | undefined>(
-    () => this.data()?.deliveryAddress
+    () => this.data()?.deliveryAddress,
   );
 
   formHeaderText = computed(() => {
@@ -52,7 +70,7 @@ export class DeliveryAddressCrudComponent implements OnInit {
     this.patchDeliveryAddressFormValue(deliveryAddress);
   });
 
-  makeFieldsMandatory = computed(() => this.data()?.makeFieldsMandatory)
+  makeFieldsMandatory = computed(() => this.data()?.makeFieldsMandatory);
 
   // Component hooks
   ngOnInit(): void {
@@ -72,7 +90,7 @@ export class DeliveryAddressCrudComponent implements OnInit {
         vat: [''],
         isTe: [false],
       });
-      return
+      return;
     }
 
     this.form = this.fb.group({
@@ -101,9 +119,7 @@ export class DeliveryAddressCrudComponent implements OnInit {
         .pipe(finalize(() => this.isFormSubmited.set(false)))
         .subscribe({
           next: (address: DeliveryAddress) => {
-            this.toastr.showSuccess(
-              'Delivery address added successfully'
-            );
+            this.toastr.showSuccess('Delivery address added successfully');
             this.dialogRef.close(address.id);
             this.resetForm();
           },

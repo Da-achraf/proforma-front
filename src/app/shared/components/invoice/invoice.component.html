@@ -1,114 +1,116 @@
 <div class="relative">
   <!-- <button class="w-fit bg-orange-400 rounded-md px-3 py-2 text-gray-50 transition-all duration-200 hover:bg-orange-500 shadow-sm" (click)="downloadInvoice()"> -->
-    <button class="absolute translate-x-[-50%] top-[90px] left-[50%] z-20 bg-orange-400 rounded-md px-3 py-2 text-gray-50 transition-all duration-200 hover:bg-orange-500 shadow-sm" (click)="downloadInvoice()">
+  <button class="absolute translate-x-[-50%] top-[90px] left-[50%] z-20 bg-orange-400 rounded-md px-3 py-2 text-gray-50 transition-all duration-200 hover:bg-orange-500 shadow-sm" (click)="downloadInvoice()">
     <span>Download</span>
     <i class="pi pi-cloud-download ml-2"></i>
   </button>
   @if (data.request; as request) {
-  <div class="invoice blur-sm" #invoiceElement>
-    <div class="mb-1 class flex items-center justify-between">
-      <div class="flex flex-col">
-        <img width="200" height="200" src="assets/te-logo.png" alt="">
-      </div>
-      <div class="flex gap-x-3 items-center">
-        <div [ngClass]="borderStyle" class="flex flex-col items-start px-4">
-          <span>Invoice date</span>
-          <span class="font-bold">{{invoiceDate | date }}</span>
+    <div class="invoice blur-sm" #invoiceElement>
+      <div class="mb-1 class flex items-center justify-between">
+        <div class="flex flex-col">
+          <img width="200" height="200" src="assets/te-logo.png" alt="">
         </div>
-        <div [ngClass]="borderStyle" class="flex flex-col items-start px-4">
-          <span>Shipping No.</span>
-          <span class="font-bold">
-            {{ request.invoicesTypes == InvoiceTypeEnum.PROFORMA ? 'P - ' : '' }}
-            {{ request.requestNumber }}
-          </span>
-        </div>
-      </div>
-    </div>
-    <h3>Invoice</h3>
-
-    <div [ngClass]="borderStyle" class="mb-1 flex items-stretch">
-      <div class="flex-1 p-2 flex flex-col gap-y-2">
-        <span class="font-semibold">Delivery address</span>
-        <span class="font-normal">{{ request.deliveryAddress.fullAddress }}</span>
-      </div>
-      <div class="flex-1 p-2 flex flex-col gap-y-2 border-l-[3px] border-gray-600">
-        <span class="font-semibold">Invoice address</span>
-        <span class="font-normal">{{ request.invoiceAddress }}</span>
-      </div>
-    </div>
-
-    <div [ngClass]="borderStyle" class="mb-2 p-2 flex flex-col">
-      <span><span class="font-semibold text-sm">Mode of transport: </span> {{ request.modeOfTransport ?? '---' }}</span>
-      <span><span class="font-semibold text-sm">Incoterms: </span> {{ request.incoterm ?? '---' }}</span>
-      <span><span class="font-semibold text-sm">Shipped via: </span> {{ request.shippedVia ?? '---' }}</span>
-    </div>
-    <table class="border-collapse border-2 border-gray-600 table rounded-sm">
-      <thead>
-        <tr class="border-b-2 border-gray-600">
-          <th class="border-r-2 border-gray-600 p-2">Item</th>
-          <th class="border-r-2 border-gray-600 p-2">Quantity</th>
-          <th class="border-r-2 border-gray-600 p-2">Unit</th>
-          <th class="border-r-2 border-gray-600 p-2">Description</th>
-          <th class="border-r-2 border-gray-600 p-2">Unit Price</th>
-          <th class="border-r-2 border-gray-600 p-2">Net Weight</th>
-          <th class="border-r-2 border-gray-600 p-2">Qte. delivered</th>
-          <th class="p-2">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of values(); let i = index" class="border-b-2 border-gray-600">
-          <td class="border-r-2 border-gray-600 p-2">{{getFieldValue(item, 'Material')}}</td>
-          <td class="border-r-2 border-gray-600 p-2">{{ getFieldValue(item, 'Quantity') }}</td>
-          <td class="border-r-2 border-gray-600 p-2">{{ getFieldValue(item, 'Unit') }}</td>
-          <td class="border-r-2 border-gray-600 p-2">
-            <div class="flex flex-col">
-              <span>{{ getFieldValue(item, 'Description') }}</span>
-              <span>Country of origin: <span class="text-xs font-bold">{{  getFieldValue(item, 'COO') }}</span></span>
-              <span>HTS Code <span class="text-xs font-bold">{{  getFieldValue(item, 'HTS Code') }}</span></span>
-            </div>
-          </td>
-          <td class="border-r-2 border-gray-600 p-2">{{ getFieldValue(item, 'Unit Value') }}</td>
-          <td class="border-r-2 border-gray-600 p-2">{{ getWeight(item, 'Net Weight') }} KG</td>
-          <td class="border-r-2 border-gray-600 p-2">{{ getFieldValue(item, 'Quantity') }}</td>
-          <td class="p-2">
-            <span>
-              {{ calculateAmount(item) | number:'1.2-2' | currency : request.currency }} 
-              <span class="text-xs font-semibold"> ({{ getFieldValue(item, StandardFieldEnum.QUANTITY) }}x{{getFieldValue(item, StandardFieldEnum.UNIT_VALUE)}}) </span>
+        <div class="flex gap-x-3 items-center">
+          <div [ngClass]="borderStyle" class="flex flex-col items-start px-4">
+            <span>Invoice date</span>
+            <span class="font-bold">{{invoiceDate | date }}</span>
+          </div>
+          <div [ngClass]="borderStyle" class="flex flex-col items-start px-4">
+            <span>Shipping No.</span>
+            <span class="font-bold">
+              {{ request.invoicesTypes == InvoiceTypeEnum.PROFORMA ? 'P - ' : '' }}
+              {{ request.requestNumber }}
             </span>
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr class="">
-          <td colspan="7" class="total-label p-2">Total</td>
-          <td class="bg-gray-300 p-2">{{ calculateTotal() | number:'1.2-2' | currency : request.currency }}</td>
-        </tr>
-      </tfoot>
-    </table>
-  
-    <div [ngClass]="borderStyle" class="footer flex flex-col p-2">
-      <span><span class="font-semibold text-sm">Gross Weight:</span> {{ grossWeight() || '---' }} KG</span>
-      <span><span class="font-semibold text-sm">Net Weight:</span> {{ netWeight() || '---' }} KG </span>
-      <span><span class="font-semibold text-sm">Number of parcels:</span> {{ request.numberOfBoxes }} </span>
-      <span><span class="font-semibold text-sm">Dimension:</span> {{ request.dimension }} </span>
-      <div class="text-center mt-3">
-        <p class="vat-note text-sm font-semibold">VAT: Value for customs purpose only</p>
-        <p class="terms-note text-xs font-semibold">Our General Terms and Conditions of Business will apply. They are available on request and can also be found under www.te.com/aboutus/tandc.asp</p>
+          </div>
+        </div>
       </div>
-    </div>
-    
+      <h3>Invoice</h3>
+
+      <div [ngClass]="borderStyle" class="mb-1 flex items-stretch">
+        <div class="flex-1 p-2 flex flex-col gap-y-2">
+          <span class="font-semibold">Delivery address</span>
+          <span class="font-normal">{{ request.deliveryAddress.fullAddress }}</span>
+        </div>
+        <div class="flex-1 p-2 flex flex-col gap-y-2 border-l-[3px] border-gray-600">
+          <span class="font-semibold">Invoice address</span>
+          <span class="font-normal">{{ request.invoiceAddress }}</span>
+        </div>
+      </div>
+
+      <div [ngClass]="borderStyle" class="mb-2 p-2 flex flex-col">
+        <span><span class="font-semibold text-sm">Mode of transport: </span> {{ request.modeOfTransport ?? '---' }}</span>
+        <span><span class="font-semibold text-sm">Incoterms: </span> {{ request.incoterm ?? '---' }}</span>
+        <span><span class="font-semibold text-sm">Shipped via: </span> {{ request.shippedVia ?? '---' }}</span>
+      </div>
+      <table class="border-collapse border-2 border-gray-600 table rounded-sm">
+        <thead>
+          <tr class="border-b-2 border-gray-600">
+            <th class="border-r-2 border-gray-600 p-2">Item</th>
+            <th class="border-r-2 border-gray-600 p-2">Quantity</th>
+            <th class="border-r-2 border-gray-600 p-2">Unit</th>
+            <th class="border-r-2 border-gray-600 p-2">Description</th>
+            <th class="border-r-2 border-gray-600 p-2">Unit Price</th>
+            <th class="border-r-2 border-gray-600 p-2">Net Weight</th>
+            <th class="border-r-2 border-gray-600 p-2">Qte. delivered</th>
+            <th class="p-2">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of values(); track item; let i = $index) {
+            <tr class="border-b-2 border-gray-600">
+              <td class="border-r-2 border-gray-600 p-2">{{getFieldValue(item, 'Material')}}</td>
+              <td class="border-r-2 border-gray-600 p-2">{{ getFieldValue(item, 'Quantity') }}</td>
+              <td class="border-r-2 border-gray-600 p-2">{{ getFieldValue(item, 'Unit') }}</td>
+              <td class="border-r-2 border-gray-600 p-2">
+                <div class="flex flex-col">
+                  <span>{{ getFieldValue(item, 'Description') }}</span>
+                  <span>Country of origin: <span class="text-xs font-bold">{{  getFieldValue(item, 'COO') }}</span></span>
+                  <span>HTS Code <span class="text-xs font-bold">{{  getFieldValue(item, 'HTS Code') }}</span></span>
+                </div>
+              </td>
+              <td class="border-r-2 border-gray-600 p-2">{{ getFieldValue(item, 'Unit Value') }}</td>
+              <td class="border-r-2 border-gray-600 p-2">{{ getWeight(item, 'Net Weight') }} KG</td>
+              <td class="border-r-2 border-gray-600 p-2">{{ getFieldValue(item, 'Quantity') }}</td>
+              <td class="p-2">
+                <span>
+                  {{ calculateAmount(item) | number:'1.2-2' | currency : request.currency }}
+                  <span class="text-xs font-semibold"> ({{ getFieldValue(item, StandardFieldEnum.QUANTITY) }}x{{getFieldValue(item, StandardFieldEnum.UNIT_VALUE)}}) </span>
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr class="">
+            <td colspan="7" class="total-label p-2">Total</td>
+            <td class="bg-gray-300 p-2">{{ calculateTotal() | number:'1.2-2' | currency : request.currency }}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div [ngClass]="borderStyle" class="footer flex flex-col p-2">
+        <span><span class="font-semibold text-sm">Gross Weight:</span> {{ grossWeight() || '---' }} KG</span>
+        <span><span class="font-semibold text-sm">Net Weight:</span> {{ netWeight() || '---' }} KG </span>
+        <span><span class="font-semibold text-sm">Number of parcels:</span> {{ request.numberOfBoxes }} </span>
+        <span><span class="font-semibold text-sm">Dimension:</span> {{ request.dimension }} </span>
+        <div class="text-center mt-3">
+          <p class="vat-note text-sm font-semibold">VAT: Value for customs purpose only</p>
+          <p class="terms-note text-xs font-semibold">Our General Terms and Conditions of Business will apply. They are available on request and can also be found under www.te.com/aboutus/tandc.asp</p>
+        </div>
+      </div>
 
 
-    <div class="mt-2 flex justify-between items-stretch">
-      <div class="flex-1 p-2 flex flex-col gap-y-2 ">
-        <span class="font-semibold">Exporter</span>
-        <span class="font-normal">{{ request.exporterAddress }}</span>
-      </div>
-      <div class="flex-1 p-2 flex flex-col gap-y-2">
-        <span class="font-semibold">Shipped from</span>
-        <span class="font-normal">{{ request.shipPoint.fullAddress }}</span>
+
+      <div class="mt-2 flex justify-between items-stretch">
+        <div class="flex-1 p-2 flex flex-col gap-y-2 ">
+          <span class="font-semibold">Exporter</span>
+          <span class="font-normal">{{ request.exporterAddress }}</span>
+        </div>
+        <div class="flex-1 p-2 flex flex-col gap-y-2">
+          <span class="font-semibold">Shipped from</span>
+          <span class="font-normal">{{ request.shipPoint.fullAddress }}</span>
+        </div>
       </div>
     </div>
-  </div>
-}
+  }
 </div>

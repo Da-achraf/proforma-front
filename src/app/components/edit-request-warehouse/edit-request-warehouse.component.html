@@ -1,14 +1,14 @@
 <div class="flex items-center justify-between p-4">
   <span class="text-xl font-semibold">
     Edit Request
-    <span class="text-gray-500 text-sm">(Warehouse)</span> [<span
-      class="text-cyan-600 font-semibold font-serif"
+    <span class="text-sm text-gray-500">(Warehouse)</span> [<span
+      class="font-serif font-semibold text-cyan-600"
       >{{ data.requestNumber }}</span
     >]
   </span>
 
   @if (requestSig()?.status; as status) {
-  <app-request-status [status]="status" />
+    <app-request-status [status]="status" />
   }
 </div>
 
@@ -40,18 +40,18 @@
         <input matInput formControlName="modeOfTransport" type="text" />
       </mat-form-field>
 
-      @if (modeOfTransport() === 'By Air') {
-      <mat-form-field appearance="fill">
-        <mat-label>DHL Account</mat-label>
-        <input matInput formControlName="dhlAccount" readonly />
-      </mat-form-field>
+      @if (modeOfTransport() === "By Air") {
+        <mat-form-field appearance="fill">
+          <mat-label>DHL Account</mat-label>
+          <input matInput formControlName="dhlAccount" readonly />
+        </mat-form-field>
       }
 
       <mat-form-field>
         <mat-label>Currency</mat-label>
         <mat-select formControlName="currency" name="currency">
           @for (option of currencyCodes(); track option) {
-          <mat-option [value]="option">{{ option }}</mat-option>
+            <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -67,10 +67,15 @@
       </mat-form-field>
 
       @if (showTrackingNoField()) {
-      <mat-form-field appearance="fill" class="small-form-field">
-        <mat-label>Tracking Number</mat-label>
-        <input matInput required formControlName="trackingNumber" type="text" />
-      </mat-form-field>
+        <mat-form-field appearance="fill" class="small-form-field">
+          <mat-label>Tracking Number</mat-label>
+          <input
+            matInput
+            required
+            formControlName="trackingNumber"
+            type="text"
+          />
+        </mat-form-field>
       }
 
       <mat-form-field appearance="fill">
@@ -78,56 +83,83 @@
         <input matInput formControlName="dimension" />
       </mat-form-field>
 
-      <app-parcels />
+      <mat-form-field appearance="fill">
+        <mat-label>Boxes</mat-label>
+        <input
+          matInput
+          required
+          type="number"
+          min="0"
+          valueAsNumber="0"
+          formControlName="boxes"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Pallets</mat-label>
+        <input
+          matInput
+          required
+          type="number"
+          min="0"
+          valueAsNumber="0"
+          formControlName="pallets"
+        />
+      </mat-form-field>
+
     </div>
 
     <!-- Items Array -->
     @if (items.controls.length !== 0) {
-    <div class="border border-gray-200 rounded-md overflow-hidden">
-      <div class="bg-orange-200 p-2 mb-2 text-center">
-        <span class="font-mono text-md w-fit text-orange-600">
-          Number Of Items
-          <span class="font-bold text-xs text-gray-800">
-            ({{ items.length }})
+      <div class="overflow-hidden rounded-md border border-gray-200">
+        <div class="mb-2 bg-orange-200 p-2 text-center">
+          <span class="text-md w-fit font-mono text-orange-600">
+            Number Of Items
+            <span class="text-xs font-bold text-gray-800">
+              ({{ items.length }})
+            </span>
           </span>
-        </span>
-      </div>
-      @defer {
-      <div class="p-2" formArrayName="items">
-        @for (itemGroup of items.controls; track itemGroup; let i = $index) {
-        <div
-          [formGroupName]="i"
-          class="mb-4 p-2 border border-gray-300 rounded shadow-md"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <span class="font-bold">Item {{ i + 1 }}</span>
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            @for (field of formItems() || []; track field) {
-            <div [formGroupName]="field.nameItem">
-              <mat-form-field appearance="fill" class="w-full mb-2">
-                <mat-label>{{ field.nameItem }}</mat-label>
-                <input
-                  matInput
-                  formControlName="value"
-                  [type]="field.type"
-                  [required]="field.isMandatory"
-                  [readonly]="field.readOnly"
-                />
-              </mat-form-field>
-            </div>
+        </div>
+        @defer {
+          <div class="p-2" formArrayName="items">
+            @for (
+              itemGroup of items.controls;
+              track itemGroup;
+              let i = $index
+            ) {
+              <div
+                [formGroupName]="i"
+                class="mb-4 rounded border border-gray-300 p-2 shadow-md"
+              >
+                <div class="mb-2 flex items-center justify-between">
+                  <span class="font-bold">Item {{ i + 1 }}</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  @for (field of formItems() || []; track field) {
+                    <div [formGroupName]="field.nameItem">
+                      <mat-form-field appearance="fill" class="mb-2 w-full">
+                        <mat-label>{{ field.nameItem }}</mat-label>
+                        <input
+                          matInput
+                          formControlName="value"
+                          [type]="field.type"
+                          [required]="field.isMandatory"
+                          [readonly]="field.readOnly"
+                        />
+                      </mat-form-field>
+                    </div>
+                  }
+                </div>
+              </div>
             }
           </div>
-        </div>
+        } @placeholder (minimum 700ms) {
+          <loading-dots [diameter]="25" />
         }
       </div>
-      } @placeholder (minimum 700ms) {
-      <loading-dots [diameter]="25" />
-      }
-    </div>
     }
 
-    <div class="mt-4 flex items-center gap-x-3 justify-end">
+    <div class="mt-4 flex items-center justify-end gap-x-3">
       <button
         mat-raised-button
         color="warn"

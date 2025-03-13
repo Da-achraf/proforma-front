@@ -1,18 +1,18 @@
-import { Component, computed, effect, ElementRef, inject, input, OnInit, signal, ViewChild } from '@angular/core';
+import { CurrencyPipe, DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import { Component, computed, effect, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
-import { RequestService } from '../../../services/request.service';
-import { InvoiceTypeEnum, StandardFieldEnum } from '../../../models/request.model';
-import { PdfService } from '../../services/pdf.service';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, of } from 'rxjs';
-
+import { InvoiceTypeEnum, StandardFieldEnum } from '../../../models/request.model';
+import { RequestService } from '../../../services/request.service';
 
 @Component({
   selector: 'app-invoice',
   templateUrl: './invoice.component.html',
-  styleUrl: './invoice.component.css'
+  styleUrl: './invoice.component.css',
+  imports: [NgClass, DatePipe, DecimalPipe, CurrencyPipe]
 })
 export class InvoiceComponent implements OnInit {
 

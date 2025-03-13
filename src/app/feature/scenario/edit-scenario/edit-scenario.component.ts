@@ -4,13 +4,20 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
+  ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
+import { MatDivider } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { forkJoin, switchMap } from 'rxjs';
 import { CreateItemDialogComponent } from '../../../components/create-item-dialog/create-item-dialog.component';
 import {
@@ -21,6 +28,7 @@ import {
 import { RequestItemService } from '../../../services/request-item.service';
 import { ScenarioItemConfigurationService } from '../../../services/scenario-item-configuration.service';
 import { ScenarioService } from '../../../services/scenario.service';
+import { LoadingDotsComponent } from '../../../shared/components/loading-dots/loading-dots.component';
 import { ToasterService } from '../../../shared/services/toaster.service';
 import { ScenarioUtilService } from '../scenario-util.service';
 
@@ -28,6 +36,16 @@ import { ScenarioUtilService } from '../scenario-util.service';
   selector: 'app-edit-scenario',
   templateUrl: 'edit-scenario.component.html',
   styleUrl: 'edit-scenario.component.css',
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInput,
+    MatDivider,
+    MatSelectModule,
+    MatButtonModule,
+    MatIcon,
+    LoadingDotsComponent,
+  ],
 })
 export class EditScenarioComponent implements OnInit {
   protected readonly dialogRef = inject(MatDialogRef<EditScenarioComponent>);
@@ -38,7 +56,7 @@ export class EditScenarioComponent implements OnInit {
   protected readonly scenarioService = inject(ScenarioService);
   protected readonly requestItemService = inject(RequestItemService);
   protected readonly scenarioItemConfigurationService = inject(
-    ScenarioItemConfigurationService
+    ScenarioItemConfigurationService,
   );
   protected readonly scenarioUtilService = inject(ScenarioUtilService);
 
@@ -120,7 +138,7 @@ export class EditScenarioComponent implements OnInit {
       this.fb.group({
         requestItemId: ['', Validators.required],
         isMandatory: [[MandatoryForEnum.None]],
-      })
+      }),
     );
   }
 
@@ -131,7 +149,7 @@ export class EditScenarioComponent implements OnInit {
   onItemFieldSelected(item: any, index: number) {
     const itemFieldId = item.value.requestItemId;
     const itemFieldsIds = this.items.controls.map(
-      (control) => control.value.requestItemId
+      (control) => control.value.requestItemId,
     );
 
     if (itemFieldsIds.length !== new Set(itemFieldsIds).size) {
@@ -147,7 +165,7 @@ export class EditScenarioComponent implements OnInit {
     this.scenarioUtilService.onMandatoryForChange(
       selectedValues,
       index,
-      isMandatoryControl
+      isMandatoryControl,
     );
   }
 
@@ -175,7 +193,7 @@ export class EditScenarioComponent implements OnInit {
               };
 
               return this.scenarioItemConfigurationService.CreatescenarioItemsConfiguration(
-                itemConfig
+                itemConfig,
               );
             });
 
@@ -184,9 +202,9 @@ export class EditScenarioComponent implements OnInit {
               switchMap(() => {
                 // Fetch the updated scenario
                 return this.scenarioService.getScenarioById(this.scenarioId);
-              })
+              }),
             );
-          })
+          }),
         )
         .subscribe({
           next: (updatedScenario) => {

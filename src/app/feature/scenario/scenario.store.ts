@@ -31,9 +31,15 @@ import { EditScenarioComponent } from './edit-scenario/edit-scenario.component';
 
 type ScenariosState = {
   loading: boolean;
+  page: number;
+  pageSize: number;
+  trigger: number;
 };
 const initialState: ScenariosState = {
   loading: false,
+  page: 0,
+  pageSize: 0,
+  trigger: 0,
 };
 
 /**
@@ -57,8 +63,16 @@ export const ScenarioStore = signalStore(
     destroyRef: inject(DestroyRef),
   })),
 
-  withComputed(({ entities }) => ({
+  withComputed(({ entities, trigger, page, pageSize }) => ({
     total: computed(() => entities().length),
+    scenarios: computed(() => {
+      trigger();
+      // Calculate the starting and ending indices based on page and pageSize
+      const start = (page() - 1) * pageSize();
+      const end = start + pageSize();
+      // Return a slice of the entities array for the current page
+      return entities().slice(start, end);
+    }),
   })),
 
   withMethods(({ scenarioService, toastr, ...store }) => ({
@@ -84,10 +98,10 @@ export const ScenarioStore = signalStore(
               next: () => patchState(store, removeEntity(id)),
               error: console.log,
               finalize: () => patchState(store, { loading: false }),
-            })
-          )
-        )
-      )
+            }),
+          ),
+        ),
+      ),
     ),
   })),
 
@@ -116,10 +130,10 @@ export const ScenarioStore = signalStore(
                   patchState(store, setAllEntities(scenarios, scenarioConfig)),
                 error: console.log,
                 finalize: () => patchState(store, { loading: false }),
-              })
-            )
-          )
-        )
+              }),
+            ),
+          ),
+        ),
       ),
 
       openCreateScenarioDialog: () => {
@@ -168,9 +182,17 @@ export const ScenarioStore = signalStore(
             },
           });
       },
-    })
+
+      setPage: (page: number) => {
+        patchState(store, { page, trigger: store.trigger() + 1 });
+      },
+
+      setPageSize: (pageSize: number) => {
+        patchState(store, { pageSize, trigger: store.trigger() + 1 });
+      },
+    }),
   ),
   withHooks(({ loadScenarios }) => ({
     onInit: () => loadScenarios(),
-  }))
+  })),
 );

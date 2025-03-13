@@ -16,14 +16,23 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
+  ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatAutocomplete } from '@angular/material/autocomplete';
+import {
+  MatAutocomplete,
+  MatAutocompleteModule,
+} from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
+  MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import _ from 'lodash';
 import { MessageService } from 'primeng/api'; // Import MessageService
@@ -48,6 +57,8 @@ import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { UserStoreService } from '../../services/user-store.service';
+import { LoadingDotsComponent } from '../../shared/components/loading-dots/loading-dots.component';
+import { RequestStatusComponent } from '../../shared/components/request-status/request-status.component';
 import { mergeArrays } from '../../shared/components/tables/helpers';
 import { notZeroValidator } from '../../shared/helpers/form-validator.helper';
 
@@ -55,6 +66,17 @@ import { notZeroValidator } from '../../shared/helpers/form-validator.helper';
   selector: 'app-edit-request-warehouse',
   templateUrl: './edit-request-warehouse.component.html',
   styleUrls: ['./edit-request-warehouse.component.css'],
+  imports: [
+    RequestStatusComponent,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInput,
+    MatSelectModule,
+    MatAutocompleteModule,
+    LoadingDotsComponent,
+    MatDialogModule,
+    MatButtonModule,
+  ],
 })
 export class EditRequestWarehouseComponent implements OnInit {
   requestForm: FormGroup = this.fb.group({
@@ -65,6 +87,8 @@ export class EditRequestWarehouseComponent implements OnInit {
     dhlAccount: [{ value: '', disabled: true }],
     grossWeight: ['', [Validators.required, notZeroValidator()]],
     dimension: ['', Validators.required],
+    boxes: [null as null | number, Validators.required],
+    pallets: [null as null | number, Validators.required],
     currency: [{ value: '', disabled: true }],
     modeOfTransport: [{ value: '', disabled: true }],
     shippedVia: [{ value: '', disabled: true }],
@@ -97,7 +121,7 @@ export class EditRequestWarehouseComponent implements OnInit {
     catchError((err) => {
       this.onNoClick();
       throw err;
-    })
+    }),
   );
 
   requestSig = toSignal(this.request$);
@@ -126,7 +150,7 @@ export class EditRequestWarehouseComponent implements OnInit {
   scenearioIdSubject = new BehaviorSubject<number>(0);
   scenarioAttributes$ = this.scenearioIdSubject.pipe(
     filter((id: number) => id != 0),
-    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
+    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id)),
   );
   scenarioAttributes = toSignal(this.scenarioAttributes$);
 
@@ -150,7 +174,7 @@ export class EditRequestWarehouseComponent implements OnInit {
 
     return selectedScenarioItems.map((item) => {
       const matchingAttribute = scenarioAttributes.find(
-        (attr) => attr.attributeName === item.nameItem
+        (attr) => attr.attributeName === item.nameItem,
       );
       return {
         ...item,
@@ -173,7 +197,7 @@ export class EditRequestWarehouseComponent implements OnInit {
     public dialogRef: MatDialogRef<EditRequestWarehouseComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { requestNumber: number },
     private dialog: MatDialog,
-    private messageService: MessageService // Inject MessageService
+    private messageService: MessageService, // Inject MessageService
   ) {
     effect(() => {
       const formItems = this.formItems();
@@ -227,7 +251,7 @@ export class EditRequestWarehouseComponent implements OnInit {
           detail: 'Error fetching request data',
         });
         console.error('Error fetching request data:', error);
-      }
+      },
     );
 
     this.requestForm.valueChanges.subscribe({
@@ -315,7 +339,7 @@ export class EditRequestWarehouseComponent implements OnInit {
         grossWeight: this.requestForm.get('grossWeight')?.value,
         dimension: this.requestForm.get('dimension')?.value,
         itemsWithValuesJson: JSON.stringify(
-          mergeArrays(existingItemsData, itemsCopy)
+          mergeArrays(existingItemsData, itemsCopy),
         ),
         userId: userId,
         boxes: this.requestForm.get('boxes')?.value,
@@ -348,7 +372,7 @@ export class EditRequestWarehouseComponent implements OnInit {
               detail: 'Error updating request',
             });
             console.error('Error updating request:', error);
-          }
+          },
         );
     } else {
       this.messageService.add({
@@ -368,14 +392,14 @@ export class EditRequestWarehouseComponent implements OnInit {
     const filterValue = value.toLowerCase();
 
     return this.currencyCodes().filter((option) =>
-      option.toLowerCase().includes(filterValue)
+      option.toLowerCase().includes(filterValue),
     );
   }
 
   onCurrencyChange(text: string) {
     this.filteredOptions = of(text).pipe(
       startWith(''),
-      map((value: string) => this._filter(value || ''))
+      map((value: string) => this._filter(value || '')),
     );
   }
 
@@ -386,7 +410,7 @@ export class EditRequestWarehouseComponent implements OnInit {
   filter(): void {
     const filterValue = this.input?.nativeElement.value.toLowerCase();
     this.filteredOptions = of(
-      this.currencyCodes().filter((o) => o.toLowerCase().includes(filterValue))
+      this.currencyCodes().filter((o) => o.toLowerCase().includes(filterValue)),
     );
   }
 }

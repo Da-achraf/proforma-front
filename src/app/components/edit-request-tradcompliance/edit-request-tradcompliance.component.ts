@@ -7,13 +7,25 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
+  MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
-import _, { get } from 'lodash';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import _ from 'lodash';
 import { MessageService } from 'primeng/api';
 import {
   BehaviorSubject,
@@ -35,14 +47,30 @@ import { CURRENCY_CODES, RequestModel } from '../../models/request.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
-import { mergeArrays } from '../../shared/components/tables/helpers';
-import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
 import { UserStoreService } from '../../services/user-store.service';
+import { LoadingDotsComponent } from '../../shared/components/loading-dots/loading-dots.component';
+import { RequestStatusComponent } from '../../shared/components/request-status/request-status.component';
+import { mergeArrays } from '../../shared/components/tables/helpers';
+import { CountrySelectorComponent } from '../../ui/components/country-select/country-select.component';
+import { RejectCommentDialogComponent } from '../reject-comment-dialog/reject-comment-dialog.component';
 
 @Component({
   selector: 'app-edit-request-tradcompliance',
   templateUrl: './edit-request-tradcompliance.component.html',
   styleUrls: ['./edit-request-tradcompliance.component.css'],
+  imports: [
+    RequestStatusComponent,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInput,
+    MatSelectModule,
+    MatAutocompleteModule,
+    LoadingDotsComponent,
+    MatDialogModule,
+    MatButtonModule,
+    MatAutocompleteModule,
+    CountrySelectorComponent,
+  ],
 })
 export class EditRequestTradcomplianceComponent implements OnInit {
   requestForm!: FormGroup;
@@ -77,7 +105,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
     catchError((err) => {
       this.onNoClick();
       throw err;
-    })
+    }),
   );
 
   requestSig = toSignal(this.request$);
@@ -98,7 +126,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
   scenearioIdSubject = new BehaviorSubject<number>(0);
   scenarioAttributes$ = this.scenearioIdSubject.pipe(
     filter((id: number) => id != 0),
-    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id))
+    switchMap((id: number) => this.scenarioService.getScenarioAttributes(id)),
   );
   scenarioAttributes = toSignal(this.scenarioAttributes$);
 
@@ -123,7 +151,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
 
     const items = selectedScenarioItems.map((item) => {
       const matchingAttribute = scenarioAttributes.find(
-        (attr) => attr.attributeName === item.nameItem
+        (attr) => attr.attributeName === item.nameItem,
       );
       return {
         ...item,
@@ -178,7 +206,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
         group[item.nameItem] = this.fb.group({
           name: item.nameItem,
           value: [
-            fieldData ? { alpha2Code: fieldData.value } : '',
+            fieldData ? fieldData.value : '',
             fieldData?.isMandatory || item.isMandatory
               ? Validators.required
               : null,
@@ -248,7 +276,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
           detail: 'Error fetching request data',
         });
         console.error('Error fetching request data:', error);
-      }
+      },
     );
   }
 
@@ -268,13 +296,11 @@ export class EditRequestTradcomplianceComponent implements OnInit {
     if (this.requestForm.valid) {
       const userId = this.authService.getUserIdFromToken();
       const existingItemsData = this.existingItemsData() ?? [];
-      let itemsCopy = transformCooValue(
-        _.cloneDeep(this.requestForm.value.items)
-      );
+      let itemsCopy = _.cloneDeep(this.requestForm.value.items);
 
       const updateData = {
         itemsWithValuesJson: JSON.stringify(
-          mergeArrays(existingItemsData, itemsCopy)
+          mergeArrays(existingItemsData, itemsCopy),
         ),
         userId: userId,
       };
@@ -298,7 +324,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
               detail: 'Error updating request',
             });
             console.error('Error updating request:', error);
-          }
+          },
         );
     } else {
       this.messageService.add({
@@ -365,7 +391,7 @@ export class EditRequestTradcomplianceComponent implements OnInit {
             detail: 'Error rejecting request',
           });
           console.error('Error rejecting request:', error);
-        }
+        },
       );
   }
 
@@ -373,28 +399,18 @@ export class EditRequestTradcomplianceComponent implements OnInit {
     const filterValue = value.toLowerCase();
 
     return this.currencyCodes().filter((option) =>
-      option.toLowerCase().includes(filterValue)
+      option.toLowerCase().includes(filterValue),
     );
   }
 
   onCurrencyChange(text: string) {
     this.filteredOptions = of(text).pipe(
       startWith(''),
-      map((value: string) => this._filter(value || ''))
+      map((value: string) => this._filter(value || '')),
     );
   }
 
   onNoClick(): void {
     this.dialogRef.close();
   }
-}
-
-function transformCooValue(items: any[]): any[] {
-  return items.map((item) => ({
-    ...item,
-    COO: {
-      ...item.COO,
-      value: get(item, 'COO.value.alpha2Code', null),
-    },
-  }));
 }

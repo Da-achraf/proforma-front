@@ -1,5 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ControlContainer, FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'app-parcels',
@@ -10,7 +12,8 @@ import { ControlContainer, FormControl, FormGroup, Validators } from '@angular/f
       provide: ControlContainer,
       useFactory: () => inject(ControlContainer, { skipSelf: true })
     }
-  ]
+  ],
+  imports: [MatFormFieldModule, MatInput]
 })
 export class ParcelsComponent implements OnInit, OnDestroy {
 
