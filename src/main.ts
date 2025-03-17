@@ -9,7 +9,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { definePreset } from '@primeng/themes';
 import Aura from '@primeng/themes/aura';
 import 'chartjs-adapter-date-fns';
-import { BarChart } from 'echarts/charts';
+import { BarChart, PieChart } from 'echarts/charts';
 import {
   GridComponent,
   LegendComponent,
@@ -29,6 +29,7 @@ import {
 
 echarts.use([
   BarChart,
+  PieChart,
   GridComponent,
   TooltipComponent,
   LegendComponent,

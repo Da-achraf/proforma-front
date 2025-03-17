@@ -7,7 +7,7 @@ import { KpiService } from '../../services/KpiService';
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [NgxEchartsDirective,],
+  imports: [NgxEchartsDirective],
 })
 export class DashboardComponent implements OnInit {
   // Scenario Chart
@@ -30,32 +30,72 @@ export class DashboardComponent implements OnInit {
     this.loadAverageFlowTimeForAllRequests();
   }
 
+  // loadScenarioData(): void {
+  //   this.kpiService.getRequestCountByAllScenarios().subscribe((data) => {
+  //     const labels = Object.keys(data);
+  //     const counts = Object.values(data);
+  //     this.scenarioCount = counts.reduce((a, b) => a + b, 0);
+
+  //     this.scenarioChartOptions = {
+  //       tooltip: {
+  //         trigger: 'axis',
+  //         axisPointer: { type: 'shadow' },
+  //       },
+  //       xAxis: {
+  //         type: 'category',
+  //         data: labels,
+  //         axisLabel: { rotate: 45 },
+  //       },
+  //       yAxis: { type: 'value' },
+  //       series: [
+  //         {
+  //           data: counts,
+  //           type: 'bar',
+  //           itemStyle: { color: '#42A5F5' },
+  //           name: 'Requests',
+  //         },
+  //       ],
+  //       grid: { containLabel: true },
+  //     };
+  //   });
+  // }
+
+  // scenarioChartOptions!: EChartsOption;
+
   loadScenarioData(): void {
     this.kpiService.getRequestCountByAllScenarios().subscribe((data) => {
       const labels = Object.keys(data);
       const counts = Object.values(data);
       this.scenarioCount = counts.reduce((a, b) => a + b, 0);
 
+      // Prepare data for the pie chart
+      const pieData = labels.map((label, index) => ({
+        name: label,
+        value: counts[index],
+      }));
+
       this.scenarioChartOptions = {
         tooltip: {
-          trigger: 'axis',
-          axisPointer: { type: 'shadow' },
+          trigger: 'item', // Tooltip triggers on individual pie slices
         },
-        xAxis: {
-          type: 'category',
-          data: labels,
-          axisLabel: { rotate: 45 },
-        },
-        yAxis: { type: 'value' },
         series: [
           {
-            data: counts,
-            type: 'bar',
-            itemStyle: { color: '#42A5F5' },
-            name: 'Requests',
+            type: 'pie',
+            data: pieData,
+            radius: '50%', // Adjust the size of the pie chart
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+              },
+            },
+            label: {
+              show: true,
+              formatter: '{b}: {c} ({d}%)', // Display label, value, and percentage
+            },
           },
         ],
-        grid: { containLabel: true },
       };
     });
   }
