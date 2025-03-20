@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { User } from '../models/user/user.model';
-import { API_URL_TOKEN } from '../config/api.config';
+import { User } from '../core/models/user/user.model';
+import { API_URL_TOKEN } from '../core/api/api.config';
 
 @Injectable({
   providedIn: 'root'

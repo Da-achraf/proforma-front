@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { SceanrioItemConfiguration } from '../models/sceanrio-item-configuration.model';
-import { API_URL_TOKEN } from '../config/api.config';
+import { SceanrioItemConfiguration } from '../core/models/sceanrio-item-configuration.model';
+import { API_URL_TOKEN } from '../core/api/api.config';
 
 @Injectable({
   providedIn: 'root',

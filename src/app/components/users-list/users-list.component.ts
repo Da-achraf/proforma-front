@@ -2,14 +2,14 @@ import { Component, inject, model, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
 import { delay, filter, map, Observable, of, switchMap, tap } from 'rxjs';
-import { TableNameEnum } from '../../models/table.model';
+import { TableNameEnum } from '../../core/models/table.model';
 import {
   emptyUser,
   mainRoles,
   User,
   userTableColumns,
   userTableProperties,
-} from '../../models/user/user.model';
+} from '../../core/models/user/user.model';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
 import { UserService } from '../../services/user.service';
@@ -17,7 +17,7 @@ import { DeleteConfirmationDialogComponent } from '../../shared/components/delet
 import { HTTP_REQUEST_DELAY } from '../../shared/constants/http-requests.constant';
 import { SideNavService } from '../../shared/services/side-nav.service';
 import { ShippointService } from '../../services/shippoint.service';
-import { Ship } from '../../models/ship.model';
+import { Ship } from '../../core/models/ship.model';
 import { ToasterService } from '../../shared/services/toaster.service';
 import {
   FormBuilder,

@@ -7,14 +7,13 @@ import {
   HistoricalData,
   HistoricalDataCreate,
   HistoricalDataUpdate,
-} from '../../models/historical-data.model';
+} from '../../core/models/historical-data.model';
 import { DeleteDialogComponent } from '../../pattern/dialogs/delete-dialog.component';
 import { withPagedEntities } from '../../shared/services/with-paged-entities.store';
 import { AddHistoricalDataComponent } from './add-historical-data/add-historical-data.component';
-import { BulkUploadComponent } from './bulk-upload/bulk-upload/bulk-upload.component';
+import { HDBulkUploadComponent } from './bulk-upload/hd-bulk-upload/hd-bulk-upload.component';
 import { HistoricalDataService } from './hitorical-data.service';
 import { UpdateHistoricalDataComponent } from './update-historical-data/update-historical-data.component';
-
 
 export const HistoricalDataStore = signalStore(
   { providedIn: 'root' },
@@ -66,10 +65,12 @@ export const HistoricalDataStore = signalStore(
 
         dialogRef
           .afterClosed()
-          .pipe(filter((result) => !!result?.data))
+          .pipe(
+            filter((result) => !!result?.data),
+            map((result) => result?.data),
+          )
           .subscribe((result) => {
-            console.log('update data:', result);
-            update({ body: historicalData, id: historicalData.id });
+            update({ body: result, id: historicalData.id });
           });
       },
 
@@ -90,7 +91,7 @@ export const HistoricalDataStore = signalStore(
       },
 
       openUploadDataDialog: () => {
-        const dialogRef = dialog.open(BulkUploadComponent, {
+        const dialogRef = dialog.open(HDBulkUploadComponent, {
           width: '900px',
         });
 

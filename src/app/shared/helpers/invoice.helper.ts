@@ -1,4 +1,4 @@
-import { TransformedRequestModel } from "../../models/request.model";
+import { TransformedRequestModel } from "../../core/models/request.model";
 import { WeightTypeEnum } from "../pipes/weight-calculator.pipe";
 
 export const getFieldValue = (item: any, fieldName: string): string => {

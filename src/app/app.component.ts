@@ -1,6 +1,6 @@
 import { Component, effect, inject, OnDestroy, untracked } from '@angular/core';
 import { tap } from 'rxjs';
-import { HistoricalDataBulkUploadStore } from './feature/historical-data/bulk-upload/bulk-upload.store';
+import { HistoricalDataBulkUploadStore } from './feature/historical-data/bulk-upload/hd-bulk-upload.store';
 import { UserService } from './services/user.service';
 import { SideNavService } from './shared/services/side-nav.service';
 import { UploadProtectionService } from './shared/services/upload-protection-service.service';

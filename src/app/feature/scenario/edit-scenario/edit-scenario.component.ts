@@ -24,7 +24,7 @@ import {
   MANDATORY_FOR_OPTIONS,
   MandatoryForEnum,
   RequestItemModel,
-} from '../../../models/request-item.model';
+} from '../../../core/models/request-item.model';
 import { RequestItemService } from '../../../services/request-item.service';
 import { ScenarioItemConfigurationService } from '../../../services/scenario-item-configuration.service';
 import { ScenarioService } from '../../../services/scenario.service';

@@ -9,13 +9,14 @@ import {
   withState,
 } from '@ngrx/signals';
 import { catchError, of, Subscription, tap } from 'rxjs';
-import { BulkUploadResult } from '../../../models/historical-data.model';
+import { BulkUploadSignalR1Service } from '../../../core/bulk-upload/bulk-upload-progress1.service';
+import { BulkUploadResult } from '../../../core/models/historical-data.model';
 import { AuthService } from '../../../services/auth.service';
-import { BulkUploadSignalRService } from '../bulk-upload-progress.service';
-import { HistoricalDataService } from '../hitorical-data.service';
-import { BulkUploadComponent } from './bulk-upload/bulk-upload.component';
+import { DeliveryAddressService } from '../../../core/delivery-address/delivery-address.service';
+import { DABulkUploadComponent } from './da-bulk-upload/da-bulk-upload.component';
 
-type HistoricalDataBulkUploadState = {
+// Delivery Address bulk upload state
+type DABulkUploadState = {
   file: File | null;
   isUploading: boolean;
   isProcessing: boolean;
@@ -26,7 +27,7 @@ type HistoricalDataBulkUploadState = {
   subscription: Subscription | null;
 };
 
-const initialState: HistoricalDataBulkUploadState = {
+const initialState: DABulkUploadState = {
   file: null,
   isUploading: false,
   isProcessing: false,
@@ -37,7 +38,7 @@ const initialState: HistoricalDataBulkUploadState = {
   subscription: null,
 };
 
-export const HistoricalDataBulkUploadStore = signalStore(
+export const DeliveryAddressBulkUploadStore = signalStore(
   { providedIn: 'root' },
 
   withState(initialState),
@@ -45,8 +46,8 @@ export const HistoricalDataBulkUploadStore = signalStore(
   withProps(() => ({
     dialog: inject(MatDialog),
     destroyRef: inject(DestroyRef),
-    dataService: inject(HistoricalDataService),
-    signalRService: inject(BulkUploadSignalRService),
+    deliveryAddressService: inject(DeliveryAddressService),
+    signalRService: inject(BulkUploadSignalR1Service),
     authService: inject(AuthService),
   })),
 
@@ -54,12 +55,24 @@ export const HistoricalDataBulkUploadStore = signalStore(
     isFileValid: computed(() => file() && preValidationErrors().length === 0),
   })),
 
+  withMethods(({ signalRService, ...store }) => ({
+    async registerUpload(): Promise<string> {
+      await signalRService.startConnection();
+
+      const uploadId = signalRService.generateUploadId();
+      await signalRService.registerUpload(uploadId); // Register the upload with the backend
+
+      return Promise.resolve(uploadId);
+    },
+  })),
+
   withMethods(
     ({
-      dataService,
+      deliveryAddressService,
       isUploading,
       file,
       progress,
+      registerUpload,
       result,
       error,
       subscription,
@@ -71,17 +84,18 @@ export const HistoricalDataBulkUploadStore = signalStore(
         patchState(store, { file });
       },
 
-      bulkUpload: () => {
+      bulkUpload: async () => {
         const _file = file();
 
         if (isUploading() || !_file) return;
 
-        signalRService.startConnection();
-        signalRService.getProgressUpdates().subscribe((progress) => {
-          patchState(store, {
-            progress,
-            isProcessing: progress < 100,
-          });
+        // Register the upload with the backend
+        // and get the upload id
+        const uploadId = await registerUpload();
+
+        // Listen for progress updates for this upload
+        signalRService.getProgressUpdates(uploadId).subscribe((progress) => {
+          patchState(store, { progress, isProcessing: progress < 100 });
         });
 
         patchState(store, {
@@ -92,8 +106,8 @@ export const HistoricalDataBulkUploadStore = signalStore(
           result: null,
         });
 
-        const upload$ = dataService
-          .uploadExcel(_file, authService.getUserIdFromToken())
+        const upload$ = deliveryAddressService
+          .uploadExcel(_file, uploadId)
           .pipe(
             tap((result) => {
               patchState(store, {
@@ -153,7 +167,7 @@ export const HistoricalDataBulkUploadStore = signalStore(
 
   withMethods(({ dialog }) => ({
     openUploadDataDialog: () => {
-      const dialogRef = dialog.open(BulkUploadComponent, {
+      const dialogRef = dialog.open(DABulkUploadComponent, {
         width: '60vw',
         maxHeight: '95vh',
         maxWidth: '1200px',

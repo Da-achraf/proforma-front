@@ -18,7 +18,7 @@ import {
   startWith,
   tap,
 } from 'rxjs/operators';
-import { Departement } from '../../models/user/departement';
+import { Departement } from '../../core/models/user/departement';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { AsyncPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';

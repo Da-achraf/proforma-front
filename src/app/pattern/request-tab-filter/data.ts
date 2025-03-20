@@ -1,4 +1,4 @@
-import { RequestStatus } from '../../models/requeststatus.model';
+import { RequestStatus } from '../../core/models/requeststatus.model';
 import { FilterOption } from '../../ui/components/radio-filter/types';
 
 export const StatusFilterOptions: FilterOption[] = [

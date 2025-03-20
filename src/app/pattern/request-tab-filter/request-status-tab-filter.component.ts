@@ -1,5 +1,5 @@
 import { Component, inject, output } from '@angular/core';
-import { RequestStatus } from '../../models/requeststatus.model';
+import { RequestStatus } from '../../core/models/requeststatus.model';
 import { RadioFilterSkeletonComponent } from '../../ui/components/radio-filter/radio-filter-skeleton.component';
 import { RadioFilterComponent } from '../../ui/components/radio-filter/radio.filter.component';
 import { RequestStatusTabFilterService } from './status-tab-filter.service';

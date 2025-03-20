@@ -16,13 +16,13 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { TableNameEnum } from '../../models/table.model';
+import { TableNameEnum } from '../../core/models/table.model';
 import {
   Plant,
   plantTableColumns,
   plantTableProperties,
-} from '../../models/user/plant.model';
-import { Roles } from '../../models/user/user.model';
+} from '../../core/models/user/plant.model';
+import { Roles } from '../../core/models/user/user.model';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';

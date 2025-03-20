@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
-import { API_URL_TOKEN } from '../config/api.config';
-import { Scenario, ScenarioModel, ScenarioUpdate } from '../models/scenario.model';
+import { API_URL_TOKEN } from '../core/api/api.config';
+import { Scenario, ScenarioModel, ScenarioUpdate } from '../core/models/scenario.model';
 
 @Injectable({
   providedIn: 'root',

@@ -10,7 +10,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { pureRoles } from '../../models/user/user.model';
+import { pureRoles } from '../../core/models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { DepartementService } from '../../services/departement.service';
 import { PlantService } from '../../services/plant.service';

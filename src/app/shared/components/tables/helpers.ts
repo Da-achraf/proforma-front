@@ -3,9 +3,9 @@ import { EditRequestRequesterComponent } from '../../../components/edit-request-
 import { EditRequestTradcomplianceComponent } from '../../../components/edit-request-tradcompliance/edit-request-tradcompliance.component';
 import { EditRequestWarehouseComponent } from '../../../components/edit-request-warehouse/edit-request-warehouse.component';
 import { ModifyRequestFinanceComponent } from '../../../components/modify-request-finance/modify-request-finance.component';
-import { JsonItemModel } from '../../../models/request.model';
-import { RequestStatus } from '../../../models/requeststatus.model';
-import { RoleEnum } from '../../../models/user/user.model';
+import { JsonItemModel } from '../../../core/models/request.model';
+import { RequestStatus } from '../../../core/models/requeststatus.model';
+import { RoleEnum } from '../../../core/models/user/user.model';
 import { FilterOption } from '../../../ui/components/radio-filter/types';
 
 export const getRequestModificationComponent = (

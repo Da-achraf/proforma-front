@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { RequestStatus, RequestStatusLabelMapping } from '../../models/requeststatus.model';
+import { RequestStatus, RequestStatusLabelMapping } from '../../core/models/requeststatus.model';
 
 @Pipe({
   name: 'mapStatus',

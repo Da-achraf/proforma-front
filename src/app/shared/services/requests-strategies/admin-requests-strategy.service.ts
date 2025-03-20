@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { RequestModel } from "../../../models/request.model";
-import { User } from "../../../models/user/user.model";
+import { RequestModel } from "../../../core/models/request.model";
+import { User } from "../../../core/models/user/user.model";
 import { RequestService } from "../../../services/request.service";
 import { IRequestStrategy } from "./requests-strategies";
 

@@ -14,16 +14,17 @@ import {
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { finalize } from 'rxjs';
 import {
   DeliveryAddress,
   DeliveryAddressCreate,
-} from '../../../models/delivery-address.model';
-import { DeliveryAddressService } from '../../../services/delivery-address.service';
-import { ToasterService } from '../../../shared/services/toaster.service';
+} from '../../../core/models/delivery-address.model';
 
 @Component({
   selector: 'app-delivery-address-crud',
@@ -42,9 +43,7 @@ import { ToasterService } from '../../../shared/services/toaster.service';
 export class DeliveryAddressCrudComponent implements OnInit {
   // Injected dependencies
   private fb = inject(FormBuilder);
-  private deliveryAddressService = inject(DeliveryAddressService);
   private dialogRef = inject(MatDialogRef<DeliveryAddressCrudComponent>);
-  private toastr = inject(ToasterService);
   private data = signal(inject(MAT_DIALOG_DATA));
 
   // Component properties
@@ -114,19 +113,21 @@ export class DeliveryAddressCrudComponent implements OnInit {
       this.isFormSubmited.set(true);
       const newDeliveryAddress: DeliveryAddressCreate = this.form.getRawValue();
 
-      this.deliveryAddressService
-        .CreateDeliveryAddress(newDeliveryAddress)
-        .pipe(finalize(() => this.isFormSubmited.set(false)))
-        .subscribe({
-          next: (address: DeliveryAddress) => {
-            this.toastr.showSuccess('Delivery address added successfully');
-            this.dialogRef.close(address.id);
-            this.resetForm();
-          },
-          error: (error) => {
-            this.toastr.showError('Unknown error occured');
-          },
-        });
+      this.dialogRef.close({ data: newDeliveryAddress });
+
+      // this.deliveryAddressService
+      //   .CreateDeliveryAddress(newDeliveryAddress)
+      //   .pipe(finalize(() => this.isFormSubmited.set(false)))
+      //   .subscribe({
+      //     next: (address: DeliveryAddress) => {
+      //       this.toastr.showSuccess('Delivery address added successfully');
+      //       this.dialogRef.close(address.id);
+      //       this.resetForm();
+      //     },
+      //     error: (error) => {
+      //       this.toastr.showError('Unknown error occured');
+      //     },
+      //   });
     }
   }
 

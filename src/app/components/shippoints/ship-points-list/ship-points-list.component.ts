@@ -14,8 +14,8 @@ import {
   ShipPointModel,
   shipPointTableColumns,
   shipPointTableProperties,
-} from '../../../models/ship.model';
-import { TableNameEnum } from '../../../models/table.model';
+} from '../../../core/models/ship.model';
+import { TableNameEnum } from '../../../core/models/table.model';
 import { ShippointService } from '../../../services/shippoint.service';
 import { DeleteConfirmationDialogComponent } from '../../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { ManagementTablesComponent } from '../../../shared/components/management-tables/management-tables.component';

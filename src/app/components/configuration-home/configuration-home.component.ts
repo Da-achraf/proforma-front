@@ -14,8 +14,8 @@ import {
   MandatoryForEnum,
   RequestItemModel,
   standardFields,
-} from '../../models/request-item.model';
-import { Roles } from '../../models/user/user.model';
+} from '../../core/models/request-item.model';
+import { Roles } from '../../core/models/user/user.model';
 import { ApproverService } from '../../services/approver.service';
 import { RequestItemService } from '../../services/request-item.service';
 import { ScenarioItemConfigurationService } from '../../services/scenario-item-configuration.service';

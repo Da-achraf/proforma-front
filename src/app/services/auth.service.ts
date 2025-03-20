@@ -4,8 +4,8 @@ import { inject, Inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { lastValueFrom, Observable, of, tap } from 'rxjs';
-import { API_URL_TOKEN } from '../config/api.config';
-import { RoleEnum, User } from '../models/user/user.model';
+import { API_URL_TOKEN } from '../core/api/api.config';
+import { RoleEnum, User } from '../core/models/user/user.model';
 
 const AUTH_TOKEN_NAME = 'TE_MI_AUTH_TOKEN';
 

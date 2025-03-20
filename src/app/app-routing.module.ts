@@ -4,7 +4,7 @@ import { AdminSectionComponent } from './components/admin-section/admin-section.
 import { ConfigurationHomeComponent } from './components/configuration-home/configuration-home.component';
 import { ConfigurationSectionComponent } from './components/configuration-section/configuration-section.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { DeliveryAddressListComponent } from './components/delivery-address/delivery-address-list/delivery-address-list.component';
+import { DeliveryAddressListComponent } from './feature/delivery-address/delivery-address-list/delivery-address-list.component';
 import { DepartmentsListComponent } from './components/departments-list/departments-list.component';
 import { Home1Component } from './components/home1/home1.component';
 import { LoginComponent } from './components/login/login.component';
@@ -17,7 +17,7 @@ import { ScenariosListComponent } from './feature/scenario/scenarios-list/scenar
 import { AuthGuard } from './Guards/auth.guard';
 import { NonAuthGuard } from './Guards/non-auth.guard';
 import { RoleGuard } from './Guards/role.guard';
-import { RoleEnum } from './models/user/user.model';
+import { RoleEnum } from './core/models/user/user.model';
 import { HomeRedirectResolver } from './resolvers/home-redirect.resolver';
 import { RequestsTableComponent } from './shared/components/tables/req-table.component';
 

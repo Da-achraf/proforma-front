@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { HistoricalDataStore } from '../historical-data.store';
 import { COLUMNS } from './const';
-import { HistoricalDataBulkUploadStore } from '../bulk-upload/bulk-upload.store';
+import { HistoricalDataBulkUploadStore } from '../bulk-upload/hd-bulk-upload.store';
 import { TitleCasePipe } from '@angular/common';
 import { GenericTableComponent } from '../../../pattern/table/generic-table.component';
 

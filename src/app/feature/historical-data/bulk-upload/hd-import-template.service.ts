@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as XLSX from 'xlsx-js-style';
 
 @Injectable({ providedIn: 'root' })
-export class TemplateService {
+export class HDTemplateService {
   generateHistoricalDataTemplate(): void {
     const headers = [
       'Material*',

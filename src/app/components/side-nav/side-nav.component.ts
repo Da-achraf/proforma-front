@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { allMenuItems } from '../../models/sidenav-item.model';
-import { RoleEnum } from '../../models/user/user.model';
+import { allMenuItems } from '../../core/models/sidenav-item.model';
+import { RoleEnum } from '../../core/models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { SideNavService } from '../../shared/services/side-nav.service';
 

@@ -63,11 +63,11 @@ bootstrapApplication(AppComponent, {
     provideNativeDateAdapter(),
     {
       provide: TABLE_PAGE_SIZE,
-      useValue: 2,
+      useValue: 10,
     },
     {
       provide: PAGE_SIZE_OPTIONS,
-      useValue: [2, 20, 50, 100],
+      useValue: [10, 20, 50, 100],
     },
     providePrimeNG({
       ripple: true,

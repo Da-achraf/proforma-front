@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { RequestModel } from '../../models/request.model';
-import { RequestStatus } from '../../models/requeststatus.model';
-import { SidenavItem } from '../../models/sidenav-item.model';
-import { RoleEnum, User } from '../../models/user/user.model';
+import { RequestModel } from '../../core/models/request.model';
+import { RequestStatus } from '../../core/models/requeststatus.model';
+import { SidenavItem } from '../../core/models/sidenav-item.model';
+import { RoleEnum, User } from '../../core/models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { UserStoreService } from '../../services/user-store.service';
 import { UserService } from '../../services/user.service';

@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { FieldTypeEnum, ItemModel, RequestItem, RequestItemModel } from '../models/request-item.model';
+import { FieldTypeEnum, ItemModel, RequestItem, RequestItemModel } from '../core/models/request-item.model';
 import { Observable } from 'rxjs';
-import { API_URL_TOKEN } from '../config/api.config';
+import { API_URL_TOKEN } from '../core/api/api.config';
 
 @Injectable({
   providedIn: 'root'

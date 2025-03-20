@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInput, MatInputModule } from '@angular/material/input';
-import { QueryParamType } from '../../../../models/api-types.model';
+import { QueryParamType } from '../../../../core/models/api-types.model';
 import { RequestStore } from '../request.store';
 import { BaButtonComponent } from '../../../../ui/components/button.component';
 

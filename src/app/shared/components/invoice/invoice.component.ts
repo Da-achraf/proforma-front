@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
 import { filter, of } from 'rxjs';
-import { InvoiceTypeEnum, StandardFieldEnum } from '../../../models/request.model';
+import { InvoiceTypeEnum, StandardFieldEnum } from '../../../core/models/request.model';
 import { RequestService } from '../../../services/request.service';
 
 @Component({

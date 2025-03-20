@@ -16,7 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { HistoricalData } from '../../../models/historical-data.model';
+import { HistoricalData } from '../../../core/models/historical-data.model';
 import { CountrySelectorComponent } from '../../../ui/components/country-select/country-select.component';
 
 @Component({

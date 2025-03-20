@@ -10,7 +10,7 @@ import { MatTable, MatTableModule } from '@angular/material/table';
 import {
   BulkUploadError,
   BulkUploadResult,
-} from '../../../../models/historical-data.model';
+} from '../../../core/models/historical-data.model';
 
 @Component({
   selector: 'app-bulk-upload-feedback',

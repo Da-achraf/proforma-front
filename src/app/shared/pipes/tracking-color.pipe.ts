@@ -1,6 +1,6 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
 import { ReportCellColorService } from '../services/report-cell-color.service';
-import { TransformedRequestModel } from '../../models/request.model';
+import { TransformedRequestModel } from '../../core/models/request.model';
 
 @Pipe({
   name: 'trackingColor',

@@ -1,7 +1,7 @@
 import { inject, Injectable, signal, Signal, WritableSignal } from '@angular/core';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { UserService } from './user.service';
-import { RoleEnum, User } from '../models/user/user.model';
+import { RoleEnum, User } from '../core/models/user/user.model';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from './auth.service';
 

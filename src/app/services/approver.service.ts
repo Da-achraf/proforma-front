@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { approverScenario } from '../models/approverScenario.model';
-import { API_URL_TOKEN } from '../config/api.config';
+import { approverScenario } from '../core/models/approverScenario.model';
+import { API_URL_TOKEN } from '../core/api/api.config';
 
 @Injectable({
   providedIn: 'root'

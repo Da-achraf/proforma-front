@@ -12,15 +12,15 @@ import {
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { debounceTime, lastValueFrom, pipe, switchMap, tap } from 'rxjs';
-import { RequestModel } from '../../../models/request.model';
-import { RoleEnum } from '../../../models/user/user.model';
+import { RequestModel } from '../../../core/models/request.model';
+import { RoleEnum } from '../../../core/models/user/user.model';
 import { AuthService } from '../../../services/auth.service';
 import { RequestExportService } from '../../../services/request-export.service';
 import { RequestService } from '../../../services/request.service';
 import { TABLE_PAGE_SIZE } from './data';
 import { queryParamsByRole } from './helpers';
 import { ToasterService } from '../../services/toaster.service';
-import { QueryParamType } from '../../../models/api-types.model';
+import { QueryParamType } from '../../../core/models/api-types.model';
 
 type RequestState = {
   requests: RequestModel[];

@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { delay, of, tap } from 'rxjs';
-import { RequestStatus } from '../../models/requeststatus.model';
-import { RoleEnum } from '../../models/user/user.model';
+import { RequestStatus } from '../../core/models/requeststatus.model';
+import { RoleEnum } from '../../core/models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { StatusFilterOptions } from './data';
 

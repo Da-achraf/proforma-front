@@ -1,19 +1,19 @@
 import { Component, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
+import { BulkUploadFeedbackComponent } from '../../../../ui/components/bulk-upload-feedback/bulk-upload-feedback.component';
 import { FileExtensionPipe } from '../../../../ui/pipes/file-extension.pipe';
 import { FileSizePipe } from '../../../../ui/pipes/file-size.pipe';
-import { BulkUploadFeedbackComponent } from '../bulk-upload-feedback/bulk-upload-feedback.component';
-import { HistoricalDataBulkUploadStore } from '../bulk-upload.store';
-import { FileValidationService } from '../file-validation.service';
-import { TemplateService } from '../import-template.service';
-import { MatButtonModule } from '@angular/material/button';
+import { DATemplateService } from '../da-import-template.service';
+import { DAFileValidationService } from '../da-file-validation.service';
+import { DeliveryAddressBulkUploadStore } from '../da-bulk-upload.store';
 
 @Component({
-  selector: 'app-hd-bulk-upload',
-  templateUrl: 'bulk-upload.component.html',
-  styleUrl: 'bulk-upload.component.css',
+  selector: 'app-da-bulk-upload',
+  templateUrl: 'da-bulk-upload.component.html',
+  styleUrl: 'da-bulk-upload.component.css',
   imports: [
     MatIcon,
     FileExtensionPipe,
@@ -23,12 +23,13 @@ import { MatButtonModule } from '@angular/material/button';
     BulkUploadFeedbackComponent,
   ],
 })
-export class BulkUploadComponent {
-  private readonly templateService = inject(TemplateService);
+export class DABulkUploadComponent {
+  // DeliveryAddressBulkUploadComponent
+  private readonly daTemplateService = inject(DATemplateService);
 
   protected readonly dialogRef = inject(MatDialogRef);
-  protected readonly bulkUploadStore = inject(HistoricalDataBulkUploadStore);
-  protected readonly fileValidator = inject(FileValidationService);
+  protected readonly bulkUploadStore = inject(DeliveryAddressBulkUploadStore);
+  protected readonly fileValidator = inject(DAFileValidationService);
 
   async onFileSelected(event: Event) {
     this.bulkUploadStore.resetState();
@@ -55,6 +56,6 @@ export class BulkUploadComponent {
   }
 
   downloadTemplate(): void {
-    this.templateService.generateHistoricalDataTemplate();
+    this.daTemplateService.generateHistoricalDataTemplate();
   }
 }

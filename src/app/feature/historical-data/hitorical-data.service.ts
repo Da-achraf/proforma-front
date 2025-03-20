@@ -1,14 +1,15 @@
 import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { API_URL_TOKEN } from '../../config/api.config';
+import { API_URL_TOKEN } from '../../core/api/api.config';
 import {
   BulkUploadResult,
   HistoricalData,
   HistoricalDataCreate,
   HistoricalDataUpdate,
-} from '../../models/historical-data.model';
-import { PagedResult, QueryParamType } from '../../models/api-types.model';
+} from '../../core/models/historical-data.model';
+import { PagedResult, QueryParamType } from '../../core/models/api-types.model';
+import { UUIDTypes } from 'uuid';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +23,7 @@ export class HistoricalDataService {
   load(
     page: number,
     pageSize: number,
-    queryParams?: QueryParamType
+    queryParams?: QueryParamType,
   ): Observable<PagedResult<HistoricalData>> {
     const params = {
       page: page?.toString(),
@@ -41,7 +42,7 @@ export class HistoricalDataService {
 
   getHistoricalDataByMaterial(material: string): Observable<HistoricalData[]> {
     return this.http.get<HistoricalData[]>(
-      `${this.baseUrl}/material/${material}`
+      `${this.baseUrl}/material/${material}`,
     );
   }
 
@@ -51,26 +52,26 @@ export class HistoricalDataService {
 
   update(
     body: Partial<HistoricalDataUpdate>,
-    id: number
+    id: number,
   ): Observable<HistoricalData> {
     return this.http.put<HistoricalData>(`${this.baseUrl}/${id}`, body);
   }
 
   uploadExcel(
     file: File,
-    currentUserId: number
+    uploadId: string,
   ): Observable<BulkUploadResult> {
     const formData = new FormData();
     formData.append('file', file);
 
     const headers = new HttpHeaders({
-      'User-Id': currentUserId, // Retrieve this from your authentication service
+      'Upload-Id': uploadId,
     });
 
     return this.http.post<BulkUploadResult>(
       `${this.baseUrl}/bulk-upload`,
       formData,
-      { headers }
+      { headers },
     );
   }
 

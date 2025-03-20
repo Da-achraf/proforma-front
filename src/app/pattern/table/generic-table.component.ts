@@ -1,4 +1,9 @@
-import { DatePipe, NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
+import {
+  DatePipe,
+  NgClass,
+  NgTemplateOutlet,
+  TitleCasePipe,
+} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,6 +28,8 @@ import { UploadButtonComponent } from '../../ui/components/upload-button/upload-
 import { PaginatorComponent } from '../paginator/paginator.component';
 import { SearchBarComponent } from '../search/search-bar.component';
 import { TableColumn } from './table-types.interface';
+import { TruncateTextPipe } from '../../shared/pipes/truncate-text.pipe';
+import { DefaultValuePipe } from '../../ui/pipes/default-value.pipe';
 
 @Component({
   selector: 'ba-generic-table',
@@ -37,10 +44,11 @@ import { TableColumn } from './table-types.interface';
     UploadButtonComponent,
     NgClass,
     DatePipe,
-    TitleCasePipe,
+    DefaultValuePipe,
     NoDataFoundComponent,
     PaginatorComponent,
     NgTemplateOutlet,
+    TruncateTextPipe,
   ],
 })
 export class GenericTableComponent implements OnInit {

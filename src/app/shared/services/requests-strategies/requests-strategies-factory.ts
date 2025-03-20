@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { RequestModel } from "../../../models/request.model";
-import { RoleEnum, User } from "../../../models/user/user.model";
+import { RequestModel } from "../../../core/models/request.model";
+import { RoleEnum, User } from "../../../core/models/user/user.model";
 import { RequestService } from "../../../services/request.service";
 import { AdminRequestStrategy } from "./admin-requests-strategy.service";
 import { ByShipPointRequestStrategy } from "./by-shippoints-requests-strategy.service";

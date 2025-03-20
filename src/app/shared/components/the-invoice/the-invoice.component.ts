@@ -11,7 +11,7 @@ import {
   InvoiceTypeEnum,
   RequestModel,
   StandardFieldEnum,
-} from '../../../models/request.model';
+} from '../../../core/models/request.model';
 import { getFieldValue, getWeight } from '../../helpers/invoice.helper';
 import { CountryPipe } from '../../pipes/country.pipe';
 import { DeliveryAddressPipe } from '../../pipes/delivery-address.pipe';

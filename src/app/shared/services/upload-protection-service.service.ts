@@ -1,5 +1,5 @@
 import { effect, inject, Injectable, untracked } from '@angular/core';
-import { HistoricalDataBulkUploadStore } from '../../feature/historical-data/bulk-upload/bulk-upload.store';
+import { HistoricalDataBulkUploadStore } from '../../feature/historical-data/bulk-upload/hd-bulk-upload.store';
 
 @Injectable({ providedIn: 'root' })
 export class UploadProtectionService {

@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { API_URL_TOKEN } from '../config/api.config';
+import { API_URL_TOKEN } from '../core/api/api.config';
 import {
   DeliveryAddress,
   DeliveryAddressCreate,
   DeliveryAddressUpdate,
-} from '../models/delivery-address.model';
+} from '../core/models/delivery-address.model';
 
 @Injectable({
   providedIn: 'root',

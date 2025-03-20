@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
-import { RoleEnum } from '../models/user/user.model';
+import { RoleEnum } from '../core/models/user/user.model';
 import { AuthService } from '../services/auth.service';
 import { ToasterService } from '../shared/services/toaster.service';
 

@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Plant } from '../models/user/plant.model';
+import { Plant } from '../core/models/user/plant.model';
 import { Observable } from 'rxjs';
-import { API_URL_TOKEN } from '../config/api.config';
+import { API_URL_TOKEN } from '../core/api/api.config';
 
 @Injectable({
   providedIn: 'root'

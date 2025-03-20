@@ -1,9 +1,9 @@
-import { DeliveryAddress } from '../../models/delivery-address.model';
-import { ShipPointModel } from '../../models/ship.model';
-import { TableNameEnum } from '../../models/table.model';
-import { DepartmentModel } from '../../models/user/departement';
-import { PlantModel } from '../../models/user/plant.model';
-import { User } from '../../models/user/user.model';
+import { DeliveryAddress } from '../../core/models/delivery-address.model';
+import { ShipPointModel } from '../../core/models/ship.model';
+import { TableNameEnum } from '../../core/models/table.model';
+import { DepartmentModel } from '../../core/models/user/departement';
+import { PlantModel } from '../../core/models/user/plant.model';
+import { User } from '../../core/models/user/user.model';
 
 export interface ISearchFilterStrategy<T> {
   filter(searchValue: string, items: T[]): T[];

@@ -11,7 +11,7 @@ import {
   ItemModel,
   RequestItemModel,
   standardFields,
-} from '../../models/request-item.model';
+} from '../../core/models/request-item.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInput } from '@angular/material/input';

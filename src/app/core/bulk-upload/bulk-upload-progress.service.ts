@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { BehaviorSubject } from 'rxjs';
-import { API_URL_TOKEN } from '../../config/api.config';
+import { API_URL_TOKEN } from '../api/api.config';
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +42,7 @@ export class BulkUploadSignalRService {
     } else {
       console.log(
         'SignalR connection already in state:',
-        this.hubConnection.state
+        this.hubConnection.state,
       );
     }
   }
@@ -53,7 +53,7 @@ export class BulkUploadSignalRService {
         .stop()
         .then(() => console.log('SignalR connection stopped'))
         .catch((err) =>
-          console.error('Error stopping SignalR connection: ', err)
+          console.error('Error stopping SignalR connection: ', err),
         );
     }
   }

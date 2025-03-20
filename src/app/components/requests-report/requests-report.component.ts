@@ -12,23 +12,23 @@ import {
 } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { requestReportTableColumns } from '../../models/request-report.model';
+import { requestReportTableColumns } from '../../core/models/request-report.model';
 import {
   createdAtFormat,
   RequestModel,
   TransformedRequestModel,
-} from '../../models/request.model';
+} from '../../core/models/request.model';
 import {
   exportMenuOptions,
   ExportMenuOptionsEnum,
-} from '../../models/table.model';
+} from '../../core/models/table.model';
 import {
   filterRequests,
   transformRequest,
 } from '../../shared/helpers/report-table.helper';
 import { TableExportService } from '../../shared/services/table-export.service';
 import { WeightTypeEnum } from '../../shared/pipes/weight-calculator.pipe';
-import { RequestStatus } from '../../models/requeststatus.model';
+import { RequestStatus } from '../../core/models/requeststatus.model';
 import { ReportCellColorService } from '../../shared/services/report-cell-color.service';
 import { SearchBarComponent } from '../../pattern/search/search-bar.component';
 import { MatMenuModule } from '@angular/material/menu';

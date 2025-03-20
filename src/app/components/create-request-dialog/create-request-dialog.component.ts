@@ -48,13 +48,12 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs';
-import { HistoricalDataService } from '../../feature/historical-data/hitorical-data.service';
-import { DeliveryAddress } from '../../models/delivery-address.model';
-import { HistoricalData } from '../../models/historical-data.model';
+import { DeliveryAddressService } from '../../core/delivery-address/delivery-address.service';
+import { HistoricalData } from '../../core/models/historical-data.model';
 import {
   ItemModel,
   userRoleToMandatoryForMapper,
-} from '../../models/request-item.model';
+} from '../../core/models/request-item.model';
 import {
   CreateRequest,
   CURRENCY_CODES,
@@ -62,11 +61,12 @@ import {
   INVOICE_TYPES,
   ModesOfTransports,
   SHIPPED_VIA_OPTIONS,
-} from '../../models/request.model';
-import { Ship } from '../../models/ship.model';
+} from '../../core/models/request.model';
+import { Ship } from '../../core/models/ship.model';
+import { DeliveryAddressCrudComponent } from '../../feature/delivery-address/delivery-address-crud/delivery-address-crud.component';
+import { HistoricalDataService } from '../../feature/historical-data/hitorical-data.service';
 import { ToastComponent } from '../../pattern/toast/toast.component';
 import { AuthService } from '../../services/auth.service';
-import { DeliveryAddressService } from '../../services/delivery-address.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';
 import { ShippointService } from '../../services/shippoint.service';
@@ -76,8 +76,6 @@ import {
   enhanceItemsWithCacheData,
   enhancementConfig,
 } from '../../shared/utils/historical-data.util';
-import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-address-crud/delivery-address-crud.component';
-
 
 @Component({
   selector: 'app-create-request-dialog',
@@ -96,7 +94,7 @@ import { DeliveryAddressCrudComponent } from '../delivery-address/delivery-addre
     MatProgressSpinnerModule,
     MatButtonModule,
     MatDivider,
-    MatDialogModule
+    MatDialogModule,
   ],
 })
 export class CreateRequestDialogComponent implements OnInit, OnDestroy {
@@ -104,10 +102,11 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
   dialog = inject(MatDialog);
   toaster = inject(ToasterService);
   historicalDataService = inject(HistoricalDataService);
+  deliveryAddressService = inject(DeliveryAddressService);
 
   requestForm!: FormGroup;
   shipPoints: Ship[] = [];
-  deliveryAddresses: DeliveryAddress[] = [];
+  deliveryAddresses = this.deliveryAddressService.allAddresses;
   currencyCodes = signal<string[]>(CURRENCY_CODES);
   invoiceTypes = signal<string[]>(INVOICE_TYPES);
   incotermOptions = signal<string[]>(INCOTERMES);
@@ -162,7 +161,6 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private scenarioService: ScenarioService,
     private shippointService: ShippointService,
-    private deliveryAddressService: DeliveryAddressService,
     private requestService: RequestService,
     private authService: AuthService,
     private messageService: MessageService,
@@ -184,7 +182,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
       items: this.fb.array([]),
     });
     this.loadShipPoints();
-    this.loadDeliveryAddresses();
+    this.deliveryAddressService.triggerLoadAllAddresses();
     this.onScenarioChange();
     this.onShippingOrDeliveryChange();
 
@@ -409,22 +407,6 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
     );
   }
 
-  loadDeliveryAddresses(): void {
-    this.deliveryAddressService.getDeliveryAddresses().subscribe(
-      (addresses) => {
-        this.deliveryAddresses = addresses;
-      },
-      (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error loading delivery addresses',
-        });
-        console.error('Error loading delivery addresses:', error);
-      },
-    );
-  }
-
   onScenarioChange(): void {
     const scenarioIdControl = this.requestForm.get('scenarioId');
     this.selectedScenarioId.set(scenarioIdControl?.value ?? 0);
@@ -467,7 +449,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
             (point) => point.id_ship === this.requestForm.value.shippingPoint,
           )?.id_ship ?? 0;
         const deliveryAddressId =
-          this.deliveryAddresses.find(
+          this.deliveryAddresses().find(
             (address) => address.id === this.requestForm.value.deliveryAddress,
           )?.id ?? 0;
 
@@ -537,7 +519,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
     const shippingPoint = this.shipPoints.find(
       (point) => point.id_ship === shippingPointId,
     );
-    const deliveryAddress = this.deliveryAddresses.find(
+    const deliveryAddress = this.deliveryAddresses().find(
       (address) => address.id === deliveryAddressId,
     );
 
@@ -557,7 +539,7 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
       .subscribe((result) => {
         const addressControl = this.requestForm.get('deliveryAddress');
         if (result) {
-          this.loadDeliveryAddresses();
+          this.deliveryAddressService.triggerLoadAllAddresses();
           addressControl?.patchValue(result);
         } else {
           addressControl?.patchValue(null);

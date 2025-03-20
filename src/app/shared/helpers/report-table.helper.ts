@@ -1,5 +1,5 @@
-import { RequestModel, TransformedRequestModel } from '../../models/request.model';
-import { RequestStatus, RequestStatusLabelMapping } from '../../models/requeststatus.model';
+import { RequestModel, TransformedRequestModel } from '../../core/models/request.model';
+import { RequestStatus, RequestStatusLabelMapping } from '../../core/models/requeststatus.model';
 import { calculateAmount, toCamelCase } from './invoice.helper';
 
 export const getFileName = (name?: string) => {

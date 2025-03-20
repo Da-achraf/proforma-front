@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { CURRENCY_CODES } from '../../../models/request.model';
+import { CURRENCY_CODES } from '../../../core/models/request.model';
 import { CountrySelectorComponent } from '../../../ui/components/country-select/country-select.component';
 
 @Component({

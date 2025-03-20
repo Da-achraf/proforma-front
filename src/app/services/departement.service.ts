@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
-import { Departement } from '../models/user/departement';
-import { API_URL_TOKEN } from '../config/api.config';
+import { Departement } from '../core/models/user/departement';
+import { API_URL_TOKEN } from '../core/api/api.config';
 
 @Injectable({
   providedIn: 'root'

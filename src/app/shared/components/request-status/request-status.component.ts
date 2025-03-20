@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component, input } from '@angular/core';
-import { RequestStatus } from '../../../models/requeststatus.model';
+import { RequestStatus } from '../../../core/models/requeststatus.model';
 import { RequestStatusMapper } from '../../pipes/request-status-mapper.pipe';
 import { StatusClassPipe } from '../../pipes/status-class.pipe';
 

@@ -1,0 +1,23 @@
+<div class="w-full max-w-screen-2xl px-2 py-10">
+  <p
+    class="text-md mb-5 w-fit border-b-2 border-b-blue-400 font-mono font-bold text-orange-500 opacity-75"
+  >
+    {{ "delivery address" | titlecase }}
+  </p>
+
+  <ba-generic-table
+    [data]="store.entities()"
+    [columns]="columns()"
+    [total]="store.total()"
+    [loading]="store.isLoading()"
+    [emitSearch]="true"
+    [withImport]="true"
+    (page)="store.setPage($event)"
+    (pageSize)="store.setPageSize($event)"
+    (create)="store.openCreateDialog()"
+    (edit)="store.openEditDialog($event)"
+    (delete)="store.openDeleteDialog($event)"
+    (search)="onSearch($event)"
+    (upload)="bulkUploadStore.openUploadDataDialog()"
+  />
+</div>

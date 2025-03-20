@@ -24,12 +24,12 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { TableNameEnum } from '../../models/table.model';
+import { TableNameEnum } from '../../core/models/table.model';
 import {
   Departement,
   departementTableColumns,
   departementTableProperties,
-} from '../../models/user/departement';
+} from '../../core/models/user/departement';
 import { DepartementService } from '../../services/departement.service';
 import { DeleteConfirmationDialogComponent } from '../../shared/components/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { ManagementTablesComponent } from '../../shared/components/management-tables/management-tables.component';

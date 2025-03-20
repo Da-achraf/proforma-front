@@ -13,7 +13,7 @@ import {
   Column,
   TableNameEnum,
   TableProperty,
-} from '../../../models/table.model';
+} from '../../../core/models/table.model';
 import { SearchBarComponent } from '../../../pattern/search/search-bar.component';
 import { CreateButtonComponent } from '../../../ui/components/create-button/create-button.component';
 import { NoDataFoundComponent } from '../../../ui/components/no-data-found/no-data-found.component';

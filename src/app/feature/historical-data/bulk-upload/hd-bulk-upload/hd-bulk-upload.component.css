@@ -1,0 +1,24 @@
+.upload-container {
+    @apply flex flex-col items-center gap-4 p-6 border border-gray-300 rounded-lg shadow-md bg-white;
+  }
+  
+  .upload-container button {
+    @apply px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 transition;
+  }
+  
+  .progress-bar {
+    @apply w-full bg-gray-200 rounded-full h-4 overflow-hidden;
+  }
+  
+  .progress {
+    @apply h-full bg-green-500 transition-all ease-in-out duration-500;
+  }
+  
+  .upload-container p {
+    @apply text-gray-700 text-sm mt-2;
+  }
+  
+  .upload-container button.download {
+    @apply px-3 py-1 bg-red-500 text-white text-sm rounded-lg shadow hover:bg-red-600 transition;
+  }
+  

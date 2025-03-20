@@ -1,6 +1,6 @@
-import { RequestModel } from "../../models/request.model";
-import { RequestStatus } from "../../models/requeststatus.model";
-import { RoleEnum } from "../../models/user/user.model";
+import { RequestModel } from "../../core/models/request.model";
+import { RequestStatus } from "../../core/models/requeststatus.model";
+import { RoleEnum } from "../../core/models/user/user.model";
 
 /**
  * Sorts an array of requests by created_at date

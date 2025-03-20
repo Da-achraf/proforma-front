@@ -19,7 +19,7 @@ import {
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { debounceTime, Observable, pipe } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
-import { PagedResult, QueryParamType } from '../../models/api-types.model';
+import { PagedResult, QueryParamType } from '../../core/models/api-types.model';
 import { TABLE_PAGE_SIZE } from '../components/tables/data';
 import { ToasterService } from './toaster.service';
 import { withLoading } from './with-loading.store';
@@ -38,14 +38,14 @@ export function withPagedEntities<Entity extends { id: number }, C, U>(
     load: (
       page: number,
       pageSize: number,
-      queryParams?: { [key: string]: any }
+      queryParams?: { [key: string]: any },
     ) => Observable<PagedResult<Entity>>;
     update: (body: Partial<U>, id: number) => Observable<Entity>;
     save: (body: C) => Observable<Entity>;
     loadOne: (id: number) => Observable<Entity>;
     deleteMany: (ids: number[]) => Observable<void>;
     deleteOne: (id: number) => Observable<void>;
-  }>
+  }>,
 ) {
   return signalStoreFeature(
     withState<WithPagedEntityState<Entity>>({
@@ -89,7 +89,7 @@ export function withPagedEntities<Entity extends { id: number }, C, U>(
         pipe(
           tap(() => startLoading('load')),
           tap(({ page, pageSize, queryParams }) =>
-            patchState(state, { page, pageSize, queryParams })
+            patchState(state, { page, pageSize, queryParams }),
           ),
           debounceTime(1000),
           switchMap(({ page, pageSize, queryParams }) =>
@@ -99,7 +99,7 @@ export function withPagedEntities<Entity extends { id: number }, C, U>(
                   patchState(
                     state,
                     setAllEntities(response.items as Entity[]),
-                    { page: response.page, total: response.totalItems }
+                    { page: response.page, total: response.totalItems },
                   );
                 },
                 error: (err: HttpErrorResponse) => {
@@ -111,10 +111,10 @@ export function withPagedEntities<Entity extends { id: number }, C, U>(
                   }
                 },
                 finalize: () => stopLoading('load'),
-              })
-            )
-          )
-        )
+              }),
+            ),
+          ),
+        ),
       ),
 
       save: rxMethod<C>(
@@ -136,10 +136,10 @@ export function withPagedEntities<Entity extends { id: number }, C, U>(
                   }
                 },
                 finalize: () => stopLoading('save'),
-              })
-            )
-          )
-        )
+              }),
+            ),
+          ),
+        ),
       ),
 
       update: rxMethod<{ body: Partial<U>; id: number }>(
@@ -152,14 +152,17 @@ export function withPagedEntities<Entity extends { id: number }, C, U>(
                   patchState(state, setEntity(response as Entity));
                   toaster.showSuccess('Updated successfully.');
                 },
-                error: () => toaster.showError(),
+                error: (err) => {
+                  console.error('Error updating: ', err);
+                  toaster.showError();
+                },
                 finalize: () => {
                   stopLoading('update');
                 },
-              })
-            )
-          )
-        )
+              }),
+            ),
+          ),
+        ),
       ),
 
       loadOne: rxMethod<number>(
@@ -177,10 +180,10 @@ export function withPagedEntities<Entity extends { id: number }, C, U>(
                 finalize: () => {
                   stopLoading('load');
                 },
-              })
-            )
-          )
-        )
+              }),
+            ),
+          ),
+        ),
       ),
       deleteOne: rxMethod<number>(
         pipe(
@@ -196,10 +199,10 @@ export function withPagedEntities<Entity extends { id: number }, C, U>(
                 finalize: () => {
                   stopLoading('delete');
                 },
-              })
-            )
-          )
-        )
+              }),
+            ),
+          ),
+        ),
       ),
       setPage: (page: number) => {
         patchState(state, { page, trigger: state.trigger() + 1 });
@@ -218,6 +221,6 @@ export function withPagedEntities<Entity extends { id: number }, C, U>(
           load(pageAndSizeSignal);
         },
       };
-    })
+    }),
   );
 }

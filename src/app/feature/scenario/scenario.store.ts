@@ -22,7 +22,7 @@ import {
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { filter, pipe, switchMap, tap } from 'rxjs';
-import { ScenarioModel } from '../../models/scenario.model';
+import { ScenarioModel } from '../../core/models/scenario.model';
 import { DeleteDialogComponent } from '../../pattern/dialogs/delete-dialog.component';
 import { ScenarioService } from '../../services/scenario.service';
 import { ToasterService } from '../../shared/services/toaster.service';

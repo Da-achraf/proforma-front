@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { getUserRoleToDisplay } from '../../models/user/user.model';
+import { getUserRoleToDisplay } from '../../core/models/user/user.model';
 
 @Pipe({
   name: 'userRoleForDisplay',

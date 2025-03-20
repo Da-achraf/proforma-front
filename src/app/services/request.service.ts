@@ -2,13 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { saveAs } from 'file-saver';
 import { Observable, map } from 'rxjs';
-import { API_URL_TOKEN } from '../config/api.config';
-import { PagedResult } from '../models/api-types.model';
+import { API_URL_TOKEN } from '../core/api/api.config';
+import { PagedResult } from '../core/models/api-types.model';
 import {
   RequestModel,
   UpdateFinanceRequestDTO,
   UpdateRequestByRequester,
-} from '../models/request.model';
+} from '../core/models/request.model';
 
 @Injectable({
   providedIn: 'root',

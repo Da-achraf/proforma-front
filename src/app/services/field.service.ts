@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { API_URL_TOKEN } from '../config/api.config';
+import { API_URL_TOKEN } from '../core/api/api.config';
 import { HttpClient } from '@angular/common/http';
-import { ItemField } from '../models/request-item.model';
+import { ItemField } from '../core/models/request-item.model';
 import { Observable } from 'rxjs';
 
 @Injectable({

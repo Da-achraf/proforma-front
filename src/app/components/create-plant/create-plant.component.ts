@@ -13,7 +13,7 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { Plant } from '../../models/user/plant.model';
+import { Plant } from '../../core/models/user/plant.model';
 import { PlantService } from '../../services/plant.service';
 import { AsyncPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';

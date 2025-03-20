@@ -50,9 +50,9 @@ import {
 import {
   ItemModel,
   userRoleToMandatoryForMapper,
-} from '../../models/request-item.model';
-import { CURRENCY_CODES, RequestModel } from '../../models/request.model';
-import { RequestStatus } from '../../models/requeststatus.model';
+} from '../../core/models/request-item.model';
+import { CURRENCY_CODES, RequestModel } from '../../core/models/request.model';
+import { RequestStatus } from '../../core/models/requeststatus.model';
 import { AuthService } from '../../services/auth.service';
 import { RequestService } from '../../services/request.service';
 import { ScenarioService } from '../../services/scenario.service';

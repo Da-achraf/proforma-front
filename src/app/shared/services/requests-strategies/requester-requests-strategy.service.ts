@@ -1,6 +1,6 @@
 import { inject, Injectable } from "@angular/core";
-import { RequestModel } from "../../../models/request.model";
-import { LoggedInUser, User } from "../../../models/user/user.model";
+import { RequestModel } from "../../../core/models/request.model";
+import { LoggedInUser, User } from "../../../core/models/user/user.model";
 import { RequestService } from "../../../services/request.service";
 import { Observable } from "rxjs";
 import { IRequestStrategy } from "./requests-strategies";

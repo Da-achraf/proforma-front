@@ -20,9 +20,9 @@ import {
   createdAtFormat,
   otherUsersRequestColumns,
   sharedRequestColumns,
-} from '../../../models/request.model';
-import { RequestStatus } from '../../../models/requeststatus.model';
-import { RoleEnum } from '../../../models/user/user.model';
+} from '../../../core/models/request.model';
+import { RequestStatus } from '../../../core/models/requeststatus.model';
+import { RoleEnum } from '../../../core/models/user/user.model';
 import { RequestStatusTabFilterComponent } from '../../../pattern/request-tab-filter/request-status-tab-filter.component';
 import { SearchBarComponent } from '../../../pattern/search/search-bar.component';
 import { AuthService } from '../../../services/auth.service';

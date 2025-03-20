@@ -80,13 +80,19 @@
                 />
               }
               @case ("date") {
-                {{ row[col.field] | date: "MMM d, y, h:mm a" }}
+                <span
+                  [innerHTML]="
+                    row[col.field] | date: 'MMM d, y, h:mm a' | defaultValue
+                  "
+                ></span>
               }
               @case ("text") {
-                {{ row[col.field] | titlecase }}
+                <span
+                  [innerHTML]="row[col.field] | truncateText: 70 | defaultValue"
+                ></span>
               }
               @case ("numeric") {
-                {{ row[col.field] }}
+                <span [innerHTML]="row[col.field] | defaultValue"></span>
               }
             }
           </td>

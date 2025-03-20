@@ -6,33 +6,36 @@ export interface ValidationResult {
   errors: string[];
 }
 
+// Delivery Address excel file validation
 @Injectable({
   providedIn: 'root',
 })
-export class FileValidationService {
+export class DAFileValidationService {
   // Allowed file extensions and max file size
   allowedExtensions = ['.xlsx', '.csv'];
   private maxFileSize = 50 * 1024 * 1024; // 50MB
 
   // Expected headers and (optionally) expected data types for each column
   private expectedHeaders = [
-    'Material*',
-    'Unit Value*',
-    'Unit*',
-    'Description*',
-    'HTS Code*',
-    'COO*',
+    'Customer Id',
+    'Company Name',
+    'Street',
+    'Zip Code',
+    'Country',
+    'Vat',
+    'Full Address',
+    'Is TE',
   ];
 
-  // You can define expected types for sample data rows (if needed)
-  // For instance: Material (string), Unit Value (number), etc.
-  private expectedTypes: Array<'string' | 'number'> = [
-    'string', // Material*
-    'number', // Unit Value*
-    'string', // Unit*
-    'string', // Description*
-    'string', // HTS Code*
-    'string', // COO*
+  private expectedTypes: Array<'string' | 'number' | 'boolean'> = [
+    'string', // Customer Id
+    'string', // Company Name
+    'string', // Street
+    'string', // Zip Code
+    'string', // Country
+    'string', // Vat
+    'string', // Full Address
+    'boolean', // Is TE
   ];
 
   validateFile(file: File): Promise<ValidationResult> {
