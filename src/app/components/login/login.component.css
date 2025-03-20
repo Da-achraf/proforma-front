@@ -31,10 +31,9 @@ body {
         padding: 20px;
     }
 
-    .wrapper form {
+    /* .wrapper form {
         width: 100%;
-        max-width: 400px;
-    }
+    } */
 }
 
 /* Style du conteneur principal */
@@ -44,103 +43,16 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    max-width: 450px;
+    max-width: 500px;
     background: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Form group styles */
-.wrapper form .form-group {
-    margin-bottom: 10px;
-    position: relative; /* Needed for positioning the icon */
-}
 
-/* Input field styles */
-.wrapper form input:not(.pass) {
-    width: 320px;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    position: relative;
-}
-
-/* Input field when focused */
-.wrapper form input:focus {
-    outline: none;
-    border-color: #d67800; /* Change border color on focus */
-}
-
-/* Style for icons inside input fields */
-.wrapper form .form-group i {
-    position: absolute;
-    top: 50%; /* Vertically center the icon */
-    right: 10px; /* Position the icon on the right */
-    transform: translateY(-50%); /* Adjust position to stay centered */
-    color: #aaa;
-    cursor: pointer;
-    pointer-events: none; /* Disable click events on the icon */
-}
-
-/* Style for error messages */
-.text-danger {
-    margin-top: 5px;
-    color: red;
-    font-size: 0.875rem;
-}
-
-/* Style du lien "Forgot password?" */
-.wrapper form .forgot-password {
-    margin-top: 30px; /* You can adjust this margin */
-    text-align: center; /* Center the link inside the container */
-}
-
-.wrapper form .forgot-password a {
-    color: #d67800;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-
-/* Style du bouton de connexion */
-.wrapper form button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #d67800;
-    color: #fff;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-/* Style du lien "Sign Up" */
-.wrapper form .signup-route {
-    text-align: center; /* Center the link within its container */
-    margin-top: 20px; /* Adjust margin as needed */
-}
-
-.wrapper form .signup-route a {
-    color: #d67800;
-    text-decoration: none;
-}
-
-
-/* Style du lien "Forgot password?" */
-.wrapper form .forgot-password {
-    margin-top: 30px;
-    text-align: center; /* Center the link */
-}
-
-/* Style for the logo */
-.logo-container {
-    width: 100%;
-    height: 200px; /* Adjust height for your logo */
-    background-image: url('../../../assets/pro.png'); /* Path to your logo */
-    background-size: contain; /* Ensure the logo scales within the container */
-    background-repeat: no-repeat; /* Avoid logo repetition */
-    background-position: center; /* Center the logo within the container */
-    margin-bottom: 20px; /* Space between the logo and the form */
+::ng-deep {
+    .mat-mdc-form-field-error-wrapper {
+        padding: 0;
+    }
 }

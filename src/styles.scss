@@ -13,13 +13,25 @@
   ));
 }
 
+
 html {
-  color-scheme: light dark;
   @include mat.theme((
-    color: mat.$azure-palette,
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$orange-palette,
+      theme-type: light,
+    ),
     density: 0
   ));
 }
+
+// html {
+//   color-scheme: light dark;
+//   @include mat.theme((
+//     color: mat.$azure-palette,
+//     density: 0
+//   ));
+// }
 
 html, body { height: 100%; }
 * {

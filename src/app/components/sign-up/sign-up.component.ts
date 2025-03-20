@@ -1,4 +1,4 @@
-import { NgClass } from '@angular/common';
+import { NgClass, NgForOf, NgIf } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   FormArray,
@@ -8,8 +8,15 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { Router, RouterLink } from '@angular/router';
+import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { PasswordModule } from 'primeng/password';
+import { SelectModule } from 'primeng/select';
 import { pureRoles } from '../../core/models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { DepartementService } from '../../services/departement.service';
@@ -26,9 +33,18 @@ import { UserRoleForDisplayPipe } from '../../shared/pipes/user-role-for-display
   imports: [
     ReactiveFormsModule,
     MultiSelectModule,
-    NgClass,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatButtonModule,
     UserRoleForDisplayPipe,
     RouterLink,
+    NgClass,
+    SelectModule,
+    NgIf,
+    NgForOf,
+    MatInputModule,
+    InputTextModule,
+    PasswordModule,
   ],
 })
 export class SignUpComponent implements OnInit {
@@ -39,6 +55,8 @@ export class SignUpComponent implements OnInit {
   plants: any[] = [];
   shipPoints: any[] = [];
   SignUpForm!: FormGroup;
+
+  hidePassword = true;
 
   passwordFieldType: string = 'password';
 
@@ -55,7 +73,6 @@ export class SignUpComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log('test: ', this.authService.baseServerUrl);
     this.loadPlants();
     this.loadShipPoints();
     this.loadDepartements();
@@ -69,7 +86,6 @@ export class SignUpComponent implements OnInit {
           label: plant.location,
           value: plant.id_plant,
         }));
-        console.log('Loaded plants:', this.plants); // Log loaded plants
       },
       (error) => {
         console.error('Erreur lors du chargement des plantes:', error);
@@ -85,7 +101,6 @@ export class SignUpComponent implements OnInit {
           label: shipPoint.shipPoint,
           value: shipPoint.id_ship,
         }));
-        console.log('Loaded ship points:', this.shipPoints); // Log loaded plants
       },
       (error) => {
         console.error('Erreur lors du chargement des plantes:', error);
@@ -97,8 +112,10 @@ export class SignUpComponent implements OnInit {
   loadDepartements() {
     this.departementservice.getDepartements().subscribe(
       (departements) => {
-        this.departements = departements;
-        console.log('Loaded departments:', this.departements); // Log loaded departments
+        this.departements = departements.map((d) => ({
+          label: d.name,
+          value: d.id_departement,
+        }));
       },
       (error) => {
         console.error('Erreur lors du chargement des départements:', error);
@@ -160,7 +177,7 @@ export class SignUpComponent implements OnInit {
     return this.SignUpForm.get('password') as FormControl;
   }
 
-  SignUpSubmited() {
+  onSubmit() {
     if (this.SignUpForm.valid) {
       const plantId =
         this.SignUpForm.get('plantId')!.value?.map(

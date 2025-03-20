@@ -1,35 +1,50 @@
-import { Component, inject, OnInit, Signal } from '@angular/core';
+import { NgClass, NgIf } from '@angular/common';
+import { Component, inject, signal, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { RoleEnum } from '../../core/models/user/user.model';
 import { AuthService } from '../../services/auth.service';
 import { UserStoreService } from '../../services/user-store.service';
 import { ToasterService } from '../../shared/services/toaster.service';
-import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  imports: [ReactiveFormsModule, NgClass, RouterLink]
+  imports: [
+    ReactiveFormsModule,
+    MatInputModule,
+    MatButtonModule,
+    NgIf,
+    NgClass,
+    RouterLink,
+  ],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   LoginForm: FormGroup;
   passwordFieldType: string = 'password';
+  hidePassword = signal(true);
 
   private readonly returnUrl: Signal<string> = toSignal(
     inject(ActivatedRoute).queryParams.pipe(
-      map((data) => data['returnUrl'] ?? '/home')
-    )
+      map((data) => data['returnUrl'] ?? '/home'),
+    ),
   );
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private userStore: UserStoreService,
-    private toastr: ToasterService
+    private toastr: ToasterService,
   ) {
     this.LoginForm = new FormGroup({
       identifier: new FormControl('', [Validators.required]),
@@ -40,10 +55,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-  }
-
-  loginSubmitted() {
+  onSubmit() {
     if (this.LoginForm.valid) {
       const { identifier, password } = this.LoginForm.value;
       this.authService.LoginUser(identifier, password).subscribe({
@@ -78,7 +90,7 @@ export class LoginComponent implements OnInit {
   get password(): FormControl {
     return this.LoginForm.get('password') as FormControl;
   }
-  
+
   togglePasswordVisibility() {
     this.passwordFieldType =
       this.passwordFieldType === 'password' ? 'text' : 'password';

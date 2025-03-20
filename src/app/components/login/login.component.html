@@ -1,42 +1,5 @@
-<!-- <div class="responsive-background" fxLayout="column" fxLayoutAlign="center center">
-<div class="wrapper">
-  <form [formGroup]="LoginForm" (ngSubmit)="loginSubmitted()">
-    <h1>Login</h1>
-    <div class="form-group">
-      <label for="identifier">Email or TE ID:</label>
-      <input type="text" id="identifier" class="form-control" formControlName="identifier"
-        placeholder="Email or TE ID" required>
-        <i class='bx bxs-envelope'></i>
-        <div *ngIf="identifier.errors?.['required'] && identifier.touched" class="text-danger">Email or TE ID is
-        required</div>
-      </div>
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input [type]="passwordFieldType" id="password" class="form-control" formControlName="password"
-          placeholder="Enter your password" required>
-          <i class="pi"
-            [ngClass]="{'pi-eye': passwordFieldType === 'password', 'pi-eye-slash': passwordFieldType === 'text'}"
-          (click)="togglePasswordVisibility()"></i>
-          <div *ngIf="password.errors?.['required'] && password.touched" class="text-danger">Password is required
-          </div>
-          <div *ngIf="password.errors?.['minlength'] && password.touched" class="text-danger">Password should be
-          at least 6 characters long</div>
-        </div>
-        <button type="submit" class="btn btn-primary" [disabled]="LoginForm.invalid">Login</button>
-        <div class="signup-route">
-          <span>Don't have an account? <a routerLink="/sign-up"><u>SignUp</u></a></span>
-        </div>
-        <div class="form-group forgot-password">
-          <a href="#">Forgot password?</a>
-        </div>
-      </form>
-    </div>
-  </div> -->
-
-<div
+<!-- <div
   class="responsive-background"
-  fxLayout="column"
-  fxLayoutAlign="center center"
 >
   <div class="wrapper">
     <img src="assets/pro.png" width="200" height="200" alt="" />
@@ -68,6 +31,7 @@
           }
         </div>
 
+
         <div class="relative">
           <div
             class="flex items-center rounded-md border border-gray-300 bg-white p-3 focus-within:border-orange-400"
@@ -75,7 +39,7 @@
             <input
               [type]="passwordFieldType"
               id="password"
-              class="pass flex-1 border-none pr-2 outline-none"
+              class="pass flex-1 border-none pr-2 fill-none"
               formControlName="password"
               placeholder="Enter your password"
               aria-label="Password"
@@ -126,6 +90,93 @@
           >Don't have an account?
           <a [routerLink]="['/sign-up']"><u>Sign Up</u></a></span
         >
+      </div>
+    </form>
+  </div>
+</div> -->
+
+<div class="responsive-background">
+  <div class="wrapper">
+    <img src="assets/pro.png" width="200" height="200" alt="Logo" />
+
+    <form
+      class="flex w-full flex-col gap-y-4"
+      [formGroup]="LoginForm"
+      (ngSubmit)="onSubmit()"
+    >
+      <!-- Email or TE ID Field -->
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Email or TE ID</mat-label>
+        <input
+          matInput
+          type="text"
+          id="identifier"
+          formControlName="identifier"
+          placeholder="Email or TE ID"
+          required
+          aria-label="Email or TE ID"
+        />
+        <mat-error
+          *ngIf="identifier.hasError('required') && identifier.touched"
+        >
+          Email or TE ID is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Password Field -->
+      <mat-form-field appearance="fill">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          [type]="hidePassword() ? 'password' : 'text'"
+          formControlName="password"
+          required
+        />
+        <button
+          type="button"
+          mat-icon-button
+          matSuffix
+          (click)="hidePassword.set(!hidePassword())"
+        >
+          <i
+            class="fa"
+            [ngClass]="hidePassword() ? 'fa-eye-slash' : 'fa-eye'"
+          ></i>
+        </button>
+        <mat-error *ngIf="password.hasError('required') && password.touched">
+          Password is required
+        </mat-error>
+        <mat-error *ngIf="password.hasError('minlength') && password.touched">
+          Password should be at least 6 characters
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Login Button -->
+      <button
+        type="submit"
+        [disabled]="!LoginForm.valid"
+        class="rounded-md bg-orange-400 p-3 text-gray-50 hover:bg-transparent hover:text-gray-500"
+        [ngClass]="{
+          'pointer-events-none opacity-50': !LoginForm.valid,
+        }"
+      >
+        Login
+      </button>
+
+      <!-- Sign Up Link -->
+      <div class="mt-4 flex flex-col gap-y-3 text-center">
+        <span>
+          Don't have an account?
+          <a
+            [routerLink]="['/sign-up']"
+            class="text-orange-500 hover:underline"
+          >
+            <u>Sign Up</u>
+          </a>
+        </span>
+        <a [routerLink]="['/forgot-password']" class="text-orange-500 hover:underline">
+          <u>Forgot password ?</u>
+        </a>
       </div>
     </form>
   </div>
