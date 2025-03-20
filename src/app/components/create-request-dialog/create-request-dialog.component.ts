@@ -47,6 +47,7 @@ import {
   Subject,
   switchMap,
   takeUntil,
+  tap,
 } from 'rxjs';
 import { DeliveryAddressService } from '../../core/delivery-address/delivery-address.service';
 import { HistoricalData } from '../../core/models/historical-data.model';
@@ -76,6 +77,7 @@ import {
   enhanceItemsWithCacheData,
   enhancementConfig,
 } from '../../shared/utils/historical-data.util';
+import { DeliveryAddressCreate } from '../../core/models/delivery-address.model';
 
 @Component({
   selector: 'app-create-request-dialog',
@@ -536,11 +538,15 @@ export class CreateRequestDialogComponent implements OnInit, OnDestroy {
     this.dialog
       .open(DeliveryAddressCrudComponent)
       .afterClosed()
-      .subscribe((result) => {
+      .pipe(
+        map((result) => result?.data),
+        switchMap((body) => this.deliveryAddressService.save(body)),
+      )
+      .subscribe((address) => {
         const addressControl = this.requestForm.get('deliveryAddress');
-        if (result) {
+        if (address) {
           this.deliveryAddressService.triggerLoadAllAddresses();
-          addressControl?.patchValue(result);
+          addressControl?.patchValue(address.id);
         } else {
           addressControl?.patchValue(null);
         }

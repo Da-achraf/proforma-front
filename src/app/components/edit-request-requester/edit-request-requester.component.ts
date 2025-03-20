@@ -48,7 +48,7 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs';
-import { DeliveryAddressStore } from '../../feature/delivery-address/delivery-address.store';
+import { DeliveryAddressService } from '../../core/delivery-address/delivery-address.service';
 import { HistoricalData } from '../../core/models/historical-data.model';
 import {
   ItemModel,
@@ -79,7 +79,6 @@ import {
   enhancementConfig,
 } from '../../shared/utils/historical-data.util';
 import { CreateRequestDialogComponent } from '../create-request-dialog/create-request-dialog.component';
-import { DeliveryAddressService } from '../../core/delivery-address/delivery-address.service';
 
 @Component({
   selector: 'app-edit-request-requester',
@@ -561,11 +560,15 @@ export class EditRequestRequesterComponent implements OnInit, OnDestroy {
         },
       })
       .afterClosed()
-      .subscribe((result) => {
+      .pipe(
+        map((result) => result?.data),
+        switchMap((body) => this.deliveryAddressService.save(body)),
+      )
+      .subscribe((address) => {
         const addressControl = this.requestForm.get('deliveryAddress');
-        if (result) {
+        if (address) {
           this.deliveryAddressService.triggerLoadAllAddresses();
-          addressControl?.patchValue(result);
+          addressControl?.patchValue(address.id);
         } else {
           addressControl?.patchValue(null);
         }

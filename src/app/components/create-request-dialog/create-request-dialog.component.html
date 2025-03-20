@@ -65,7 +65,7 @@
             (selectionChange)="onDeliveryAddressChange($event.value)"
             >
             <mat-option value="other">Other</mat-option>
-            @for (address of deliveryAddresses(); track address) {
+            @for (address of deliveryAddresses(); track address.id) {
               <mat-option
                 [value]="address.id"
                 >{{ address.customerId }}</mat-option
